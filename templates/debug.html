@@ -1,0 +1,11 @@
+{% include "inc/head.html" %}
+<div id="debug">
+<pre>
+DEBUG
+=====
+
+{% for debug_line in debug.data %}{{debug_line}}
+{% endfor %}
+</pre>
+</div>
+{% include "inc/tail.html" %}
