@@ -13,6 +13,7 @@ from jmail.user.models import JMailUser
 class JMailBase:
     log = None
     _req = None
+    _tmpl_name = None
     _tmpl_path = None
     _tmpl_data = None
     doc_navbar = False
@@ -26,13 +27,13 @@ class JMailBase:
 
 
 class JMail(JMailBase):
-    def __init__(self, req, user_auth=True):
+    def __init__(self, req, user_auth=True, tmpl_name=None):
         JMailBase.log = JMailLog()
         self.log.dbg('start')
         JMailBase._req = req
         if user_auth:
             self._user_auth()
-        JMailBase._tmpl_path = self._tmpl_path_get()
+        JMailBase._tmpl_name = tmpl_name
         JMailBase._tmpl_data = self._tmpl_data_init()
 
     def end(self):
@@ -42,6 +43,8 @@ class JMail(JMailBase):
 
     def _tmpl_path_get(self):
         p = self._req.path
+        if self._tmpl_name is not None:
+            p = self._tmpl_name
         if p.startswith('/'):
             p = p[1:]
         if p.endswith('/'):
@@ -51,6 +54,7 @@ class JMail(JMailBase):
         return '{}.html'.format(p)
 
     def _tmpl_data_init(self):
+        JMailBase._tmpl_path = self._tmpl_path_get()
         td = {
             'doc': {
                 'error': False,
@@ -72,7 +76,7 @@ class JMail(JMailBase):
                 except JMailUser.DoesNotExist:
                     django_logout(self._req)
                     raise JMailError(self._req, 401, 'Bad user')
-                self.log.dbg(str(self.user))
+                self.log.dbg('user: ', str(self.user))
                 self.doc_navbar = True
             else:
                 django_logout(self._req)

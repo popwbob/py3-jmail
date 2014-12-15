@@ -8,4 +8,4 @@ class JMailUser(models.Model):
     django_user = models.OneToOneField(User, primary_key=True)
 
     def __str__(self):
-        return 'JMailUser({})'.format(self.django_user)
+        return str(self.django_user)

@@ -53,8 +53,19 @@ def debug(req):
 
 
 def home(req):
+    from jmail.macct.models import JMailMAcct
     try:
         jm = JMail(req)
     except JMailError as e:
         return e.response()
+    try:
+        accounts = JMailMAcct.objects.filter(user=jm.user).values()
+    except JMailMAcct.DoesNotExist:
+        accounts = []
+    jm.log.dbg('accounts: ', accounts)
+    jm.tmpl_data({
+        'mail': {
+            'accounts': accounts,
+        },
+    })
     return jm.render()

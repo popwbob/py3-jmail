@@ -1,2 +1,10 @@
 {% include "inc/head.html" %}
+<div id="home">
+<p>mail accounts</p>
+<ul>
+{% for macct in mail.accounts %}
+    <li><a href="{% url 'macct:check' macct.id %}">{{macct.address}}</a></li>
+{% endfor %}
+</ul>
+</div>
 {% include "inc/tail.html" %}

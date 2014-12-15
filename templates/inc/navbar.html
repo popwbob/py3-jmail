@@ -1,7 +1,8 @@
 {% if doc.navbar %}
 <div id="navbar">
+    <p>{{user.name}}</p>
     <ul>
-        <li>{{user.name}}</li>
+        <li><a href="{% url 'home' %}">home</a></li>
         <li><a href="{% url 'user:logout' %}">logout</a></li>
     </ul>
 </div>
