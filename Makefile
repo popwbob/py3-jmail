@@ -15,4 +15,7 @@ lib-pyo:
 django-runserver:
 	@python3 manage.py runserver 127.10.10.10:8000
 
-.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver
+smtpd-debug-server:
+	@python3 -m smtpd -n -c DebuggingServer localhost:1025
+
+.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server
