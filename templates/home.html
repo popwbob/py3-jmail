@@ -4,7 +4,7 @@
 <ul>
     <li><a href="{% url 'macct:create' %}">create new</a></li>
 {% for macct in mail.accounts %}
-    <li><a href="{% url 'macct:check' macct.id %}">{{macct.address}}</a> - <a href="{% url 'macct:remove' macct.id %}">remove</a></li>
+    <li><a href="{% url 'macct:check' macct.id %}">{{macct.address}}</a> - <a href="{% url 'macct:edit' macct.id %}">edit</a> - <a href="{% url 'macct:remove' macct.id %}">remove</a></li>
 {% endfor %}
 </ul>
 </div>

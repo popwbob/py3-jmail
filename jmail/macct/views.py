@@ -74,5 +74,31 @@ def create(req):
                 'formset': JMailMAcctForm().as_p(),
             },
         })
-        jm.log.dbg('formset: ', sorted(dir(JMailMAcctForm())))
+        return jm.render()
+
+
+def edit(req, macct_id):
+    try:
+        jm = JMail(req, tmpl_name='macct/edit')
+    except JMailError as e:
+        return e.response()
+
+    macct = _get_macct(macct_id)
+    jm.log.dbg('macct: ', macct)
+    if macct is None:
+        return jm.error(400, 'Bad mail account')
+    dbobj = JMailMAcct.objects.get(pk=macct_id)
+
+    if req.method == 'POST':
+        try:
+            form = JMailMAcctForm(req.POST, instance=dbobj)
+            form.save()
+            return jm.redirect('home')
+        except Exception as e:
+            return jm.error(500, str(e))
+    else:
+        jm.tmpl_data({
+            'macct': macct,
+            'macct_formset': JMailMAcctForm(instance=dbobj).as_p(),
+        })
         return jm.render()

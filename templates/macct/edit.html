@@ -1,0 +1,10 @@
+{% include "inc/head.html" %}
+<div id="macct-edit">
+    <h3>Edit {{macct.address}}</h3>
+    <form action="{% url 'macct:edit' macct.id %}" method="POST">
+        {% csrf_token %}
+        {{macct_formset}}
+        <input type="submit" value="save">
+    </form>
+</div>
+{% include "inc/tail.html" %}
