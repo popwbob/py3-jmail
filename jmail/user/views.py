@@ -34,14 +34,14 @@ def auth(req):
         return jm.error(400, 'No user pass')
 
     user = authenticate(username=user_email, password=user_pass)
-    if user is not None:
+    if user is None:
+        return jm.error(401, 'Invalid login')
+    else:
         if user.is_active:
             django_login(req, user)
             return jm.redirect('home')
         else:
-            jm.error(401, 'Disabled user')
-    else:
-        return jm.error(401, 'Invalid login')
+            return jm.error(401, 'Disabled user')
 
     return jm.render()
 

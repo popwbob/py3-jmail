@@ -36,6 +36,8 @@ class JMail(JMailBase):
         JMailBase._tmpl_data = self._tmpl_data_init()
 
     def end(self):
+        if self.user is not None:
+            self.user.save()
         self.log.dbg('end')
 
     def _tmpl_path_get(self):
@@ -65,11 +67,13 @@ class JMail(JMailBase):
     def _user_auth(self):
         if self._req.user.is_authenticated():
             if self._req.user.groups.filter(name='wmail').exists():
-                self.doc_navbar = True
-                self.user = JMailUser(self._req.user)
-                if self.user.DoesNotExist is True:
+                try:
+                    self.user, created = JMailUser.objects.get_or_create(django_user=self._req.user)
+                except JMailUser.DoesNotExist:
                     django_logout(self._req)
                     raise JMailError(self._req, 401, 'Bad user')
+                self.log.dbg(str(self.user))
+                self.doc_navbar = True
             else:
                 django_logout(self._req)
                 raise JMailError(self._req, 401, 'Bad user group')

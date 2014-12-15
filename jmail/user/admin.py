@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from jmail.user.models import JMailUser
+
+admin.site.register(JMailUser)

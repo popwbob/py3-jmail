@@ -5,4 +5,7 @@ from django.contrib.auth.models import User
 
 
 class JMailUser(models.Model):
-    django_user = models.OneToOneField(User)
+    django_user = models.OneToOneField(User, primary_key=True)
+
+    def __str__(self):
+        return 'JMailUser({})'.format(self.django_user)
