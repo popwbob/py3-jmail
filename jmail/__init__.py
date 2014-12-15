@@ -33,8 +33,7 @@ class JMail(JMailBase):
         JMailBase._req = req
         if user_auth:
             self._user_auth()
-        JMailBase._tmpl_name = tmpl_name
-        JMailBase._tmpl_data = self._tmpl_data_init()
+        JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
 
     def end(self):
         if self.user is not None:
@@ -53,7 +52,8 @@ class JMail(JMailBase):
             p = 'home'
         return '{}.html'.format(p)
 
-    def _tmpl_data_init(self):
+    def _tmpl_data_init(self, tmpl_name):
+        JMailBase._tmpl_name = tmpl_name
         JMailBase._tmpl_path = self._tmpl_path_get()
         td = {
             'doc': {
@@ -84,7 +84,10 @@ class JMail(JMailBase):
         else:
             raise JMailErrorUserUnauth(self._req, 401, 'Unauthenticated user')
 
-    def render(self):
+    def render(self, tmpl_name=None):
+        if tmpl_name is not None:
+            self._tmpl_name = tmpl_name
+            self._tmpl_path = self._tmpl_path_get()
         self._tmpl_data['doc']['navbar'] = self.doc_navbar
         self.end()
         return render(self._req, self._tmpl_path, self._tmpl_data)

@@ -1,0 +1,10 @@
+{% include "inc/head.html" %}
+<div id="macct-create">
+    <h3>create mail account</h3>
+    <form action="{% url 'macct:create' %}" method="POST">
+        {% csrf_token %}
+        {{macct.formset}}
+        <input type="submit" value="create">
+    </form>
+</div>
+{% include "inc/tail.html" %}

@@ -1,5 +1,6 @@
 {% include "inc/head.html" %}
 <div id="login">
+    <h3>login</h3>
     <form action="{% url 'user:auth' %}" method="POST">
         {% csrf_token %}
         <input type="text" name="jmail_user" value="">

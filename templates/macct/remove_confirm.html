@@ -1,0 +1,9 @@
+{% include "inc/head.html" %}
+<div id="macct-remove">
+    <p>Are you sure you want to remove <b>{{macct.address}}</b> account?</p>
+    <form action="{% url 'macct:remove' macct.id %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="confirm">
+    </form>
+</div>
+{% include "inc/tail.html" %}

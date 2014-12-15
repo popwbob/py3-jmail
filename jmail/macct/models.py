@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ModelForm
 
 from jmail.user.models import JMailUser
 
@@ -9,3 +10,9 @@ class JMailMAcct(models.Model):
 
     def __str__(self):
         return '{}: {}'.format(str(self.user), str(self.address))
+
+
+class JMailMAcctForm(ModelForm):
+    class Meta:
+        model = JMailMAcct
+        fields = ['address']

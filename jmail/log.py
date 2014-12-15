@@ -12,3 +12,6 @@ class JMailLog:
 
     def dbg(self, *line_items):
         self._log('DGB', *line_items)
+
+    def err(self, *line_items):
+        self._log('ERR', *line_items)
