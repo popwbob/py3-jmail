@@ -1,21 +1,11 @@
-import sys
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.core.context_processors import csrf
+from django.contrib.auth import logout as django_logout
 
-
-class JMailLog:
-    _tag = 'JMail'
-    _outfile = sys.stderr
-
-    def _log(self, tag, *line_items, sep=' '):
-        print(self._tag, '[{}]: '.format(tag), sep='', end='', file=self._outfile)
-        for li in line_items:
-            print(str(li), sep=sep, end='', file=self._outfile)
-        print(file=self._outfile)
-
-    def dbg(self, *line_items, sep=' '):
-        self._log('DGB', *line_items)
+from jmail.log import JMailLog
+from jmail.error import JMailError, JMailErrorUserUnauth
 
 
 class JMailBase:
@@ -23,6 +13,7 @@ class JMailBase:
     _req = None
     _tmpl_path = None
     _tmpl_data = None
+    doc_navbar = False
 
     def __str__(self):
         r = '{\n'
@@ -32,10 +23,12 @@ class JMailBase:
 
 
 class JMail(JMailBase):
-    def __init__(self, req):
+    def __init__(self, req, user_auth=True):
         JMailBase.log = JMailLog()
         self.log.dbg('start')
         JMailBase._req = req
+        if user_auth:
+            self._user_auth()
         JMailBase._tmpl_path = self._tmpl_path_get()
         JMailBase._tmpl_data = self._tmpl_data_init()
 
@@ -53,13 +46,31 @@ class JMail(JMailBase):
         return '{}.html'.format(p)
 
     def _tmpl_data_init(self):
-        doc = dict(title='JMail - {}'.format(self._req.path))
-        td = dict(
-            doc=doc,
-        )
+        td = {
+            'doc': {
+                'error': False,
+                'title': 'JMail - {}'.format(self._req.path),
+                'navbar': self.doc_navbar,
+            },
+            'user': {
+                'name': self._req.user,
+            },
+        }
+        td.update(csrf(self._req))
         return td
 
+    def _user_auth(self):
+        if self._req.user.is_authenticated():
+            if self._req.user.groups.filter(name='wmail').exists():
+                self.doc_navbar = True
+            else:
+                django_logout(self._req)
+                raise JMailError(self._req, 401, 'Bad user group')
+        else:
+            raise JMailErrorUserUnauth(self._req, 401, 'Unauthenticated user')
+
     def render(self):
+        self._tmpl_data['doc']['navbar'] = self.doc_navbar
         self.end()
         return render(self._req, self._tmpl_path, self._tmpl_data)
 
@@ -70,6 +81,15 @@ class JMail(JMailBase):
         dd = list()
         dd.append('JMail: {}'.format(str(self)))
         dd.append('')
-        dd.append('tmpl_data: {}'.format(json.dumps(self._tmpl_data, indent=4)))
-        dd.append('')
+        #~ dd.append('tmpl_data: {}'.format(json.dumps(self._tmpl_data, indent=4)))
+        #~ dd.append('')
         return dd
+
+    def error(self, status, message):
+        e = JMailError(self._req, status, message)
+        self.end()
+        return e.response()
+
+    def redirect(self, location):
+        self.end()
+        return redirect(location)

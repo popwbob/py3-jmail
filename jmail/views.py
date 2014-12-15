@@ -1,10 +1,11 @@
 from jmail import JMail
 from jmail import settings as jmail_settings
+from jmail.error import JMailError
 
 from django.conf import settings
 
 def debug(req):
-    jm = JMail(req)
+    jm = JMail(req, user_auth=False)
     ddata = jm.debug_data()
 
     ddata.append('req.path: {}'.format(req.path))
@@ -16,6 +17,8 @@ def debug(req):
     ddata.append('req.user: {}'.format(type(req.user)))
     ddata.append('req.user: {}'.format(sorted(dir(req.user))))
     ddata.append('req.user: {}'.format(req.user))
+    ddata.append('req.user.is_authenticated: {}'.format(req.user.is_authenticated()))
+    ddata.append('req.user.groups: {}'.format(type(req.user.groups)))
     ddata.append('')
 
     ddata.append('req.session: {}'.format(req.session))
@@ -50,5 +53,8 @@ def debug(req):
 
 
 def home(req):
-    jm = JMail(req)
+    try:
+        jm = JMail(req)
+    except JMailError as e:
+        return e.response()
     return jm.render()

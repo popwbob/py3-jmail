@@ -1,0 +1,8 @@
+{% if doc.navbar %}
+<div id="navbar">
+    <ul>
+        <li>{{user.name}}</li>
+        <li><a href="{% url 'user:logout' %}">logout</a></li>
+    </ul>
+</div>
+{% endif %}

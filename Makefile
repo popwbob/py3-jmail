@@ -12,4 +12,7 @@ lib-pyc:
 lib-pyo:
 	@python3 -O -m compileall jmail/ | grep -Ev '^Listing '
 
-.PHONY: default clean compile-all lib-pyc lib-pyo
+django-runserver:
+	@python3 manage.py runserver 127.10.10.10:8000
+
+.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver

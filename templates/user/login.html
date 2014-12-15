@@ -1,0 +1,10 @@
+{% include "inc/head.html" %}
+<div id="login">
+    <form action="{% url 'user:auth' %}" method="POST">
+        {% csrf_token %}
+        <input type="text" name="jmail_user" value="">
+        <input type="password" name="jmail_user_pass" value="">
+        <input type="submit" name="jmail_cmd" value="login">
+    </form>
+</div>
+{% include "inc/tail.html" %}
