@@ -1,6 +1,6 @@
 {% include "inc/head.html" %}
 <div id="error">
-    <h2>JMail Error</h2>
+    <h2><a href="{% url 'home' %}">JMail</a> Error</h2>
     <h3>{{error.status}}</h3>
     <p>{{error.message}}</p>
 </div>

@@ -7,6 +7,8 @@ from django.contrib.auth import logout as django_logout
 from jmail.log import JMailLog
 from jmail.error import JMailError, JMailErrorUserUnauth
 
+from jmail.user.models import JMailUser
+
 
 class JMailBase:
     log = None
@@ -14,6 +16,7 @@ class JMailBase:
     _tmpl_path = None
     _tmpl_data = None
     doc_navbar = False
+    user = None
 
     def __str__(self):
         r = '{\n'
@@ -63,6 +66,10 @@ class JMail(JMailBase):
         if self._req.user.is_authenticated():
             if self._req.user.groups.filter(name='wmail').exists():
                 self.doc_navbar = True
+                self.user = JMailUser(self._req.user)
+                if self.user.DoesNotExist is True:
+                    django_logout(self._req)
+                    raise JMailError(self._req, 401, 'Bad user')
             else:
                 django_logout(self._req)
                 raise JMailError(self._req, 401, 'Bad user group')
