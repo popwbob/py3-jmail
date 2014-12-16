@@ -1,4 +1,4 @@
-import re
+import email
 
 from jmail import JMail
 from jmail.error import JMailError
@@ -31,35 +31,43 @@ def check(req, macct_id, mbox_name):
     imap = imap_connect(macct)
     try:
         imap.select(mbox_name)
-        typ, msgs_ids = imap.search('UTF8', 'ALL')
+        #~ typ, msgs_ids = imap.search('UTF8', 'ALL')
+        typ, msgs_ids = imap.uid('SEARCH', 'ALL')
         jm.log.dbg('typ: ', typ)
         jm.log.dbg('msgs_ids: ', msgs_ids)
     except Exception as e:
         return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))
 
-    showh_re = re.compile(r'^Delivered-To:|^Date:|^From:|^To:|^Subject:|^Message-ID:')
-    #~ showh_re = re.compile(r'.*')
+    showh_list = [
+        #~ '_ALL_',
+        #~ 'delivered-to',
+        #~ 'message-id',
+        #~ 'to',
+        'date',
+        'from',
+        'subject',
+    ]
 
     msgs = list()
     for mid in msgs_ids[0].split():
+        msg_info = dict()
         if mid != b'':
-            typ, data = imap.fetch(mid, '(UID FLAGS BODY[HEADER])')
-            jm.log.dbg('msg typ: ', typ)
-            jm.log.dbg('msg data: ', data)
-            headers = data[0][1].splitlines()
-            jm.log.dbg('msg headers: ', headers)
-            showh = list()
+            #~ typ, data = imap.fetch(mid, '(BODY[HEADER])')
+            typ, data = imap.uid('FETCH', mid, '(BODY[HEADER])')
+            headers = email.message_from_bytes(data[0][1])
+            msg_info['id'] = mid
+            showh = dict()
             for hdr in headers:
-                if showh_re.match(hdr.decode()):
-                    showh.append(hdr)
-            if len(showh) > 0:
-                msgs.append(showh)
+                if '_ALL_' in showh_list or hdr.lower() in showh_list:
+                    showh[hdr] = headers.get(hdr)
+            msg_info['headers'] = showh
+            msgs.append(msg_info)
 
     imap.close()
     imap_end(imap)
 
-    if len(msgs) == 0:
-        msgs.append(['NO MESSAGES'])
+    jm.log.dbg('msgs: ', msgs)
+    jm.log.dbg('msgs number: ', len(msgs))
     jm.tmpl_data({
         'macct': macct,
         'mbox_name': mbox_name,

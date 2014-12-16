@@ -4,7 +4,7 @@
     <form action="{% url 'macct:create' %}" method="POST">
         {% csrf_token %}
         {{macct.formset}}
-        <input type="submit" value="create">
+        <input type="submit" value="create"><span> - <a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
 {% include "inc/tail.html" %}

@@ -1,10 +1,16 @@
 {% include "inc/head.html" %}
 <div id="macct-check">
     <p><h3>{{macct.address}} - {{mbox_name}}</h3></p>
-    <ul><li><a href="{% url 'macct:subs' macct.id %}">subs</a></li></ul>
-    {% for headers in msgs %}
-    <pre>{% for hline in headers %}{{hline}}
+    <p><a href="{% url 'macct:subs' macct.id %}">subs</a></p>
+    {% if msgs|length_is:"0" %}
+    <pre>NO MESSAGES</pre>
+    {% else %}
+    {% for minfo in msgs %}
+    <pre>{% for hn, hv in minfo.headers.items %}{{hn}}: {{hv}}
 {% endfor %}</pre>
+    <p>{{minfo.id}}</p>
+    <hr>
     {% endfor %}
+    {% endif %}
 </div>
 {% include "inc/tail.html" %}
