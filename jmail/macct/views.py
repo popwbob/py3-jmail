@@ -58,6 +58,8 @@ def check(req, macct_id, mbox_name):
     imap.close()
     imap_end(imap)
 
+    if len(msgs) == 0:
+        msgs.append(['NO MESSAGES'])
     jm.tmpl_data({
         'macct': macct,
         'mbox_name': mbox_name,

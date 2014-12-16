@@ -1,9 +1,8 @@
 {% if doc.navbar %}
 <div id="navbar">
     <h3>{{user.name}}</h3>
-    <ul>
-        <li><a href="{% url 'home' %}">home</a></li>
-        <li><a href="{% url 'user:logout' %}">logout</a></li>
-    </ul>
+    <p>
+        <a href="{% url 'user:logout' %}">logout</a> - <a href="{% url 'home' %}">home</a>
+    </p>
 </div>
 {% endif %}
