@@ -1,0 +1,10 @@
+{% include "inc/head.html" %}
+<div id="macct-subs">
+    <h3>{{macct.address}}</h3>
+    <ul>
+    {% for child in subs_list %}
+        <li><a href="{% url 'macct:check' macct.id child %}">{{child}}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+{% include "inc/tail.html" %}

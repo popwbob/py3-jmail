@@ -1,5 +1,10 @@
 {% include "inc/head.html" %}
 <div id="macct-check">
-<h3>{{macct.address}}</h3>
+    <p><h3>{{macct.address}} - {{mbox_name}}</h3></p>
+    <ul><li><a href="{% url 'macct:subs' macct.id %}">subs</a></li></ul>
+    {% for headers in msgs %}
+    <pre>{% for hline in headers %}{{hline}}
+{% endfor %}</pre>
+    {% endfor %}
 </div>
 {% include "inc/tail.html" %}
