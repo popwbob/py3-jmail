@@ -4,7 +4,7 @@
     <p>Are you sure you want to remove <b>{{macct.address}}</b> account?</p>
     <form action="{% url 'macct:remove' macct.id %}" method="POST">
         {% csrf_token %}
-        <input type="submit" value="confirm">
+        <input type="submit" value="confirm"><span> - <a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
 {% include "inc/tail.html" %}
