@@ -12,7 +12,7 @@ from jmail.error import JMailError, JMailErrorUserUnauth
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
-IMAP_DEBUG = 4
+IMAP_DEBUG = 0
 
 
 class JMailBase:
@@ -144,7 +144,7 @@ class JMail(JMailBase):
             raise JMailError(404, 'Mail account not found')
         if macct is None:
             raise JMailError(400, 'Bad mail account')
-        self.log.dbg('macct: ', macct)
+        #~ self.log.dbg('macct: ', macct)
         return macct
 
 

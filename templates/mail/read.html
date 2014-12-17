@@ -1,6 +1,8 @@
 {% include "inc/head.html" %}
 <div id="mail-read">
-    <pre>{{message}}</pre>
+    <pre>{% for hk, hv in msg.headers %}{{hk}}: {{hv}}
+{% endfor %}
+{{msg.body}}</pre>
 </div>
 {% if mdata_debug %}
 <div id="mail-read-debug">

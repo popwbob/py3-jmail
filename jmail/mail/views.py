@@ -54,6 +54,6 @@ def read(req, macct_id, mbox_name, mail_uid):
 
     jm.tmpl_data({
         'macct': macct,
-        'message': msg,
+        'msg': msg,
     })
     return jm.render()
