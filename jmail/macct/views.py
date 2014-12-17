@@ -151,8 +151,7 @@ def check(req, macct_id, mbox_name):
     for mid in msgs_ids[0].split():
         msg_info = dict()
         if mid != b'':
-            #~ typ, data = imap.fetch(mid, '(BODY[HEADER])')
-            typ, data = imap.uid('FETCH', mid, '(BODY[HEADER])')
+            typ, data = imap.uid('FETCH', mid, '(BODY.PEEK[HEADER])')
             headers = email.message_from_bytes(data[0][1])
             msg_info['id'] = mid
             showh = dict()

@@ -1,0 +1,12 @@
+{% include "inc/head.html" %}
+<div id="mail-read">
+    <pre>{{message}}</pre>
+</div>
+{% if mdata_debug %}
+<div id="mail-read-debug">
+    <h5>DEBUG</h5>
+    <pre>{% for dline in mdata_debug %}{{dline}}
+{% endfor %}</pre>
+</div>
+{% endif %}
+{% include "inc/tail.html" %}

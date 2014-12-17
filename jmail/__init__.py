@@ -4,6 +4,7 @@ import imaplib
 from django.shortcuts import render, redirect
 from django.core.context_processors import csrf
 from django.contrib.auth import logout as django_logout
+from django.conf import settings
 
 from jmail.log import JMailLog
 from jmail.error import JMailError, JMailErrorUserUnauth
@@ -20,8 +21,10 @@ class JMailBase:
     _tmpl_name = None
     _tmpl_path = None
     _tmpl_data = None
+    imap = None
     doc_navbar = False
     user = None
+    debug = None
 
     def __str__(self):
         r = '{\n'
@@ -34,10 +37,15 @@ class JMail(JMailBase):
     def __init__(self, req, user_auth=True, tmpl_name=None):
         JMailBase.log = JMailLog()
         self.log.dbg('start')
+        self._load_settings()
         JMailBase._req = req
         if user_auth:
             self._user_auth()
         JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
+
+
+    def _load_settings(self):
+        self.debug = settings.DEBUG
 
 
     def end(self):
@@ -144,12 +152,13 @@ class JMail(JMailBase):
         use_ssl = macct.get('imap_server_ssl')
         try:
             if use_ssl:
-                imap = imaplib.IMAP4_SSL(macct.get('imap_server'), macct.get('imap_server_port'))
+                JMailBase.imap = imaplib.IMAP4_SSL(macct.get('imap_server'), macct.get('imap_server_port'))
             else:
-                imap = imaplib.IMAP(macct.get('imap_server'), macct.get('imap_server_port'))
-            imap.debug = IMAP_DEBUG
-            imap.login(macct.get('address'), macct.get('password', ''))
-            return imap
+                JMailBase.imap = imaplib.IMAP(macct.get('imap_server'), macct.get('imap_server_port'))
+            self.imap.debug = IMAP_DEBUG
+            self.imap.login(macct.get('address'), macct.get('password', ''))
+            self.log.dbg('imap_start: ', self.imap)
+            return self.imap
         except Exception as e:
             self.log.err('imap_start: [{}] {}'.format(type(e), str(e)))
             if e.args[0].startswith(b'[AUTHENTICATIONFAILED]'):
@@ -158,5 +167,7 @@ class JMail(JMailBase):
                 raise JMailError(500, e.args[0].decode())
 
 
-    def imap_end(self, imap):
-        imap.logout()
+    def imap_end(self, imap=None):
+        if imap is None:
+            imap = self.imap
+        return imap.logout()

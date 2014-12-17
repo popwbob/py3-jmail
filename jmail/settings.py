@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'jmail.user',
     'jmail.macct',
+    'jmail.mail',
 )
 
 MIDDLEWARE_CLASSES = (
