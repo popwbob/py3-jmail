@@ -84,3 +84,22 @@ CSRF_COOKIE_AGE = 1209600
 CSRF_COOKIE_NAME = 'jmail_token'
 SESSION_COOKIE_AGE = 1209600
 SESSION_COOKIE_NAME = 'jmail_sid'
+
+#~ LOGGING = {
+    #~ 'version': 1,
+    #~ 'disable_existing_loggers': False,
+    #~ 'handlers': {
+        #~ 'file': {
+            #~ 'level': 'DEBUG',
+            #~ 'class': 'logging.FileHandler',
+            #~ 'filename': '/tmp/django-debug.log',
+        #~ },
+    #~ },
+    #~ 'loggers': {
+        #~ 'django.db.backends': {
+            #~ 'handlers': ['file'],
+            #~ 'level': 'DEBUG',
+            #~ 'propagate': True,
+        #~ },
+    #~ },
+#~ }

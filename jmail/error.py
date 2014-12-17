@@ -6,10 +6,11 @@ class JMailError(Exception):
     message = None
     req = None
 
-    def __init__(self, req, status, message):
+    def __init__(self, status, message):
+        from . import JMailBase
         self.status = status
         self.message = message
-        self.req = req
+        self.req = JMailBase._req
 
     def tmpl_data(self):
         td = {
