@@ -94,7 +94,7 @@ def subs(req, macct_id):
             jm.end()
         return e.response()
 
-    jm.log.dbg('macct: ', macct)
+    #~ jm.log.dbg('macct: ', macct)
     imap.select()
 
     mbox = imap.lsub()
@@ -102,9 +102,9 @@ def subs(req, macct_id):
 
     subs_list = ['INBOX']
     for d in mbox[1]:
-        jm.log.dbg('d: ', d)
+        #~ jm.log.dbg('d: ', d)
         child = d.split()[2].decode().replace('"', '')
-        jm.log.dbg('child: ', child)
+        #~ jm.log.dbg('child: ', child)
         subs_list.append(child)
 
     imap.close()
@@ -127,12 +127,12 @@ def check(req, macct_id, mbox_name):
             jm.end()
         return e.response()
 
-    jm.log.dbg('macct: ', macct)
+    #~ jm.log.dbg('macct: ', macct)
 
     try:
         imap.select(mbox_name)
         typ, msgs_ids = imap.uid('SEARCH', 'ALL')
-        jm.log.dbg('typ: ', typ)
+        #~ jm.log.dbg('typ: ', typ)
         jm.log.dbg('msgs_ids: ', msgs_ids)
     except Exception as e:
         return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))

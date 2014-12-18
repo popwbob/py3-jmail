@@ -68,18 +68,20 @@ class JMailMessage:
         else:
             self.log.dbg('body content-type: ', body.get_content_type())
             if body.get_content_type() == 'text/plain':
+                self.log.dbg('body charset: ', body.get_charset())
                 return body.get_payload()
             else:
-                return body.get_payload(decode=True)
+                return '[No plain text content]'
 
 
     def _body_parts(self, body):
         self.body_parts = list()
-        text = None
+        text = '[No plain text content part]'
         for part in body.walk():
             self.log.dbg('part content-type: ', part.get_content_type())
             if part.get_content_type() == 'text/plain':
                 self.log.dbg('part used as body')
+                self.log.dbg('part charset: ', part.get_charset())
                 return part.get_payload()
             else:
                 self.body_parts.append(part)

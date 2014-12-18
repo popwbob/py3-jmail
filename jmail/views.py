@@ -62,7 +62,7 @@ def home(req):
         accounts = JMailMAcct.objects.filter(user=jm.user).values()
     except JMailMAcct.DoesNotExist:
         accounts = []
-    jm.log.dbg('accounts: ', accounts)
+    jm.log.dbg('accounts: ', len(accounts))
     jm.tmpl_data({
         'mail': {
             'accounts': accounts,
