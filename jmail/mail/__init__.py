@@ -55,6 +55,7 @@ class JMailMessage:
 
         self.headers_full = self.body_raw.items()
         self.headers = self._headers_filter(self.headers_full)
+
         self.body = self._body_get(self.body_raw)
         self.flags = self._flags_get(mdata[0][0])
 
@@ -72,31 +73,52 @@ class JMailMessage:
         return f
 
 
+    def _body_text(self, msg):
+        self.log.dbg('body_text msg: ', dir(msg))
+        self.log.dbg('body_text msg default type: ', msg.get_default_type())
+        self.log.dbg('body_text msg content type: ', msg.get_content_type())
+        self.log.dbg('body_text msg content charset: ', msg.get_content_charset())
+        self.log.dbg('body_text msg charset: ', msg.get_charset())
+        self.log.dbg('body_text msg charsets: ', msg.get_charsets())
+        self.log.dbg('body_text msg params: ', msg.get_params())
+        self.log.dbg('body_text msg unixfrom: ', msg.get_unixfrom())
+        if msg.get_content_subtype() == 'plain':
+            return msg.get_payload()
+        else:
+            return None
+
+
     def _body_get(self, body):
         if body.is_multipart():
             return self._body_parts(body)
         else:
-            self.log.dbg('body content-type: ', body.get_content_type())
-            if body.get_content_type() == 'text/plain':
-                self.log.dbg('body charset: ', body.get_charset())
-                return body.get_payload()
+            self.log.dbg('body: ', sorted(dir(body)))
+            self.log.dbg('body content main type: ', body.get_content_maintype())
+            if body.get_content_maintype() == 'text':
+                text = self._body_text(body)
+            if text is None:
+                return '[NO TEXT CONTENT]'
             else:
-                return '[No plain text content]'
+                return text
 
 
     def _body_parts(self, body):
         self.body_parts = list()
-        text = '[No plain text content part]'
+        text = None
         for part in body.walk():
-            self.log.dbg('part content-type: ', part.get_content_type())
-            if part.get_content_type() == 'text/plain':
-                self.log.dbg('part used as body')
-                self.log.dbg('part charset: ', part.get_charset())
-                return part.get_payload()
+            self.log.dbg('part content main type: ', part.get_content_maintype())
+            if part.get_content_maintype() == 'text':
+                if text is None:
+                    text = self._body_text(part)
             else:
-                self.body_parts.append(part)
+                self.body_parts.append(part.get_content_type())
+        if text is None:
+            text = '[NO PLAIN TEXT CONTENT]'
         return text
 
 
     def __str__(self):
-        return '{}{}'.format(self.headers, self.body)
+        try:
+            return 'JMailMessage({}: {})'.format(self.headers[0][0], self.headers[0][1])
+        except:
+            return 'JMailMessage'

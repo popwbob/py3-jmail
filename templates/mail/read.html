@@ -2,6 +2,8 @@
 <div id="mail-read">
     <pre>{{msg.flags}} {{msg.size}}
 
+{{msg.body_parts}}
+
 {% for hk, hv in msg.headers %}{{hk}}: {{hv}}
 {% endfor %}
 {{msg.body}}</pre>
