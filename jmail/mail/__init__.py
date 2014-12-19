@@ -12,7 +12,7 @@ SHOW_HEADERS = [
 
 
 class JMailMessage:
-    _muid = None
+    uid = None
     _honly = None
     _imap = None
     _fetch_cmd = None
@@ -26,7 +26,7 @@ class JMailMessage:
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None):
-        self._muid = mail_uid
+        self.uid = mail_uid
         self._honly = headers_only
         self._imap = JMailBase.imap
         if imap is not None:
@@ -38,15 +38,15 @@ class JMailMessage:
 
     def fetch(self, mail_uid=None, headers_only=None):
         if mail_uid is not None:
-            self._muid = mail_uid
+            self.uid = mail_uid
         if headers_only is not None:
             self._honly = headers_only
             self._fetch_cmd = 'BODY.PEEK[HEADER]'
-        self.log.dbg('JMailMessage mail_uid: ', self._muid)
+        self.log.dbg('JMailMessage mail_uid: ', self.uid)
         self.log.dbg('JMailMessage headers_only: ', self._honly)
         self.log.dbg('JMailMessage imap: ', self._imap)
         self.log.dbg('JMailMessage fetch_cmd: ', self._fetch_cmd)
-        typ, mdata = self._imap.uid('FETCH', self._muid, '(FLAGS {})'.format(self._fetch_cmd))
+        typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(self._fetch_cmd))
         self.body_raw = email.message_from_bytes(mdata[0][1])
         self.log.dbg('body_raw multipart: ', self.body_raw.is_multipart())
         self.headers_full = self.body_raw.items()

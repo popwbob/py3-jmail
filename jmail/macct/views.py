@@ -2,6 +2,7 @@ import email
 
 from jmail import JMail
 from jmail.error import JMailError
+from jmail.mail import JMailMessage
 
 from django.forms.models import modelformset_factory
 
@@ -127,39 +128,21 @@ def check(req, macct_id, mbox_name):
             jm.end()
         return e.response()
 
-    #~ jm.log.dbg('macct: ', macct)
-
+    # -- get messages uid list
     try:
         imap.select(mbox_name)
         typ, msgs_ids = imap.uid('SEARCH', 'ALL')
-        #~ jm.log.dbg('typ: ', typ)
         jm.log.dbg('msgs_ids: ', msgs_ids)
     except Exception as e:
         return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))
 
-    showh_list = [
-        #~ '_ALL_',
-        #~ 'delivered-to',
-        #~ 'message-id',
-        #~ 'to',
-        'date',
-        'from',
-        'subject',
-    ]
-
+    # -- get messages headers
     msgs = list()
-    for mid in msgs_ids[0].split():
-        msg_info = dict()
-        if mid != b'':
-            typ, data = imap.uid('FETCH', mid, '(BODY.PEEK[HEADER])')
-            headers = email.message_from_bytes(data[0][1])
-            msg_info['id'] = mid
-            showh = dict()
-            for hdr in headers:
-                if '_ALL_' in showh_list or hdr.lower() in showh_list:
-                    showh[hdr] = headers.get(hdr)
-            msg_info['headers'] = showh
-            msgs.append(msg_info)
+    for muid in msgs_ids[0].split():
+        if muid != b'':
+            msg = JMailMessage(muid, headers_only=True)
+            msg.fetch()
+            msgs.append(msg)
 
     imap.close()
     jm.imap_end(imap)
