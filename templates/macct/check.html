@@ -7,7 +7,9 @@
     <pre>NO MESSAGES</pre>
     {% else %}
     {% for minfo in msgs %}
-    <pre>{% for hn, hv in minfo.headers %}{{hn}}: {{hv}}
+    <pre>{{minfo.flags}} {{minfo.size}}
+
+{% for hn, hv in minfo.headers %}{{hn}}: {{hv}}
 {% endfor %}
 {% include 'macct/check_navbar.html' %}</pre>
     <hr>

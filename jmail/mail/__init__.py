@@ -23,6 +23,7 @@ class JMailMessage:
     flags = None
     body = None
     body_parts = None
+    size = None
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None):
@@ -42,16 +43,25 @@ class JMailMessage:
         if headers_only is not None:
             self._honly = headers_only
             self._fetch_cmd = 'BODY.PEEK[HEADER]'
+
         self.log.dbg('JMailMessage mail_uid: ', self.uid)
         self.log.dbg('JMailMessage headers_only: ', self._honly)
         self.log.dbg('JMailMessage imap: ', self._imap)
         self.log.dbg('JMailMessage fetch_cmd: ', self._fetch_cmd)
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(self._fetch_cmd))
+
         self.body_raw = email.message_from_bytes(mdata[0][1])
         self.log.dbg('body_raw multipart: ', self.body_raw.is_multipart())
+
         self.headers_full = self.body_raw.items()
         self.headers = self._headers_filter(self.headers_full)
         self.body = self._body_get(self.body_raw)
+        self.flags = self._flags_get(mdata[0][0])
+
+
+    def _flags_get(self, mdata):
+        self.size = mdata.split()[-1]
+        return [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
 
 
     def _headers_filter(self, headers):

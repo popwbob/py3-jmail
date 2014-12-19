@@ -1,6 +1,8 @@
 {% include "inc/head.html" %}
 <div id="mail-read">
-    <pre>{% for hk, hv in msg.headers %}{{hk}}: {{hv}}
+    <pre>{{msg.flags}} {{msg.size}}
+
+{% for hk, hv in msg.headers %}{{hk}}: {{hv}}
 {% endfor %}
 {{msg.body}}</pre>
 </div>
