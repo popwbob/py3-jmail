@@ -24,6 +24,7 @@ class JMailMessage:
     body = None
     body_parts = None
     size = None
+    prop = None
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None):
@@ -75,13 +76,16 @@ class JMailMessage:
 
     def _body_text(self, msg):
         self.log.dbg('body_text msg: ', dir(msg))
-        self.log.dbg('body_text msg default type: ', msg.get_default_type())
-        self.log.dbg('body_text msg content type: ', msg.get_content_type())
-        self.log.dbg('body_text msg content charset: ', msg.get_content_charset())
-        self.log.dbg('body_text msg charset: ', msg.get_charset())
-        self.log.dbg('body_text msg charsets: ', msg.get_charsets())
-        self.log.dbg('body_text msg params: ', msg.get_params())
-        self.log.dbg('body_text msg unixfrom: ', msg.get_unixfrom())
+        self.prop = {
+            'default_type': msg.get_default_type(),
+            'content_type': msg.get_content_type(),
+            'content_charset': msg.get_content_charset(),
+            'charset': msg.get_charset(),
+            'charsets': msg.get_charsets(),
+            #~ 'params': msg.get_params(),
+            'unixfrom': msg.get_unixfrom(),
+        }
+        self.log.dbg('msg.prop: ', self.prop)
         if msg.get_content_subtype() == 'plain':
             return msg.get_payload()
         else:
