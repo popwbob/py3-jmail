@@ -1,5 +1,7 @@
 import email
 
+from base64 import urlsafe_b64decode
+
 from jmail import JMail
 from jmail.error import JMailError
 from jmail.mail import JMailMessage
@@ -94,23 +96,10 @@ def subs(req, macct_id):
         if jm:
             jm.end()
         return e.response()
-
-    #~ jm.log.dbg('macct: ', macct)
     imap.select()
-
-    mbox = imap.lsub()
-    jm.log.dbg(mbox)
-
-    subs_list = ['INBOX']
-    for d in mbox[1]:
-        #~ jm.log.dbg('d: ', d)
-        child = d.split()[2].decode().replace('"', '')
-        #~ jm.log.dbg('child: ', child)
-        subs_list.append(child)
-
+    subs_list = jm.imap_lsub()
     imap.close()
     jm.imap_end(imap)
-
     jm.tmpl_data({
         'macct': macct,
         'subs_list': subs_list,
@@ -128,12 +117,17 @@ def check(req, macct_id, mbox_name):
             jm.end()
         return e.response()
 
+    jm.log.dbg('mbox_name_enc: ', mbox_name)
+    mbox_name = urlsafe_b64decode(mbox_name.encode())
+    jm.log.dbg('mbox_name: ', mbox_name)
+
     # -- get messages uid list
     try:
         imap.select(mbox_name)
         typ, msgs_ids = imap.uid('SEARCH', 'ALL')
         jm.log.dbg('msgs_ids: ', msgs_ids)
     except Exception as e:
+        jm.log.err(e)
         return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))
 
     # -- get messages headers

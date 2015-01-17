@@ -1,6 +1,8 @@
 import json
 import imaplib
 
+from base64 import urlsafe_b64encode
+
 from django.shortcuts import render, redirect
 from django.core.context_processors import csrf
 from django.contrib.auth import logout as django_logout
@@ -12,7 +14,7 @@ from jmail.error import JMailError, JMailErrorUserUnauth
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
-IMAP_DEBUG = 0
+IMAP_DEBUG = 3
 
 
 class JMailBase:
@@ -171,3 +173,34 @@ class JMail(JMailBase):
         if imap is None:
             imap = self.imap
         return imap.logout()
+
+
+    def imap_lsub(self, imap=None):
+        if imap is None:
+            imap = self.imap
+        mbox = imap.lsub()
+        self.log.dbg(mbox)
+        sl = []
+        for d in mbox[1]:
+            if d != b'':
+                if type(d) == type(tuple()):
+                    child = d[1]
+                else:
+                    child = b' '.join(d.split(b' ')[2:])
+                sl.append(child)
+        sl.insert(0, b'INBOX')
+        self.log.dbg('subs: ', sl)
+        #~ sl = sorted(sl)
+        r = list()
+        for c in sl:
+            show_name = c
+            if show_name.startswith(b'"'):
+                show_name = show_name[1:]
+            if show_name.endswith(b'"'):
+                show_name = show_name[:-1]
+            r.append({
+                'name': show_name,
+                'imap_name': c.decode(),
+                'name_encode': urlsafe_b64encode(c).decode(),
+            })
+        return r

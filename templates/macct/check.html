@@ -1,7 +1,6 @@
 {% include "inc/head.html" %}
 <div id="macct-check">
-    <h3>{{macct.address}}</h3>
-    <p><a href="{% url 'macct:subs' macct.id %}">subs</a></p>
+    <h3><a href="{% url 'macct:subs' macct.id %}">{{macct.address}}</a></h3>
     <h4>{{mbox_name}}</h4>
     {% if msgs|length_is:"0" %}
     <pre>NO MESSAGES</pre>

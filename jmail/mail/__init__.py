@@ -15,7 +15,6 @@ class JMailMessage:
     uid = None
     _honly = None
     _imap = None
-    _fetch_cmd = None
     _raw = None
     log = None
     headers = None
@@ -35,21 +34,22 @@ class JMailMessage:
             self._imap = imap
         self.log = JMailBase.log
         self.log.dbg('JMailMessage created')
-        self._fetch_cmd = 'BODY[]'
 
 
     def fetch(self, mail_uid=None, headers_only=None):
+        fetch_cmd = 'BODY[]'
         if mail_uid is not None:
             self.uid = mail_uid
         if headers_only is not None:
             self._honly = headers_only
-            self._fetch_cmd = 'BODY.PEEK[HEADER]'
+        if self._honly:
+            fetch_cmd = 'BODY.PEEK[HEADER]'
 
         self.log.dbg('JMailMessage mail_uid: ', self.uid)
         self.log.dbg('JMailMessage headers_only: ', self._honly)
         self.log.dbg('JMailMessage imap: ', self._imap)
-        self.log.dbg('JMailMessage fetch_cmd: ', self._fetch_cmd)
-        typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(self._fetch_cmd))
+        self.log.dbg('JMailMessage fetch_cmd: ', fetch_cmd)
+        typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
 
         self.body_raw = email.message_from_bytes(mdata[0][1])
         self.log.dbg('body_raw multipart: ', self.body_raw.is_multipart())
@@ -57,8 +57,8 @@ class JMailMessage:
         self.headers_full = self.body_raw.items()
         self.headers = self._headers_filter(self.headers_full)
 
-        self.body = self._body_get(self.body_raw)
         self.flags = self._flags_get(mdata[0][0])
+        self.body = self._body_get(self.body_raw)
 
 
     def _flags_get(self, mdata):
@@ -93,11 +93,14 @@ class JMailMessage:
 
 
     def _body_get(self, body):
+        if self._honly:
+            return '[HEADERS ONLY]'
         if body.is_multipart():
             return self._body_parts(body)
         else:
             self.log.dbg('body: ', sorted(dir(body)))
             self.log.dbg('body content main type: ', body.get_content_maintype())
+            text = None
             if body.get_content_maintype() == 'text':
                 text = self._body_text(body)
             if text is None:
