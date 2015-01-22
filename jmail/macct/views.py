@@ -107,24 +107,22 @@ def subs(req, macct_id):
     return jm.render()
 
 
-def check(req, macct_id, mbox_name):
+def check(req, macct_id, mbox_name_enc):
     try:
-        jm = JMail(req, tmpl_name='macct/check')
-        macct = jm.macct_get(macct_id)
-        imap = jm.imap_start(macct)
+        jm = JMail(req, tmpl_name='macct/check', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         if jm:
             jm.end()
         return e.response()
 
-    jm.log.dbg('mbox_name_enc: ', mbox_name)
-    mbox_name = urlsafe_b64decode(mbox_name.encode())
+    jm.log.dbg('mbox_name_enc: ', mbox_name_enc)
+    mbox_name = urlsafe_b64decode(mbox_name_enc.encode())
     jm.log.dbg('mbox_name: ', mbox_name)
 
     # -- get messages uid list
     try:
-        imap.select(mbox_name)
-        typ, msgs_ids = imap.uid('SEARCH', 'ALL')
+        jm.imap.select(mbox_name)
+        typ, msgs_ids = jm.imap.uid('SEARCH', 'ALL')
         jm.log.dbg('msgs_ids: ', msgs_ids)
     except Exception as e:
         jm.log.err(e)
@@ -138,14 +136,16 @@ def check(req, macct_id, mbox_name):
             msg.fetch()
             msgs.append(msg)
 
-    imap.close()
-    jm.imap_end(imap)
+    jm.imap.close()
+    jm.imap_end()
 
     jm.log.dbg('msgs: ', msgs)
     jm.log.dbg('msgs number: ', len(msgs))
     jm.tmpl_data({
-        'macct': macct,
-        'mbox_name': mbox_name,
+        'mbox': {
+            'name': mbox_name,
+            'name_encode': mbox_name_enc,
+        },
         'msgs': msgs,
     })
     return jm.render()

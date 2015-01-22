@@ -27,6 +27,8 @@ class JMailBase:
     doc_navbar = False
     user = None
     debug = None
+    macct = None
+    charset = 'utf-8'
 
     def __str__(self):
         r = '{\n'
@@ -36,14 +38,22 @@ class JMailBase:
 
 
 class JMail(JMailBase):
-    def __init__(self, req, user_auth=True, tmpl_name=None):
+
+    def __init__(self, req, user_auth=True, tmpl_name=None, macct_id=None, imap_start=False):
         JMailBase.log = JMailLog()
         self.log.dbg('start')
         self._load_settings()
         JMailBase._req = req
+        JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
+        # -- user auth
         if user_auth:
             self._user_auth()
-        JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
+        # -- mail account
+        if macct_id is not None:
+            JMailBase.macct = self.macct_get(macct_id)
+        # -- IMAP
+        if imap_start:
+            self.imap_start(self.macct)
 
 
     def _load_settings(self):
@@ -77,6 +87,7 @@ class JMail(JMailBase):
                 'error': False,
                 'title': 'JMail - {}'.format(self._req.path),
                 'navbar': self.doc_navbar,
+                'charset': self.charset,
             },
             'user': {
                 'name': self._req.user,
@@ -113,6 +124,9 @@ class JMail(JMailBase):
 
 
     def tmpl_data(self, data):
+        self._tmpl_data.update({
+            'macct': self.macct,
+        })
         self._tmpl_data.update(data)
 
 

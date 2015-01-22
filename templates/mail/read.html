@@ -1,5 +1,7 @@
 {% include "inc/head.html" %}
 <div id="mail-read">
+    {% include 'inc/mbox_navbar.html' %}
+
     <pre>{{msg.flags}} {{msg.size}}
 
 {{msg.body_parts}}
