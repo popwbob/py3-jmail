@@ -1,13 +1,14 @@
 import email
-
 from jmail import JMailBase
 
+
 SHOW_HEADERS = [
-    'x-spam-level',
-    'date',
-    'subject',
+    #~ 'x-spam-level',
     'from',
     'to',
+    'cc',
+    'subject',
+    'date',
 ]
 
 
@@ -68,9 +69,14 @@ class JMailMessage:
 
     def _headers_filter(self, headers):
         f = list()
-        for hk, hv in headers:
-            if hk.lower() in SHOW_HEADERS:
-                f.append((hk, hv))
+        header_keys = sorted([h[0].lower() for h in headers])
+        for hk in SHOW_HEADERS:
+            if hk.lower() in header_keys:
+                hv = None
+                for h in headers:
+                    if h[0].lower() == hk:
+                        hv = h[1]
+                f.append((hk.capitalize(), hv))
         return f
 
 
