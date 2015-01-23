@@ -53,9 +53,7 @@ def create(req):
         return jm.redirect('home')
     else:
         jm.tmpl_data({
-            'macct': {
-                'formset': JMailMAcctForm().as_p(),
-            },
+            'form_data': JMailMAcctForm().as_p(),
         })
         return jm.render()
 

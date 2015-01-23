@@ -1,5 +1,5 @@
-{% include "inc/head.html" %}
-<div id="macct-edit">
+{% include "head.html" %}
+<div class="macct-edit">
     <h3>Edit {{macct.address}}</h3>
     <form action="{% url 'macct:edit' macct.id %}" method="POST">
         {% csrf_token %}
@@ -7,4 +7,4 @@
         <input type="submit" value="save"><span> - <a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

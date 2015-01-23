@@ -53,4 +53,5 @@ def logout(req):
         return e.response()
     jm.doc_navbar = False
     django_logout(req)
+    jm.tmpl_data({'user': None})
     return jm.render()

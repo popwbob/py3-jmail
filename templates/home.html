@@ -1,5 +1,5 @@
-{% include "inc/head.html" %}
-<div id="home">
+{% include "head.html" %}
+<div class="home">
 <h3>mail accounts</h3>
 <ul>
     <li><a href="{% url 'macct:create' %}">create new</a></li>
@@ -12,5 +12,5 @@
     </li>
 {% endfor %}
 </ul>
-</div>
-{% include "inc/tail.html" %}
+</div><!-- home -->
+{% include "tail.html" %}

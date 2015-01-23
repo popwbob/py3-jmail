@@ -1,6 +1,6 @@
-{% include "inc/head.html" %}
-<div id="error">
+{% include "head.html" %}
+<div class="error">
     <h3><a href="{% url 'home' %}">JMail</a> Error</h3>
     <p>{{error.status}} - {{error.message}}</p>
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

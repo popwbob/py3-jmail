@@ -1,24 +1,20 @@
-{% include "inc/head.html" %}
-<div id="mail-read">
-    {% include 'inc/mbox_navbar.html' %}
-    {% include 'inc/mail_attributes.html' %}
-    {% include 'inc/mail_headers.html' %}
-
-<pre id="mail-body">
+{% include "head.html" %}
+<div class="mail-read">
+    {% include 'mail/attributes.html' %}
+    {% include 'mail/headers.html' %}
+    <pre class="mail-body">
 {{msg.body}}
 </pre>
-
-    <div id="mail-parts">
+    <div class="mail-parts">
         {{msg.body_parts}}
     </div>
-
-</div><!-- id="mail-read" -->
+</div><!-- mail-read -->
 
 {% if mdata_debug %}
-<div id="mail-read-debug">
+<div class="mail-read-debug">
     <h5>DEBUG</h5>
     <pre>{% for dline in mdata_debug %}{{dline}}
 {% endfor %}</pre>
-</div>
+</div><!-- mail-read-debug -->
 {% endif %}
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

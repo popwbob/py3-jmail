@@ -1,15 +1,13 @@
-{% include "inc/head.html" %}
-<div id="macct-check">
-    {% include 'inc/mbox_navbar.html' %}
-
+{% include "head.html" %}
+<div class="macct-check">
     {% if msgs|length_is:"0" %}
         <pre>NO MESSAGES</pre>
     {% else %}
         {% for msg in msgs %}
-            {% include 'inc/mail_attributes.html' %}
-            {% include 'inc/mail_headers.html' %}
-            {% include 'macct/check_navbar.html' %}
+            {% include 'mail/attributes.html' %}
+            {% include 'mail/headers.html' %}
+            {% include 'mail/actions.html' %}
         {% endfor %}
     {% endif %}
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

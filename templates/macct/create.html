@@ -1,10 +1,10 @@
-{% include "inc/head.html" %}
-<div id="macct-create">
+{% include "head.html" %}
+<div class="macct-create">
     <h3>create mail account</h3>
     <form action="{% url 'macct:create' %}" method="POST">
         {% csrf_token %}
-        {{macct.formset}}
+        {{form_data}}
         <input type="submit" value="create"><span> - <a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

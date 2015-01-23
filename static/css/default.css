@@ -1,8 +1,10 @@
 body
 {
-    font-size:100%;
+    font-size:120%;
+    line-height:150%;
     margin:0;
-    padding:0;
+    padding:1px 7px;
+    font-family:monospace;
 }
 
 #jmail

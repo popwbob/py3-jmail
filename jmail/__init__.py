@@ -44,10 +44,12 @@ class JMail(JMailBase):
         self.log.dbg('start')
         self._load_settings()
         JMailBase._req = req
-        JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
         # -- user auth
         if user_auth:
             self._user_auth()
+        self.log.dbg('user: ', self.user)
+        # -- tmpl data init
+        JMailBase._tmpl_data = self._tmpl_data_init(tmpl_name)
         # -- mail account
         if macct_id is not None:
             JMailBase.macct = self.macct_get(macct_id)
@@ -63,6 +65,8 @@ class JMail(JMailBase):
     def end(self):
         if self.user is not None:
             self.user.save()
+        JMailBase.macct = None
+        JMailBase.imap = None
         self.log.dbg('end')
 
 
@@ -89,10 +93,15 @@ class JMail(JMailBase):
                 'navbar': self.doc_navbar,
                 'charset': self.charset,
             },
-            'user': {
-                'name': self._req.user,
-            },
         }
+        if self.user is None:
+            td.update({'user': None})
+        else:
+            td.update({
+                'user': {
+                    'name': self._req.user
+                }
+            })
         td.update(csrf(self._req))
         return td
 
@@ -124,9 +133,8 @@ class JMail(JMailBase):
 
 
     def tmpl_data(self, data):
-        self._tmpl_data.update({
-            'macct': self.macct,
-        })
+        self.log.dbg('tmpl_data macct: ', self.macct)
+        self._tmpl_data.update({'macct': self.macct})
         self._tmpl_data.update(data)
 
 

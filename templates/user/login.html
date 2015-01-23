@@ -1,5 +1,5 @@
-{% include "inc/head.html" %}
-<div id="login">
+{% include "head.html" %}
+<div class="user-login">
     <h3>login</h3>
     <form action="{% url 'user:auth' %}" method="POST">
         {% csrf_token %}
@@ -8,4 +8,4 @@
         <input type="submit" name="jmail_cmd" value="login">
     </form>
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

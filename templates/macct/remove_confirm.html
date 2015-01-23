@@ -1,5 +1,5 @@
-{% include "inc/head.html" %}
-<div id="macct-remove">
+{% include "head.html" %}
+<div class="macct-remove">
     <h3>Remove {{macct.address}}</h3>
     <p>Are you sure you want to remove <b>{{macct.address}}</b> account?</p>
     <form action="{% url 'macct:remove' macct.id %}" method="POST">
@@ -7,4 +7,4 @@
         <input type="submit" value="confirm"><span> - <a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
-{% include "inc/tail.html" %}
+{% include "tail.html" %}

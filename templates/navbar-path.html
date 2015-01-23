@@ -1,0 +1,11 @@
+<div class="path">
+    <p class="buttons">
+    {% if macct %}
+        <a href="{% url 'macct:subs' macct.id %}">{{macct.address}}</a>
+    {% endif %}
+    {% if mbox %}
+        <br>
+        <a href="{% url 'macct:check' macct.id mbox.name_encode %}">{{mbox.name}}</a>
+    {% endif %}
+    </p>
+</div>
