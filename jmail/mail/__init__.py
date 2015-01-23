@@ -132,6 +132,16 @@ class JMailMessage:
         return prop
 
 
+    def _text_plain(self, msg):
+        text = msg.get_payload()
+        self.log.dbg('msg text: ', type(text))
+        # -- quoted-printable
+        if self.prop['transfer_encoding'] == 'quoted-printable':
+            self.log.dbg('text quoted-printable')
+            text = decodestring(text.encode()).decode(self.prop['charset'])
+        return text
+
+
     def _body_text(self, msg):
         self.log.dbg('msg body text')
         self.log.dbg('msg boundary: ', msg.get_boundary())
@@ -144,13 +154,13 @@ class JMailMessage:
         self.prop = self._msg_properties(msg)
         self.log.dbg('msg.prop: ', self.prop)
         text = None
-        if msg.get_content_subtype() == 'plain':
-            text = msg.get_payload()
-        self.log.dbg('msg text: ', type(text))
-        # -- encoding
-        if self.prop['transfer_encoding'] == 'quoted-printable':
-            self.log.dbg('text quoted-printable')
-            text = decodestring(text.encode()).decode()
+        msg_subtype = msg.get_content_subtype()
+        if msg_subtype == 'plain':
+            self.log.dbg('subtype plain')
+            text = self._text_plain(msg)
+        elif msg_subtype == 'html':
+            self.log.dbg('subtype html')
+            self.body_parts.append('text/html')
         return text
 
 
@@ -158,6 +168,7 @@ class JMailMessage:
         self.log.dbg('msg body get')
         if self._honly:
             return '[HEADERS ONLY]'
+        self.body_parts = list()
         if body.is_multipart():
             return self._body_parts(body)
         else:
@@ -173,15 +184,14 @@ class JMailMessage:
 
     def _body_parts(self, body):
         self.log.dbg('msg body parts')
-        self.body_parts = list()
         text = None
         for part in body.walk():
-            self.log.dbg('part content main type: ', part.get_content_maintype())
+            self.log.dbg('part content type: ', part.get_content_type())
             if part.get_content_maintype() == 'text':
-                if text is None:
-                    text = self._body_text(part)
-            else:
-                self.body_parts.append(part.get_content_type())
+                self.log.dbg('part maintype text')
+                r = self._body_text(part)
+                if r is not None:
+                    text = r
         if text is None:
             text = '[NO PLAIN TEXT CONTENT]'
         return text

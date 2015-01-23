@@ -43,13 +43,10 @@ def read(req, macct_id, mbox_name_enc, mail_uid):
     except Exception as e:
         return jm.error(400, 'Bad request: {}'.format(e.args[0]))
 
-    try:
-        msg = JMailMessage(mail_uid)
-        msg.fetch()
-        jm.imap.close()
-        jm.imap_end()
-    except Exception as e:
-        return jm.error(500, e.args[0])
+    msg = JMailMessage(mail_uid)
+    msg.fetch()
+    jm.imap.close()
+    jm.imap_end()
 
     jm.tmpl_data({
         'load_navbar_path': True,
