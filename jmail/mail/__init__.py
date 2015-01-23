@@ -16,7 +16,7 @@ class JMailMessage:
     uid = None
     _honly = None
     _imap = None
-    _raw = None
+    _msg = None
     log = None
     source = None
     headers = None
@@ -29,12 +29,13 @@ class JMailMessage:
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None):
+        self.log = JMailBase.log
+        self.log.dbg('msg init')
         self.uid = mail_uid
         self._honly = headers_only
         self._imap = JMailBase.imap
         if imap is not None:
             self._imap = imap
-        self.log = JMailBase.log
 
 
     def fetch(self, mail_uid=None, headers_only=None):
@@ -49,22 +50,28 @@ class JMailMessage:
         self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
 
-        self.source = email.message_from_bytes(mdata[0][1])
-        self.log.dbg('source multipart: ', self.source.is_multipart())
+        self._msg = email.message_from_bytes(mdata[0][1])
+        #~ self.log.dbg('msg: ', type(self._msg), ' ', sorted(dir(self._msg)))
+        self.log.dbg('msg multipart: ', self._msg.is_multipart())
 
-        self.headers_full = self.source.items()
+        self.source = self._msg.as_string()
+        self.log.dbg('msg source: ', type(self.source))
+
+        self.headers_full = self._msg.items()
         self.headers = self._headers_filter(self.headers_full)
 
         self.flags = self._flags_get(mdata[0][0])
-        self.body = self._body_get(self.source)
+        self.body = self._body_get(self._msg)
 
 
     def _flags_get(self, mdata):
+        self.log.dbg('msg flags get')
         self.size = mdata.split()[-1]
         return [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
 
 
     def _headers_filter(self, headers):
+        self.log.dbg('msg headers filter')
         f = list()
         header_keys = sorted([h[0].lower() for h in headers])
         for hk in SHOW_HEADERS:
@@ -77,24 +84,73 @@ class JMailMessage:
         return f
 
 
-    def _body_text(self, msg):
-        self.prop = {
-            'default_type': msg.get_default_type(),
+    def _msg_properties(self, msg):
+        self.log.dbg('msg properties')
+        prop = {
+            #~ 'default_type': msg.get_default_type(),
             'content_type': msg.get_content_type(),
+            'content_maintype': msg.get_content_maintype(),
+            'content_subtype': msg.get_content_subtype(),
             'content_charset': msg.get_content_charset(),
             'charset': msg.get_charset(),
-            'charsets': msg.get_charsets(),
+            #~ 'charsets': msg.get_charsets(),
             #~ 'params': msg.get_params(),
-            'unixfrom': msg.get_unixfrom(),
+            #~ 'unixfrom': msg.get_unixfrom(),
+            'filename': msg.get_filename(),
+            'transfer_encoding': None,
+            'disposition': None,
         }
+        msg_keys = msg.keys()
+        # -- content type
+        try:
+            idx = msg_keys.index('Content-Type')
+        except ValueError:
+            idx = None
+        if idx is not None:
+            d = msg.values()[idx]
+            ct = d.split(';')[0].strip()
+            cs = d.split(';')[1].strip()
+            prop['content_type'] = ct
+            k, v = cs.split('=')
+            if k == 'charset':
+                prop['charset'] = v
+        # -- transfer encoding
+        try:
+            idx = msg_keys.index('Content-Transfer-Encoding')
+        except ValueError:
+            idx = None
+        if idx is not None:
+            prop['transfer_encoding'] = msg.values()[idx]
+        # -- disposition
+        try:
+            idx = msg_keys.index('Content-Disposition')
+        except ValueError:
+            idx = None
+        if idx is not None:
+            prop['disposition'] = msg.values()[idx]
+        return prop
+
+
+    def _body_text(self, msg):
+        self.log.dbg('msg body text')
+        self.log.dbg('msg boundary: ', msg.get_boundary())
+        #~ self.log.dbg('msg attach: ', msg.attach)
+        #~ self.log.dbg('msg defects: ', msg.defects)
+        #~ self.log.dbg('msg epilogue: ', msg.epilogue)
+        #~ self.log.dbg('msg preamble: ', msg.preamble)
+        self.log.dbg('msg keys: ', msg.keys())
+        self.log.dbg('msg values: ', msg.values())
+        self.prop = self._msg_properties(msg)
         self.log.dbg('msg.prop: ', self.prop)
+        text = None
         if msg.get_content_subtype() == 'plain':
-            return msg.get_payload()
-        else:
-            return None
+            text = msg.get_payload()
+        self.log.dbg('msg text: ', type(text))
+        return text
 
 
     def _body_get(self, body):
+        self.log.dbg('msg body get')
         if self._honly:
             return '[HEADERS ONLY]'
         if body.is_multipart():
@@ -111,6 +167,7 @@ class JMailMessage:
 
 
     def _body_parts(self, body):
+        self.log.dbg('msg body parts')
         self.body_parts = list()
         text = None
         for part in body.walk():
@@ -126,6 +183,7 @@ class JMailMessage:
 
 
     def __str__(self):
+        self.log.dbg('msg str')
         try:
             return 'JMailMessage({}: {})'.format(self.headers[0][0], self.headers[0][1])
         except:
