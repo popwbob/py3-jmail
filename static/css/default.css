@@ -1,1 +1,56 @@
+body
+{
+    font-size:100%;
+    margin:0;
+    padding:0;
+}
 
+#jmail
+{
+    padding:3px 9px;
+}
+#jmail hr
+{
+    color:gray;
+    height:1px;
+    border-width:0;
+    background-color:gray;
+}
+
+#mail-flags p
+{
+    border:1px dotted black;
+    overflow:auto;
+    padding:3px 6px;
+    margin-top:6px;
+    margin-bottom:6px;
+}
+
+#mail-headers p
+{
+    border:1px solid black;
+    padding:3px 6px;
+    overflow:auto;
+    margin-top:6px;
+    margin-bottom:6px;
+}
+#mail-headers p .header-key
+{
+    font-weight:bold;
+}
+
+#mail-body
+{
+    padding:1px 6px;
+    overflow:auto;
+    margin-top:9px;
+}
+
+#mail-parts
+{
+    border:1px dotted black;
+    overflow:auto;
+    padding:3px 6px;
+    margin-top:6px;
+    margin-bottom:6px;
+}

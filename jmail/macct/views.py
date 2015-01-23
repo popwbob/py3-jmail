@@ -111,8 +111,6 @@ def check(req, macct_id, mbox_name_enc):
     try:
         jm = JMail(req, tmpl_name='macct/check', macct_id=macct_id, imap_start=True)
     except JMailError as e:
-        if jm:
-            jm.end()
         return e.response()
 
     jm.log.dbg('mbox_name_enc: ', mbox_name_enc)
