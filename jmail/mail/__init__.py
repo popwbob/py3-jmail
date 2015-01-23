@@ -1,5 +1,7 @@
 import email
+from base64 import b64decode
 from quopri import decodestring
+
 from jmail import JMailBase
 
 
@@ -135,10 +137,15 @@ class JMailMessage:
     def _text_plain(self, msg):
         text = msg.get_payload()
         self.log.dbg('msg text: ', type(text))
+        tenc = self.prop['transfer_encoding']
+        charset = self.prop['charset']
+        self.log.dbg('transfer encoding: ', tenc)
         # -- quoted-printable
-        if self.prop['transfer_encoding'] == 'quoted-printable':
-            self.log.dbg('text quoted-printable')
-            text = decodestring(text.encode()).decode(self.prop['charset'])
+        if tenc == 'quoted-printable':
+            text = decodestring(text.encode()).decode(charset)
+        # -- base64
+        elif tenc == 'base64':
+            text = b64decode(text.encode()).decode(charset)
         return text
 
 
