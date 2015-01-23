@@ -173,8 +173,8 @@ class JMailMessage:
 
     def _text_plain(self, msg, props):
         self.log.dbg('text plain')
-        text = msg.get_payload()
-        return self._text_encoding(text, props)
+        text = self._text_encoding(msg.get_payload(), props)
+        return text.splitlines()
 
 
     def _body_text(self, msg, props):

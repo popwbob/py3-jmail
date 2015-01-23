@@ -1,3 +1,5 @@
-<pre class="mail-body">
-{{msg.body}}
-</pre>
+<p class="mail-body">
+{% for line in msg.body %}
+{{line}}<br>
+{% endfor %}
+</p>
