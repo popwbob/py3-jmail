@@ -99,6 +99,7 @@ def subs(req, macct_id):
     imap.close()
     jm.imap_end(imap)
     jm.tmpl_data({
+        'load_navbar_path': True,
         'macct': macct,
         'subs_list': subs_list,
     })
@@ -138,10 +139,24 @@ def check(req, macct_id, mbox_name_enc):
     jm.log.dbg('msgs: ', msgs)
     jm.log.dbg('msgs number: ', len(msgs))
     jm.tmpl_data({
+        'load_navbar_path': True,
         'mbox': {
             'name': mbox_name,
             'name_encode': mbox_name_enc,
         },
         'msgs': msgs,
+    })
+    return jm.render()
+
+
+def admin(req):
+    try:
+        jm = JMail(req, tmpl_name='macct/admin')
+    except JMailError as e:
+        return e.response()
+    jm.tmpl_data({
+        'mail': {
+            'accounts': jm.macct_get_all(),
+        },
     })
     return jm.render()

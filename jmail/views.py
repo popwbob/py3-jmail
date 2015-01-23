@@ -58,14 +58,9 @@ def home(req):
         jm = JMail(req)
     except JMailError as e:
         return e.response()
-    try:
-        accounts = JMailMAcct.objects.filter(user=jm.user).values()
-    except JMailMAcct.DoesNotExist:
-        accounts = []
-    jm.log.dbg('accounts: ', len(accounts))
     jm.tmpl_data({
         'mail': {
-            'accounts': accounts,
+            'accounts': jm.macct_get_all(),
         },
     })
     return jm.render()

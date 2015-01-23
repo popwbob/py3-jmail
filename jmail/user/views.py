@@ -55,3 +55,11 @@ def logout(req):
     django_logout(req)
     jm.tmpl_data({'user': None})
     return jm.render()
+
+
+def home(req):
+    try:
+        jm = JMail(req, tmpl_name='user/home')
+    except JMailError as e:
+        return e.response()
+    return jm.render()

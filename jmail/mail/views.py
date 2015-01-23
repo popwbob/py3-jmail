@@ -54,6 +54,7 @@ def read(req, macct_id, mbox_name_enc, mail_uid):
         return jm.error(500, e.args[0])
 
     jm.tmpl_data({
+        'load_navbar_path': True,
         'mbox': {
             'name': mbox_name,
             'name_encode': mbox_name_enc,

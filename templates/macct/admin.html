@@ -1,0 +1,20 @@
+{% include "head.html" %}
+<div class="macct-admin">
+<ul class="buttons">
+    <li><a href="{% url 'macct:create' %}">create new</a></li>
+</ul>
+<ul class="buttons">
+    {% for macct in mail.accounts %}
+    <li>
+        {{macct.address}}
+        <ul class="buttons">
+            <li>
+                <a href="{% url 'macct:edit' macct.id %}">edit</a>
+                <a href="{% url 'macct:remove' macct.id %}">remove</a>
+            </li>
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+</div><!-- macct-admin -->
+{% include "tail.html" %}

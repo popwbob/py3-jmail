@@ -9,6 +9,11 @@ body
     background-color:white;
 }
 
+.container input
+{
+    border:1px solid black;
+}
+
 .content
 {
     padding:0;
@@ -24,26 +29,34 @@ body
     overflow:auto;
 }
 
-.buttons br
+input[type=submit]
 {
-    line-height:200%;
+    padding:0;
 }
-.buttons a, input
+.buttons a, input[type=submit]
 {
-    text-decoration: none;
-    border:1px solid black;
-    padding:1px 5px;
-    color:black;
+    text-decoration: underline;
+    border:none;
+    color:blue;
     background-color:white;
 }
 .buttons a:visited
 {
-    color:black;
+    color:blue;
 }
 .buttons a:hover, input[type=submit]:hover
 {
     cursor:pointer;
-    background-color:lightgray;
+    font-weight:bold;
+    border:none;
+}
+ul.buttons
+{
+    margin-bottom:7px;
+}
+ul.buttons li
+{
+    list-style:none;
 }
 
 .mail-headers p

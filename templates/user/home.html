@@ -1,0 +1,8 @@
+{% include "head.html" %}
+<div class="user-home">
+    <ul class="buttons">
+        <li><a href="{% url 'macct:admin' %}">accounts</a></li>
+        <li><a href="{% url 'user:logout' %}">logout</a></li>
+    </ul>
+</div><!-- user-home -->
+{% include "tail.html" %}

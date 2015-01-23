@@ -4,7 +4,7 @@
     <form action="{% url 'macct:edit' macct.id %}" method="POST">
         {% csrf_token %}
         {{macct_formset}}
-        <input type="submit" value="save"> <span class="buttons"><a href="{% url 'home' %}">cancel</a></span>
+        <input type="submit" value="save"> <span class="buttons"><a href="{% url 'macct:admin' %}">cancel</a></span>
     </form>
 </div>
 <script>

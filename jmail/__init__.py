@@ -172,6 +172,15 @@ class JMail(JMailBase):
         return macct
 
 
+    def macct_get_all(self):
+        try:
+            accounts = JMailMAcct.objects.filter(user=self.user).values()
+        except JMailMAcct.DoesNotExist:
+            accounts = []
+        self.log.dbg('macct_get_all accounts: ', len(accounts))
+        return accounts
+
+
     def imap_start(self, macct):
         use_ssl = macct.get('imap_server_ssl')
         try:
