@@ -3,16 +3,14 @@
     {% include 'inc/mbox_navbar.html' %}
 
     {% if msgs|length_is:"0" %}
-    <pre>NO MESSAGES</pre>
+        <pre>NO MESSAGES</pre>
     {% else %}
-    {% for mail in msgs %}
-    <pre>{{mail.flags}} {{mail.size}}
-
-{% for hn, hv in mail.headers %}{{hn}}: {{hv}}
-{% endfor %}
-{% include 'macct/check_navbar.html' %}</pre>
-    <hr>
-    {% endfor %}
+        {% for msg in msgs %}
+            {% include 'inc/mail_attributes.html' %}
+            {% include 'inc/mail_headers.html' %}
+            {% include 'macct/check_navbar.html' %}
+            <hr>
+        {% endfor %}
     {% endif %}
 </div>
 {% include "inc/tail.html" %}
