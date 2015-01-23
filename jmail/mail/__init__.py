@@ -29,6 +29,7 @@ class JMailMessage:
     body_parts = None
     size = None
     prop = None
+    attachs = None
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None):
@@ -88,7 +89,7 @@ class JMailMessage:
 
 
     def _msg_properties(self, msg):
-        self.log.dbg('msg properties')
+        self.log.dbg('msg properties: ', type(msg))
         prop = {
             #~ 'default_type': msg.get_default_type(),
             'content_type': msg.get_content_type(),
@@ -112,11 +113,20 @@ class JMailMessage:
         if idx is not None:
             d = msg.values()[idx]
             ct = d.split(';')[0].strip()
-            cs = d.split(';')[1].strip()
             prop['content_type'] = ct
-            k, v = cs.split('=')
-            if k == 'charset':
-                prop['charset'] = v
+            try:
+                cs = d.split(';')[1].strip()
+            except IndexError:
+                cs = None
+            if cs is not None:
+                self.log.dbg('split charset: ', cs)
+                try:
+                    k, v = cs.split('=')
+                except ValueError:
+                    k = '__VALUE_ERROR__'
+                    v = None
+                if k == 'charset':
+                    prop['charset'] = v
         # -- transfer encoding
         try:
             idx = msg_keys.index('Content-Transfer-Encoding')
@@ -189,12 +199,27 @@ class JMailMessage:
                 return text
 
 
+    def _msg_attachs(self, part, props):
+        self.log.dbg('msg attachs')
+        self.attachs.append({
+            'content_type': props['content_type'],
+            'filename': props['filename'],
+        })
+
+
     def _body_parts(self, body):
         self.log.dbg('msg body parts')
+        self.attachs = list()
         text = None
         for part in body.walk():
-            self.log.dbg('part content type: ', part.get_content_type())
-            if part.get_content_maintype() == 'text':
+            props = self._msg_properties(part)
+            self.log.dbg('part props: ', props)
+            disp = props.get('disposition', None)
+            if disp is None:
+                disp = '__NOT_SET__'
+            if disp.startswith('attachment'):
+                self._msg_attachs(part, props)
+            elif props['content_maintype'] == 'text':
                 self.log.dbg('part maintype text')
                 r = self._body_text(part)
                 if r is not None:

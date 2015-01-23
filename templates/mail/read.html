@@ -5,10 +5,15 @@
     </p>
     {% include 'mail/attributes.html' %}
     {% include 'mail/headers.html' %}
-    <div class="mail-parts">
-    {% for part in msg.body_parts %}
-        {{part}}
-    {% endfor %}
+    <div class="mail-attachs">
+        <p>
+        {% for part in msg.body_parts %}
+            {{part}}
+        {% endfor %}
+        {% for attach in msg.attachs %}
+            <a title="{{attach.content_type}}"><q>{{attach.filename}}</q></a>
+        {% endfor %}
+        </p>
     </div>
     <pre class="mail-body">
 {{msg.body}}
