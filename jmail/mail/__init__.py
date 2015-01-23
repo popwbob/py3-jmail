@@ -225,7 +225,7 @@ class JMailMessage:
     def _body_get(self, body):
         self.log.dbg('msg body get')
         if self._honly:
-            return '[HEADERS ONLY]'
+            return ['[HEADERS ONLY]']
         self.body_parts = list()
         props = self._msg_properties(body)
         if body.is_multipart():
@@ -236,7 +236,7 @@ class JMailMessage:
             if body.get_content_maintype() == 'text':
                 text = self._body_text(body, props)
             if text is None:
-                return '[NO TEXT CONTENT]'
+                return ['[NO TEXT CONTENT]']
             else:
                 return text
 
@@ -268,7 +268,7 @@ class JMailMessage:
                     text = r
                     self.prop = part_props
         if text is None:
-            text = '[NO CONTENT]'
+            text = ['[NO CONTENT]']
         return text
 
 
