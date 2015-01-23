@@ -57,6 +57,7 @@ ul.buttons
 ul.buttons li
 {
     list-style:none;
+    text-indent:-40px;
 }
 
 .mail-headers p
