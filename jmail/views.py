@@ -6,6 +6,7 @@ from jmail.error import JMailError
 
 from django.conf import settings
 
+
 def debug(req):
     jm = JMail(req, user_auth=False)
     ddata = jm.debug_data()

@@ -51,7 +51,6 @@ def logout(req):
         jm = JMail(req)
     except JMailError as e:
         return e.response()
-    jm.doc_navbar = False
     django_logout(req)
     jm.tmpl_data({'user': None})
     return jm.render()

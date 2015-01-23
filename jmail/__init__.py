@@ -24,7 +24,6 @@ class JMailBase:
     _tmpl_path = None
     _tmpl_data = None
     imap = None
-    doc_navbar = False
     user = None
     debug = None
     macct = None
@@ -90,7 +89,6 @@ class JMail(JMailBase):
             'doc': {
                 'error': False,
                 'title': 'JMail - {}'.format(self._req.path),
-                'navbar': self.doc_navbar,
                 'charset': self.charset,
             },
         }
@@ -114,7 +112,6 @@ class JMail(JMailBase):
                 except JMailUser.DoesNotExist:
                     django_logout(self._req)
                     raise JMailError(401, 'Bad user')
-                self.doc_navbar = True
             else:
                 django_logout(self._req)
                 raise JMailError(401, 'Bad user group')
@@ -122,13 +119,16 @@ class JMail(JMailBase):
             raise JMailErrorUserUnauth(401, 'Unauthenticated user')
 
 
-    def render(self, tmpl_name=None):
+    def render(self, tmpl_name=None, content_type='text/html', charset=None):
         if tmpl_name is not None:
             self._tmpl_name = tmpl_name
             self._tmpl_path = self._tmpl_path_get()
-        self._tmpl_data['doc']['navbar'] = self.doc_navbar
+        if charset is None:
+            charset = self.charset
+        ctype = '{}; charset={}'.format(content_type, charset)
+        self._tmpl_data['doc']['charset'] = charset
         self.end()
-        return render(self._req, self._tmpl_path, self._tmpl_data)
+        return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
 
 
     def tmpl_data(self, data):
