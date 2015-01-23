@@ -37,17 +37,17 @@ input[type=submit]
 {
     text-decoration: underline;
     border:none;
-    color:blue;
+    color:black;
     background-color:white;
 }
 .buttons a:visited
 {
-    color:blue;
+    color:black;
 }
 .buttons a:hover, input[type=submit]:hover
 {
+    color:blue;
     cursor:pointer;
-    font-weight:bold;
     border:none;
 }
 ul.buttons
