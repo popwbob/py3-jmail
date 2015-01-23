@@ -2,7 +2,6 @@ from base64 import urlsafe_b64decode
 
 from jmail import JMail
 from jmail.error import JMailError
-from jmail.mbox import JMailMBox
 
 from . import JMailMessage
 
