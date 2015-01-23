@@ -24,6 +24,13 @@ body
     padding:0;
 }
 
+.mail-read-html iframe
+{
+    min-width:100%;
+    border:none;
+    overflow:hidden;
+}
+
 .mail-body, .mail-source pre
 {
     font-size:100%;
