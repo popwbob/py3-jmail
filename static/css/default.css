@@ -3,56 +3,65 @@ body
     font-size:120%;
     line-height:150%;
     margin:0;
-    padding:1px 7px;
-    font-family:monospace;
-}
-
-#jmail
-{
     padding:3px 9px;
-}
-#jmail hr
-{
-    color:gray;
-    height:1px;
-    border-width:0;
-    background-color:gray;
+    font-family:monospace;
+    color:black;
+    background-color:white;
 }
 
-#mail-flags p
+.content
 {
-    border:1px dotted black;
+    padding:0;
+}
+
+.mail-read
+{
+    padding:0;
+}
+
+.mail-body
+{
     overflow:auto;
-    padding:3px 6px;
-    margin-top:6px;
-    margin-bottom:6px;
 }
 
-#mail-headers p
+.buttons br
 {
+    line-height:200%;
+}
+.buttons a, input
+{
+    text-decoration: none;
     border:1px solid black;
-    padding:3px 6px;
-    overflow:auto;
-    margin-top:6px;
-    margin-bottom:6px;
+    padding:1px 5px;
+    color:black;
+    background-color:white;
 }
-#mail-headers p .header-key
+.buttons a:visited
 {
-    font-weight:bold;
+    color:black;
 }
-
-#mail-body
+.buttons a:hover, input[type=submit]:hover
 {
-    padding:1px 6px;
-    overflow:auto;
-    margin-top:9px;
+    cursor:pointer;
+    background-color:lightgray;
 }
 
-#mail-parts
+.mail-headers p
 {
+    overflow:auto;
     border:1px dotted black;
-    overflow:auto;
-    padding:3px 6px;
-    margin-top:6px;
-    margin-bottom:6px;
+    padding:1px 3px;
+    line-height: 120%;
+}
+.header-key
+{
+    font-weight: bold;
+}
+.mail-flags
+{
+    margin-bottom: -11px;
+}
+.mail-actions
+{
+    margin-top: -11px;
 }

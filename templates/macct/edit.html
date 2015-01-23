@@ -4,7 +4,10 @@
     <form action="{% url 'macct:edit' macct.id %}" method="POST">
         {% csrf_token %}
         {{macct_formset}}
-        <input type="submit" value="save"><span> - <a href="{% url 'home' %}">cancel</a></span>
+        <input type="submit" value="save"> <span class="buttons"><a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
+<script>
+    jmail_set_password_type("id_password");
+</script>
 {% include "tail.html" %}

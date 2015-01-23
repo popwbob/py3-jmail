@@ -1,10 +1,9 @@
 {% include "head.html" %}
 <div class="macct-remove">
-    <h3>Remove {{macct.address}}</h3>
     <p>Are you sure you want to remove <b>{{macct.address}}</b> account?</p>
     <form action="{% url 'macct:remove' macct.id %}" method="POST">
         {% csrf_token %}
-        <input type="submit" value="confirm"><span> - <a href="{% url 'home' %}">cancel</a></span>
+        <input type="submit" value="confirm"> <span class="buttons"><a href="{% url 'home' %}">cancel</a></span>
     </form>
 </div>
 {% include "tail.html" %}

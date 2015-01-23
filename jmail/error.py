@@ -22,6 +22,7 @@ class JMailError(Exception):
                 'status': self.status,
                 'message': self.message,
             },
+            'user': None,
         }
         return td
 

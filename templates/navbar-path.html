@@ -1,11 +1,12 @@
 <div class="path">
     <p class="buttons">
     {% if macct %}
-        <a href="{% url 'macct:subs' macct.id %}">{{macct.address}}</a>
+        {{macct.address}}
+        <a href="{% url 'macct:subs' macct.id %}">check</a>
     {% endif %}
     {% if mbox %}
-        <br>
-        <a href="{% url 'macct:check' macct.id mbox.name_encode %}">{{mbox.name}}</a>
+        <br>{{mbox.name}}
+        <a href="{% url 'macct:check' macct.id mbox.name_encode %}">refresh</a>
     {% endif %}
     </p>
 </div>
