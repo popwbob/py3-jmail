@@ -31,7 +31,7 @@ def _mdata_debug(jm, mdata):
     return mdata_debug
 
 
-def read(req, macct_id, mbox_name_enc, mail_uid):
+def read(req, macct_id, mbox_name_enc, mail_uid, read_html=None):
     try:
         jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
@@ -43,10 +43,15 @@ def read(req, macct_id, mbox_name_enc, mail_uid):
     except Exception as e:
         return jm.error(400, 'Bad request: {}'.format(e.args[0]))
 
-    msg = JMailMessage(mail_uid)
+    if read_html is not None:
+        read_html = True
+    jm.log.dbg('read HTML: ', read_html)
+
+    msg = JMailMessage(mail_uid, read_html=read_html)
     msg.fetch()
     jm.imap.close()
     jm.imap_end()
+
 
     jm.tmpl_data({
         'load_navbar_path': True,
@@ -55,6 +60,7 @@ def read(req, macct_id, mbox_name_enc, mail_uid):
             'name_encode': mbox_name_enc,
         },
         'msg': msg,
+        'read_html': read_html,
     })
     return jm.render()
 

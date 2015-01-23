@@ -20,6 +20,7 @@ class JMailMessage:
     _honly = None
     _imap = None
     _msg = None
+    _html = None
     log = None
     source = None
     headers = None
@@ -32,7 +33,7 @@ class JMailMessage:
     attachs = None
 
 
-    def __init__(self, mail_uid=None, headers_only=False, imap=None):
+    def __init__(self, mail_uid=None, headers_only=False, imap=None, read_html=False):
         self.log = JMailBase.log
         self.log.dbg('msg init')
         self.uid = mail_uid
@@ -40,6 +41,7 @@ class JMailMessage:
         self._imap = JMailBase.imap
         if imap is not None:
             self._imap = imap
+        self._html = read_html
 
 
     def fetch(self, mail_uid=None, headers_only=None):
@@ -55,7 +57,6 @@ class JMailMessage:
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
 
         self._msg = email.message_from_bytes(mdata[0][1])
-        #~ self.log.dbg('msg: ', type(self._msg), ' ', sorted(dir(self._msg)))
         self.log.dbg('msg multipart: ', self._msg.is_multipart())
 
         self.source = self._msg.as_string()
@@ -89,7 +90,6 @@ class JMailMessage:
 
 
     def _msg_properties(self, msg):
-        self.log.dbg('msg properties: ', type(msg))
         prop = {
             #~ 'default_type': msg.get_default_type(),
             'content_type': msg.get_content_type(),
@@ -119,7 +119,7 @@ class JMailMessage:
             except IndexError:
                 cs = None
             if cs is not None:
-                self.log.dbg('split charset: ', cs)
+                #~ self.log.dbg('split charset: ', cs)
                 try:
                     k, v = cs.split('=')
                 except ValueError:
@@ -141,14 +141,20 @@ class JMailMessage:
             idx = None
         if idx is not None:
             prop['disposition'] = msg.values()[idx]
+        # -- debug info
+        self.log.dbg('msg properties: ', type(msg),
+            ' {}, {}'.format(
+                prop['content_type'],
+                prop['disposition'],
+            )
+        )
         return prop
 
 
-    def _text_plain(self, msg):
-        text = msg.get_payload()
+    def _text_encoding(self, text, props):
         self.log.dbg('msg text: ', type(text))
-        tenc = self.prop['transfer_encoding']
-        charset = self.prop['charset']
+        tenc = props['transfer_encoding']
+        charset = props['charset']
         self.log.dbg('transfer encoding: ', tenc)
         # -- quoted-printable
         if tenc == 'quoted-printable':
@@ -159,7 +165,19 @@ class JMailMessage:
         return text
 
 
-    def _body_text(self, msg):
+    def _text_html(self, msg, props):
+        self.log.dbg('text html')
+        text = msg.get_payload()
+        return self._text_encoding(text, props)
+
+
+    def _text_plain(self, msg, props):
+        self.log.dbg('text plain')
+        text = msg.get_payload()
+        return self._text_encoding(text, props)
+
+
+    def _body_text(self, msg, props):
         self.log.dbg('msg body text')
         self.log.dbg('msg boundary: ', msg.get_boundary())
         #~ self.log.dbg('msg attach: ', msg.attach)
@@ -168,16 +186,21 @@ class JMailMessage:
         #~ self.log.dbg('msg preamble: ', msg.preamble)
         self.log.dbg('msg keys: ', msg.keys())
         self.log.dbg('msg values: ', msg.values())
-        self.prop = self._msg_properties(msg)
-        self.log.dbg('msg.prop: ', self.prop)
+        self.log.dbg('props: ', props)
         text = None
-        msg_subtype = msg.get_content_subtype()
+        msg_subtype = props['content_subtype']
         if msg_subtype == 'plain':
             self.log.dbg('subtype plain')
-            text = self._text_plain(msg)
+            if self._html:
+                self.body_parts.append('text/plain')
+            else:
+                text = self._text_plain(msg, props)
         elif msg_subtype == 'html':
             self.log.dbg('subtype html')
-            self.body_parts.append('text/html')
+            if self._html:
+                text = self._text_html(msg, props)
+            else:
+                self.body_parts.append('text/html')
         return text
 
 
@@ -186,13 +209,14 @@ class JMailMessage:
         if self._honly:
             return '[HEADERS ONLY]'
         self.body_parts = list()
+        props = self._msg_properties(body)
         if body.is_multipart():
             return self._body_parts(body)
         else:
-            self.log.dbg('body content main type: ', body.get_content_maintype())
+            self.log.dbg('body content type: ', props['content_type'])
             text = None
             if body.get_content_maintype() == 'text':
-                text = self._body_text(body)
+                text = self._body_text(body, props)
             if text is None:
                 return '[NO TEXT CONTENT]'
             else:
@@ -212,20 +236,21 @@ class JMailMessage:
         self.attachs = list()
         text = None
         for part in body.walk():
-            props = self._msg_properties(part)
-            self.log.dbg('part props: ', props)
-            disp = props.get('disposition', None)
+            part_props = self._msg_properties(part)
+            #~ self.log.dbg('part props: ', part_props)
+            disp = part_props.get('disposition', None)
             if disp is None:
                 disp = '__NOT_SET__'
             if disp.startswith('attachment'):
-                self._msg_attachs(part, props)
-            elif props['content_maintype'] == 'text':
+                self._msg_attachs(part, part_props)
+            elif part_props['content_maintype'] == 'text':
                 self.log.dbg('part maintype text')
-                r = self._body_text(part)
+                r = self._body_text(part, part_props)
                 if r is not None:
                     text = r
+                    self.prop = part_props
         if text is None:
-            text = '[NO PLAIN TEXT CONTENT]'
+            text = '[NO CONTENT]'
         return text
 
 
