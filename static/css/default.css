@@ -1,7 +1,7 @@
 body
 {
-    font-size:120%;
-    line-height:150%;
+    font-size:110%;
+    line-height:140%;
     margin:0;
     padding:3px 9px;
     font-family:monospace;
@@ -19,14 +19,19 @@ body
     padding:0;
 }
 
-.mail-read
+.mail-read, .mail-source
 {
     padding:0;
 }
 
-.mail-body
+.mail-body, .mail-source pre
 {
+    font-size:100%;
     overflow:auto;
+}
+.mail-source pre
+{
+    font-size:90%;
 }
 
 input[type=submit]
@@ -60,12 +65,17 @@ ul.buttons li
     text-indent:-40px;
 }
 
+.macct-check
+{
+    font-size:90%;
+}
+
 .mail-headers p
 {
     overflow:auto;
     border:1px dotted black;
     padding:1px 3px;
-    line-height: 120%;
+    line-height: 110%;
 }
 .header-key
 {

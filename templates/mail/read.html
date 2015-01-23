@@ -1,13 +1,18 @@
 {% include "head.html" %}
 <div class="mail-read">
+    <p class="buttons">
+        <a href="{% url 'mail:source' macct.id mbox.name_encode msg.uid %}">view source</a>
+    </p>
     {% include 'mail/attributes.html' %}
     {% include 'mail/headers.html' %}
+    <div class="mail-parts">
+    {% for part in msg.body_parts %}
+        {{part}}
+    {% endfor %}
+    </div>
     <pre class="mail-body">
 {{msg.body}}
 </pre>
-    <div class="mail-parts">
-        {{msg.body_parts}}
-    </div>
 </div><!-- mail-read -->
 
 {% if mdata_debug %}

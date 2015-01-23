@@ -14,7 +14,7 @@ from jmail.error import JMailError, JMailErrorUserUnauth
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
-IMAP_DEBUG = 3
+IMAP_DEBUG = 0
 
 
 class JMailBase:
@@ -114,7 +114,6 @@ class JMail(JMailBase):
                 except JMailUser.DoesNotExist:
                     django_logout(self._req)
                     raise JMailError(401, 'Bad user')
-                self.log.dbg('user: ', str(self.user))
                 self.doc_navbar = True
             else:
                 django_logout(self._req)
@@ -133,8 +132,9 @@ class JMail(JMailBase):
 
 
     def tmpl_data(self, data):
-        self.log.dbg('tmpl_data macct: ', self.macct)
-        self._tmpl_data.update({'macct': self.macct})
+        self._tmpl_data.update({
+            'macct': self.macct,
+        })
         self._tmpl_data.update(data)
 
 

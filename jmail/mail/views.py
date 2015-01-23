@@ -35,8 +35,37 @@ def read(req, macct_id, mbox_name_enc, mail_uid):
     try:
         jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
-        if jm:
-            jm.end()
+        return e.response()
+
+    mbox_name = urlsafe_b64decode(mbox_name_enc.encode())
+    try:
+        jm.imap.select(mbox_name)
+    except Exception as e:
+        return jm.error(400, 'Bad request: {}'.format(e.args[0]))
+
+    try:
+        msg = JMailMessage(mail_uid)
+        msg.fetch()
+        jm.imap.close()
+        jm.imap_end()
+    except Exception as e:
+        return jm.error(500, e.args[0])
+
+    jm.tmpl_data({
+        'load_navbar_path': True,
+        'mbox': {
+            'name': mbox_name,
+            'name_encode': mbox_name_enc,
+        },
+        'msg': msg,
+    })
+    return jm.render()
+
+
+def source(req, macct_id, mbox_name_enc, mail_uid):
+    try:
+        jm = JMail(req, tmpl_name='mail/source', macct_id=macct_id, imap_start=True)
+    except JMailError as e:
         return e.response()
 
     mbox_name = urlsafe_b64decode(mbox_name_enc.encode())

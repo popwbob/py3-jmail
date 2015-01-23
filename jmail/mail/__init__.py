@@ -4,11 +4,11 @@ from jmail import JMailBase
 
 SHOW_HEADERS = [
     #~ 'x-spam-level',
+    'date',
     'from',
     'to',
     'cc',
     'subject',
-    'date',
 ]
 
 
@@ -18,6 +18,7 @@ class JMailMessage:
     _imap = None
     _raw = None
     log = None
+    source = None
     headers = None
     headers_full = None
     flags = None
@@ -34,7 +35,6 @@ class JMailMessage:
         if imap is not None:
             self._imap = imap
         self.log = JMailBase.log
-        self.log.dbg('JMailMessage created')
 
 
     def fetch(self, mail_uid=None, headers_only=None):
@@ -46,20 +46,17 @@ class JMailMessage:
         if self._honly:
             fetch_cmd = 'BODY.PEEK[HEADER]'
 
-        self.log.dbg('JMailMessage mail_uid: ', self.uid)
-        self.log.dbg('JMailMessage headers_only: ', self._honly)
-        self.log.dbg('JMailMessage imap: ', self._imap)
-        self.log.dbg('JMailMessage fetch_cmd: ', fetch_cmd)
+        self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
 
-        self.body_raw = email.message_from_bytes(mdata[0][1])
-        self.log.dbg('body_raw multipart: ', self.body_raw.is_multipart())
+        self.source = email.message_from_bytes(mdata[0][1])
+        self.log.dbg('source multipart: ', self.source.is_multipart())
 
-        self.headers_full = self.body_raw.items()
+        self.headers_full = self.source.items()
         self.headers = self._headers_filter(self.headers_full)
 
         self.flags = self._flags_get(mdata[0][0])
-        self.body = self._body_get(self.body_raw)
+        self.body = self._body_get(self.source)
 
 
     def _flags_get(self, mdata):
@@ -81,7 +78,6 @@ class JMailMessage:
 
 
     def _body_text(self, msg):
-        self.log.dbg('body_text msg: ', dir(msg))
         self.prop = {
             'default_type': msg.get_default_type(),
             'content_type': msg.get_content_type(),
@@ -104,7 +100,6 @@ class JMailMessage:
         if body.is_multipart():
             return self._body_parts(body)
         else:
-            self.log.dbg('body: ', sorted(dir(body)))
             self.log.dbg('body content main type: ', body.get_content_maintype())
             text = None
             if body.get_content_maintype() == 'text':
