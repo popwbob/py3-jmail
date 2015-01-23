@@ -1,4 +1,5 @@
 import email
+from email.header import decode_header
 from base64 import b64decode
 from quopri import decodestring
 
@@ -75,6 +76,23 @@ class JMailMessage:
         return [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
 
 
+    def _header_decode(self, hval):
+        l = decode_header(hval)
+        items = list()
+        for t in l:
+            s = t[0]
+            c = t[1]
+            if type(s) is str:
+                items.append(s)
+            else:
+                if c is None:
+                    items.append(s.decode())
+                else:
+                    items.append(s.decode(c))
+        return ' '.join(items)
+
+
+
     def _headers_filter(self, headers):
         self.log.dbg('msg headers filter')
         f = list()
@@ -84,7 +102,7 @@ class JMailMessage:
                 hv = None
                 for h in headers:
                     if h[0].lower() == hk:
-                        hv = h[1]
+                        hv = self._header_decode(h[1])
                 f.append((hk.capitalize(), hv))
         return f
 
