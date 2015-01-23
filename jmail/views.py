@@ -1,3 +1,5 @@
+import sys
+
 from jmail import JMail
 from jmail import settings as jmail_settings
 from jmail.error import JMailError
@@ -7,6 +9,9 @@ from django.conf import settings
 def debug(req):
     jm = JMail(req, user_auth=False)
     ddata = jm.debug_data()
+
+    ddata.append('python: {}'.format(sys.version))
+    ddata.append('')
 
     ddata.append('req.path: {}'.format(req.path))
     ddata.append('req.path_info: {}'.format(req.path_info))

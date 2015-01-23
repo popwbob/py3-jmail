@@ -1,4 +1,5 @@
 import email
+from quopri import decodestring
 from jmail import JMailBase
 
 
@@ -146,6 +147,10 @@ class JMailMessage:
         if msg.get_content_subtype() == 'plain':
             text = msg.get_payload()
         self.log.dbg('msg text: ', type(text))
+        # -- encoding
+        if self.prop['transfer_encoding'] == 'quoted-printable':
+            self.log.dbg('text quoted-printable')
+            text = decodestring(text.encode()).decode()
         return text
 
 
