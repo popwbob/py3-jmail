@@ -13,6 +13,7 @@ def login(req):
         return e.response()
     if req.user.is_authenticated():
         return jm.redirect('home')
+    jm.tmpl_data({})
     return jm.render()
 
 
@@ -61,4 +62,5 @@ def home(req):
         jm = JMail(req, tmpl_name='user/home')
     except JMailError as e:
         return e.response()
+    jm.tmpl_data({})
     return jm.render()

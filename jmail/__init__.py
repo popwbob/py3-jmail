@@ -179,6 +179,7 @@ class JMail(JMailBase):
 
     def tmpl_data(self, data):
         self._tmpl_data.update({
+            'date_time': time.strftime('%a, %d %b %Y %H:%M:%S %z', time.localtime()),
             'macct': self.macct,
         })
         self._tmpl_data.update(data)

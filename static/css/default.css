@@ -114,5 +114,7 @@ ul.buttons li
 
 .footer p
 {
+    line-height:110%;
+    font-size:70%;
     color:gray;
 }
