@@ -9,7 +9,7 @@ body
     background-color:white;
 }
 
-.container input
+.container input,textarea
 {
     border:1px solid black;
 }
@@ -117,4 +117,46 @@ ul.buttons li
     line-height:110%;
     font-size:70%;
     color:gray;
+}
+
+.mail-compose
+{
+    line-height:2em;
+}
+.mail-compose label
+{
+    vertical-align:top;
+    font-weight:bold;
+}
+
+#mail-from
+{
+    width:42.6em;
+    padding:.2em .4em;
+}
+#mail-from[readonly]
+{
+    color:gray;
+}
+#mail-to, #mail-cc
+{
+    width:42.6em;
+    padding:.2em .4em;
+}
+#mail-bcc
+{
+    width:42.6em;
+    padding:.2em .4em;
+}
+#mail-subject
+{
+    width:42.6em;
+    padding:.2em .4em;
+}
+#mail-body
+{
+    padding:.2em .4em;
+    overflow:auto;
+    width:48em;
+    height:30em;
 }
