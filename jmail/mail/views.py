@@ -68,11 +68,11 @@ def attach(req, macct_id, mbox_name_enc, mail_uid, filename_enc):
     if cs is None:
         cs = jm.charset
     ct = attach['content_type']
-    maintype = attach['content_maintype']
-    subtype = attach['content_subtype']
-    if maintype == 'text':
-        if subtype == 'x-patch':
-            ct = 'text/plain'
+    #~ maintype = attach['content_maintype']
+    #~ subtype = attach['content_subtype']
+    #~ if maintype == 'text':
+        #~ if subtype == 'x-patch':
+            #~ ct = 'text/plain'
     resp = HttpResponse(content_type='{}; charset={}'.format(ct, cs))
     resp['Content-Disposition'] = attach['disposition']
     jm.end()
