@@ -1,3 +1,7 @@
+import smtplib
+
+from email.mime.text import MIMEText
+
 from django.http import HttpResponse
 
 from jmail import JMail
@@ -98,10 +102,39 @@ def send(req, macct_id):
     except JMailError as e:
         return e.response()
     jm.log.dbg('mail send: ', jm._req)
-    if req.method == 'POST':
-        return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
-    else:
-        return jm.error(500, 'mail send failed!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
+
+    td = jm.tmpl_data({'load_navbar_path': True})
+
+    if req.method != 'POST':
+        return jm.error(400, 'bad request', tmpl_data=td)
+
+    try:
+        msg = MIMEText(req.POST.get('mail_body', ''))
+        msg['From'] = req.POST.get('mail_from')
+        msg['To'] = req.POST.get('mail_to')
+    except Exception as e:
+        return jm.error(500, 'could not create email: '+str(e), tmpl_data=td)
+
+    mail_subject = req.POST.get('mail_subject', None)
+    if mail_subject is not None:
+        msg['Subject'] = mail_subject
+
+    mail_cc = req.POST.get('mail_cc', None)
+    if mail_cc is not None:
+        msg['Cc'] = mail_cc
+
+    mail_bcc = req.POST.get('mail_bcc', None)
+    if mail_bcc is not None:
+        msg['Bcc'] = mail_bcc
+
+    try:
+        smtp = smtplib.SMTP(jm.macct['smtp_server'], jm.macct['smtp_server_port'])
+        smtp.send_message(msg)
+        smtp.quit()
+    except Exception as e:
+        return jm.error(500, 'SMTP error: '+str(e), tmpl_data=td)
+
+    return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
 
 
 def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=False):
