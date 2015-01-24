@@ -1,5 +1,5 @@
 {% include "head.html" %}
-<div class="macct-subs">
+<div class="mbox-subs">
     <ul class="buttons">
     {% for child in subs_list %}
         <li><a href="{% url 'mbox:check' macct.id child.name_encode %}">{{child.name}}</a></li>

@@ -2,7 +2,7 @@
     <p class="buttons">
     {% if load_navbar_path %}
         {% if macct %}
-        <a href="{% url 'macct:subs' macct.id %}">{{macct.address}}</a>
+        <a href="{% url 'mbox:subs' macct.id %}">{{macct.address}}</a>
         {% endif %}
         {% if mbox %}
         <p class="buttons">
