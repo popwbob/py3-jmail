@@ -1,5 +1,6 @@
 import json
 import imaplib
+import time
 
 from base64 import urlsafe_b64encode
 
@@ -25,6 +26,7 @@ class JMailBase:
     _tmpl_name = None
     _tmpl_path = None
     _tmpl_data = None
+    _start_tstamp = None
     imap = None
     user = None
     debug = None
@@ -76,6 +78,7 @@ class JMailBase:
 class JMail(JMailBase):
 
     def __init__(self, req, user_auth=True, tmpl_name=None, macct_id=None, imap_start=False):
+        self._start_tstamp = time.time()
         JMailBase.log = JMailLog()
         self.log.dbg('start')
         self._load_settings()
@@ -107,7 +110,9 @@ class JMail(JMailBase):
             self.user.save()
         JMailBase.macct = None
         JMailBase.imap = None
-        self.log.dbg('end')
+        took = time.time() - self._start_tstamp
+        self.log.dbg('end - {}s'.format(took))
+        return took
 
 
     def _tmpl_path_get(self):
@@ -168,7 +173,7 @@ class JMail(JMailBase):
             charset = self.charset
         ctype = '{}; charset={}'.format(content_type, charset)
         self._tmpl_data['doc']['charset'] = charset
-        self.end()
+        self._tmpl_data['took'] = '{:.3f}'.format(self.end())
         return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
 
 

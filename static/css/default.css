@@ -111,3 +111,8 @@ ul.buttons li
     font-size:80%;
     border-bottom:1px dotted black;
 }
+
+.footer p
+{
+    color:gray;
+}
