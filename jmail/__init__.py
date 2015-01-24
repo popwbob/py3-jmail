@@ -46,6 +46,32 @@ class JMailBase:
             idx += 1
         return '{:.2f}{}'.format(sh, B2H_UNITS[idx])
 
+    @classmethod
+    def _cache_key(self, key):
+        ck = str(self._req.user)
+        ck += ':'+self._tmpl_name
+        ck += ':'+str(self.macct.get('id'))
+        ck += ':'+key
+        self.log.dbg('cache_key: ', ck)
+        return ck
+
+    @classmethod
+    def cache_get(self, key, default=None):
+        ck = self._cache_key(key)
+        cv = django_cache.get(ck, None)
+        if cv is None:
+            return default
+        else:
+            return cv
+
+    @classmethod
+    def cache_set(self, key, val, ttl=None):
+        ck = self._cache_key(key)
+        if ttl is None:
+            django_cache.set(ck, val)
+        else:
+            django_cache.set(ck, val, ttl)
+
 
 class JMail(JMailBase):
 
@@ -73,6 +99,10 @@ class JMail(JMailBase):
 
 
     def end(self):
+        try:
+            self.imap_end()
+        except Exception as e:
+            self.log.warn('imap_end: ', e)
         if self.user is not None:
             self.user.save()
         JMailBase.macct = None
@@ -214,7 +244,8 @@ class JMail(JMailBase):
     def imap_end(self, imap=None):
         if imap is None:
             imap = self.imap
-        return imap.logout()
+        if imap is not None:
+            imap.logout()
 
 
     def imap_lsub(self, imap=None):
@@ -246,29 +277,3 @@ class JMail(JMailBase):
                 'name_encode': urlsafe_b64encode(c).decode(),
             })
         return r
-
-
-    def _cache_key(self, key):
-        ck = str(self._req.user)
-        ck += ':'+self._tmpl_name
-        ck += ':'+str(self.macct.get('id'))
-        ck += ':'+key
-        self.log.dbg('cache_key: ', ck)
-        return ck
-
-
-    def cache_get(self, key, default=None):
-        ck = self._cache_key(key)
-        cv = django_cache.get(ck, None)
-        if cv is None:
-            return default
-        else:
-            return cv
-
-
-    def cache_set(self, key, val, ttl=None):
-        ck = self._cache_key(key)
-        if ttl is None:
-            django_cache.set(ck, val)
-        else:
-            django_cache.set(ck, val, ttl)

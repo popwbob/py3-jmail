@@ -15,3 +15,6 @@ class JMailLog:
 
     def err(self, *line_items):
         self._log('ERR', *line_items)
+
+    def warn(self, *line_items):
+        self._log('WRN', *line_items)

@@ -37,12 +37,14 @@ class JMailMessage:
     prop = None
     attachs = None
     seen = None
+    mbox_name = None
 
 
-    def __init__(self, mail_uid=None, headers_only=False, imap=None, read_html=False):
+    def __init__(self, mail_uid, mbox_name, headers_only=False, imap=None, read_html=False):
         self.log = JMailBase.log
         self.log.dbg('msg init')
         self.uid = mail_uid
+        self.mbox_name = mbox_name
         self._honly = headers_only
         self._imap = JMailBase.imap
         if imap is not None:
@@ -59,8 +61,13 @@ class JMailMessage:
         if self._honly:
             fetch_cmd = 'BODY.PEEK[]'
 
+        ck = self.mbox_name.decode()+':'+self.uid.decode()
+        mdata = JMailBase.cache_get(ck+':mdata')
+
+        self._imap.select(self.mbox_name)
         self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
+        self._imap.close()
 
         self._msg = email.message_from_bytes(mdata[0][1])
         self.log.dbg('msg multipart: ', self._msg.is_multipart())

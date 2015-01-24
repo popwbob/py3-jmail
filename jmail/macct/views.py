@@ -127,6 +127,7 @@ def check(req, macct_id, mbox_name_enc):
         jm.imap.select(mbox_name)
         typ, msgs_ids = jm.imap.uid('SEARCH', 'ALL')
         jm.log.dbg('msgs_ids: ', msgs_ids)
+        jm.imap.close()
     except Exception as e:
         jm.log.err(e)
         return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))
@@ -135,12 +136,9 @@ def check(req, macct_id, mbox_name_enc):
     msgs = list()
     for muid in msgs_ids[0].split():
         if muid != b'':
-            msg = JMailMessage(muid, headers_only=True)
+            msg = JMailMessage(muid, mbox_name, headers_only=True)
             msg.fetch()
             msgs.append(msg)
-
-    jm.imap.close()
-    jm.imap_end()
 
     jm.log.dbg('msgs: ', msgs)
     jm.log.dbg('msgs number: ', len(msgs))
