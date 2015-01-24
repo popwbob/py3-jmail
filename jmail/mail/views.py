@@ -1,8 +1,7 @@
-from base64 import urlsafe_b64decode
-
 from jmail import JMail
 from jmail.error import JMailError
 
+from ..mbox import JMailMBox
 from . import JMailMessage
 
 
@@ -36,21 +35,17 @@ def read(req, macct_id, mbox_name_enc, mail_uid, read_html=None):
         jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
-
     if read_html is not None:
         read_html = True
     jm.log.dbg('read HTML: ', read_html)
-
-    mbox_name = urlsafe_b64decode(mbox_name_enc.encode())
-    msg = JMailMessage(mail_uid.encode(), mbox_name, read_html=read_html)
-    msg.fetch()
-
+    try:
+        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
+        msg = mbox.msg_fetch(mail_uid, read_html=read_html)
+    except JMailError as e:
+        return e.response()
     jm.tmpl_data({
         'load_navbar_path': True,
-        'mbox': {
-            'name': mbox_name,
-            'name_encode': mbox_name_enc,
-        },
+        'mbox': mbox.tmpl_data(),
         'msg': msg,
         'read_html': read_html,
     })
@@ -60,22 +55,15 @@ def read(req, macct_id, mbox_name_enc, mail_uid, read_html=None):
 def source(req, macct_id, mbox_name_enc, mail_uid):
     try:
         jm = JMail(req, tmpl_name='mail/source', macct_id=macct_id, imap_start=True)
+        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
+        msg = mbox.msg_fetch(mail_uid)
     except JMailError as e:
         return e.response()
-
-    mbox_name = urlsafe_b64decode(mbox_name_enc.encode())
-    try:
-        msg = JMailMessage(mail_uid.encode(), mbox_name)
-        msg.fetch()
     except Exception as e:
-        return jm.error(500, e.args[0])
-
+        return jm.error(500, e)
     jm.tmpl_data({
         'load_navbar_path': True,
-        'mbox': {
-            'name': mbox_name,
-            'name_encode': mbox_name_enc,
-        },
+        'mbox': mbox.tmpl_data(),
         'msg': msg,
     })
     return jm.render()

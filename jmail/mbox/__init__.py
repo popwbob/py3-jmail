@@ -38,6 +38,14 @@ class JMailMBox(JMailBase):
         return msgs
 
 
+    def msg_fetch(self, mail_uid, read_html=False):
+        if type(mail_uid) is str:
+            mail_uid = mail_uid.encode()
+        msg = JMailMessage(mail_uid, self.name, read_html=read_html)
+        msg.fetch()
+        return msg
+
+
     def tmpl_data(self):
         return {
             'name': self.name,
