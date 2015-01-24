@@ -77,22 +77,29 @@ ul.buttons li
     font-size:90%;
 }
 
-.mail-headers p
+.mail-headers
 {
-    overflow:auto;
-    border:1px dotted black;
-    padding:1px 3px;
-    line-height: 110%;
+    border-bottom:1px dotted black;
 }
 .header-key
 {
     font-weight: bold;
 }
+
 .mail-flags
 {
-    margin-bottom: -11px;
+    line-height:90%;
+    font-size:80%;
+    border-bottom:1px dotted black;
 }
+
 .mail-actions
 {
-    margin-top: -11px;
+}
+
+.mail-parts
+{
+    line-height:90%;
+    font-size:80%;
+    border-bottom:1px dotted black;
 }
