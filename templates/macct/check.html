@@ -4,9 +4,24 @@
         <pre>NO MESSAGES</pre>
     {% else %}
         {% for msg in msgs %}
-            {% include 'mail/attributes.html' %}
-            {% include 'mail/headers.html' %}
-            {% include 'mail/actions.html' %}
+            <p class="buttons">
+                <a title="read" href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">{{msg.flags_minimal}}</a>
+
+                {% if not msg.seen %}
+                    <b>
+                {% endif %}
+                {% for hk, hv in msg.headers_short %}
+                    {{hv}} |
+                {% endfor %}
+                {% if not msg.seen %}
+                    </b>
+                {% endif %}
+
+                <span class="size">{{msg.size}}</span>
+            </p>
+            {# include 'mail/attributes.html' #}
+            {# include 'mail/headers.html' #}
+            {# include 'mail/actions.html' #}
         {% endfor %}
     {% endif %}
 </div>

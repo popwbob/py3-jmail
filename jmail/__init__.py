@@ -15,6 +15,7 @@ from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
 IMAP_DEBUG = 0
+B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
 
 class JMailBase:
@@ -34,6 +35,15 @@ class JMailBase:
         r += '    tmpl_path: {}\n'.format(self._tmpl_path)
         r += '}\n'
         return r
+
+    @classmethod
+    def bytes2human(self, size_bytes):
+        idx = 0
+        sh = size_bytes
+        while sh > 1024:
+            sh = sh / 1024
+            idx += 1
+        return '{:.2f}{}'.format(sh, B2H_UNITS[idx])
 
 
 class JMail(JMailBase):

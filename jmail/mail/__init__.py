@@ -1,7 +1,9 @@
 import email
+
 from email.header import decode_header
 from base64 import b64decode
 from quopri import decodestring
+from time import strftime, strptime
 
 from jmail import JMailBase
 
@@ -26,12 +28,15 @@ class JMailMessage:
     source = None
     headers = None
     headers_full = None
+    headers_short = None
     flags = None
     body = None
     body_parts = None
     size = None
+    size_bytes = None
     prop = None
     attachs = None
+    seen = None
 
 
     def __init__(self, mail_uid=None, headers_only=False, imap=None, read_html=False):
@@ -52,7 +57,7 @@ class JMailMessage:
         if headers_only is not None:
             self._honly = headers_only
         if self._honly:
-            fetch_cmd = 'BODY.PEEK[HEADER]'
+            fetch_cmd = 'BODY.PEEK[]'
 
         self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
         typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
@@ -65,15 +70,40 @@ class JMailMessage:
 
         self.headers_full = self._msg.items()
         self.headers = self._headers_filter(self.headers_full)
+        self.headers_short = self._headers_short(self.headers)
 
-        self.flags = self._flags_get(mdata[0][0])
         self.body = self._body_get(self._msg)
+        self.flags = self._flags_get(mdata[0][0])
+        self.flags_minimal = self._flags_minimal(self.flags)
 
 
     def _flags_get(self, mdata):
         self.log.dbg('msg flags get')
-        self.size = mdata.split()[-1]
-        return [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
+        self.size_bytes = int(mdata.split()[-1][1:-1])
+        self.size = JMailBase.bytes2human(self.size_bytes)
+        flags = [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
+        return flags
+
+
+    def _flags_minimal(self, flags):
+        fm = ''
+        # -- seen
+        if '\Seen' in flags:
+            fm += 'S'
+            self.seen = True
+        else:
+            fm += '.'
+        # -- attachs
+        if self.attachs is not None and len(self.attachs) > 0:
+            fm += 'A'
+        else:
+            fm += '.'
+        # -- replied
+        if '\Answered' in flags:
+            fm += 'R'
+        else:
+            fm += '.'
+        return fm
 
 
     def _header_decode(self, hval):
@@ -105,6 +135,21 @@ class JMailMessage:
                         hv = self._header_decode(h[1])
                 f.append((hk.capitalize(), hv))
         return f
+
+
+    def _headers_short(self, headers):
+        hs = list()
+        # '%a, %d %b %Y %H:%M:%S %z'
+        for hk, hv in headers:
+            if hk.lower() == 'date':
+                dstring = ' '.join(hv.split()[:6])
+                dobj = strptime(dstring, '%a, %d %b %Y %H:%M:%S %z')
+                hv = strftime('%Y%m%d.%H:%M', dobj)
+            elif hk.lower() == 'from' or hk.lower() == 'to':
+                if len(hv) > 18:
+                    hv = hv[:18] + '..'
+            hs.append((hk, hv))
+        return hs
 
 
     def _msg_properties(self, msg):
@@ -224,8 +269,8 @@ class JMailMessage:
 
     def _body_get(self, body):
         self.log.dbg('msg body get')
-        if self._honly:
-            return ['[HEADERS ONLY]']
+        #~ if self._honly:
+            #~ return ['[HEADERS ONLY]']
         self.body_parts = list()
         props = self._msg_properties(body)
         if body.is_multipart():
