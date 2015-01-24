@@ -24,6 +24,7 @@ class JMailMessage:
     _imap = None
     _msg = None
     _html = None
+    _ck = None
     log = None
     source = None
     headers = None
@@ -50,6 +51,7 @@ class JMailMessage:
         if imap is not None:
             self._imap = imap
         self._html = read_html
+        self._ck = self.mbox_name.decode()+':'+self.uid.decode()
 
 
     def fetch(self, mail_uid=None, headers_only=None):
@@ -61,18 +63,26 @@ class JMailMessage:
         if self._honly:
             fetch_cmd = 'BODY.PEEK[]'
 
-        ck = self.mbox_name.decode()+':'+self.uid.decode()
-        mdata = JMailBase.cache_get(ck+':mdata')
+        mdata = JMailBase.cache_get(self._ck+':mdata')
+        if mdata is None:
+            self._imap.select(self.mbox_name)
+            self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
+            typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
+            self._imap.close()
+            JMailBase.cache_set(self._ck+':mdata', mdata)
 
-        self._imap.select(self.mbox_name)
-        self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
-        typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
-        self._imap.close()
+        self._msg = JMailBase.cache_get(self._ck+':msg')
+        if self._msg is None:
+            self._msg = email.message_from_bytes(mdata[0][1])
+            JMailBase.cache_set(self._ck+':msg', self._msg)
 
-        self._msg = email.message_from_bytes(mdata[0][1])
         self.log.dbg('msg multipart: ', self._msg.is_multipart())
 
-        self.source = self._msg.as_string()
+        self.source = JMailBase.cache_get(self._ck+':source')
+        if self.source is None:
+            self.source = self._msg.as_string()
+            JMailBase.cache_set(self._ck+':source', self.source)
+
         self.log.dbg('msg source: ', type(self.source))
 
         self.headers_full = self._msg.items()
@@ -88,11 +98,16 @@ class JMailMessage:
         self.log.dbg('msg flags get')
         self.size_bytes = int(mdata.split()[-1][1:-1])
         self.size = JMailBase.bytes2human(self.size_bytes)
+        flags = JMailBase.cache_get(self._ck+':flags')
+        if flags is not None:
+            return flags
         flags = [f.decode().replace('(', '').replace(')', '') for f in mdata.split()[4:][:-2]]
+        JMailBase.cache_set(self._ck+':flags', flags)
         return flags
 
 
     def _flags_minimal(self, flags):
+        self.log.dbg('msg flags minimal')
         fm = ''
         # -- seen
         if '\Seen' in flags:
@@ -100,6 +115,9 @@ class JMailMessage:
             self.seen = True
         else:
             fm += '.'
+        fmc = JMailBase.cache_get(self._ck+':flags_minimal')
+        if fmc is not None:
+            return fmc
         # -- attachs
         if self.attachs is not None and len(self.attachs) > 0:
             fm += 'A'
@@ -110,6 +128,7 @@ class JMailMessage:
             fm += 'R'
         else:
             fm += '.'
+        JMailBase.cache_set(self._ck+':flags_minimal', fm)
         return fm
 
 
@@ -132,6 +151,9 @@ class JMailMessage:
 
     def _headers_filter(self, headers):
         self.log.dbg('msg headers filter')
+        f = JMailBase.cache_get(self._ck+':headers_filter')
+        if f is not None:
+            return f
         f = list()
         header_keys = sorted([h[0].lower() for h in headers])
         for hk in SHOW_HEADERS:
@@ -141,10 +163,15 @@ class JMailMessage:
                     if h[0].lower() == hk:
                         hv = self._header_decode(h[1])
                 f.append((hk.capitalize(), hv))
+        JMailBase.cache_set(self._ck+':headers_filter', f)
         return f
 
 
     def _headers_short(self, headers):
+        self.log.dbg('headers short')
+        hs = JMailBase.cache_get(self._ck+':headers_short')
+        if hs is not None:
+            return hs
         hs = list()
         # '%a, %d %b %Y %H:%M:%S %z'
         for hk, hv in headers:
@@ -156,6 +183,7 @@ class JMailMessage:
                 if len(hv) > 18:
                     hv = hv[:18] + '..'
             hs.append((hk, hv))
+        JMailBase.cache_set(self._ck+':headers_short', hs)
         return hs
 
 
@@ -237,26 +265,36 @@ class JMailMessage:
 
     def _text_html(self, msg, props):
         self.log.dbg('text html')
+        text = JMailBase.cache_get(self._ck+':text_html')
+        if text is not None:
+            return text
         text = msg.get_payload()
-        return self._text_encoding(text, props)
+        r = self._text_encoding(text, props)
+        JMailBase.cache_set(self._ck+':text_html', r)
+        return r
 
 
     def _text_plain(self, msg, props):
         self.log.dbg('text plain')
+        text = JMailBase.cache_get(self._ck+':text_plain')
+        if text is not None:
+            return text
         text = self._text_encoding(msg.get_payload(), props)
-        return text.splitlines()
+        r = text.splitlines()
+        JMailBase.cache_set(self._ck+':text_plain', r)
+        return r
 
 
     def _body_text(self, msg, props):
         self.log.dbg('msg body text')
-        self.log.dbg('msg boundary: ', msg.get_boundary())
+        #~ self.log.dbg('msg boundary: ', msg.get_boundary())
         #~ self.log.dbg('msg attach: ', msg.attach)
         #~ self.log.dbg('msg defects: ', msg.defects)
         #~ self.log.dbg('msg epilogue: ', msg.epilogue)
         #~ self.log.dbg('msg preamble: ', msg.preamble)
-        self.log.dbg('msg keys: ', msg.keys())
-        self.log.dbg('msg values: ', msg.values())
-        self.log.dbg('props: ', props)
+        #~ self.log.dbg('msg keys: ', msg.keys())
+        #~ self.log.dbg('msg values: ', msg.values())
+        #~ self.log.dbg('props: ', props)
         text = None
         msg_subtype = props['content_subtype']
         if msg_subtype == 'plain':
