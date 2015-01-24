@@ -77,3 +77,29 @@ def attach(req, macct_id, mbox_name_enc, mail_uid, filename_enc):
     resp['Content-Disposition'] = attach['disposition']
     jm.end()
     return resp
+
+
+def compose(req, macct_id):
+    try:
+        jm = JMail(req, tmpl_name='mail/compose', macct_id=macct_id, imap_start=True)
+    except JMailError as e:
+        return e.response()
+    jm.tmpl_data({
+        'load_navbar_path': True,
+        #~ 'mbox': mbox.tmpl_data(),
+        #~ 'msg': msg,
+    })
+    return jm.render()
+
+
+def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=False):
+    try:
+        jm = JMail(req, tmpl_name='mail/reply', macct_id=macct_id, imap_start=True)
+    except JMailError as e:
+        return e.response()
+    jm.tmpl_data({
+        'load_navbar_path': True,
+        #~ 'mbox': mbox.tmpl_data(),
+        #~ 'msg': msg,
+    })
+    return jm.render()
