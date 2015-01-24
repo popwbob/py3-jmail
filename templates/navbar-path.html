@@ -6,7 +6,7 @@
         {% endif %}
         {% if mbox %}
         <p class="buttons">
-            <a href="{% url 'macct:check' macct.id mbox.name_encode %}">{{mbox.name}}</a>
+            <a href="{% url 'mbox:check' macct.id mbox.name_encode %}">{{mbox.name}}</a>
         </p>
         {% endif %}
     {% endif %}

@@ -1,10 +1,9 @@
 import email
 
-from base64 import urlsafe_b64decode
-
 from jmail import JMail
 from jmail.error import JMailError
 from jmail.mail import JMailMessage
+from jmail.mbox import JMailMBox
 
 from django.forms.models import modelformset_factory
 
@@ -108,47 +107,6 @@ def subs(req, macct_id):
     jm.tmpl_data({
         'load_navbar_path': True,
         'subs_list': subs_list,
-    })
-    return jm.render()
-
-
-def check(req, macct_id, mbox_name_enc):
-    try:
-        jm = JMail(req, tmpl_name='macct/check', macct_id=macct_id, imap_start=True)
-    except JMailError as e:
-        return e.response()
-
-    jm.log.dbg('mbox_name_enc: ', mbox_name_enc)
-    mbox_name = urlsafe_b64decode(mbox_name_enc.encode())
-    jm.log.dbg('mbox_name: ', mbox_name)
-
-    # -- get messages uid list
-    try:
-        jm.imap.select(mbox_name)
-        typ, msgs_ids = jm.imap.uid('SEARCH', 'ALL')
-        jm.log.dbg('msgs_ids: ', msgs_ids)
-        jm.imap.close()
-    except Exception as e:
-        jm.log.err(e)
-        return jm.error(404, 'Mailbox not found: {}'.format(mbox_name))
-
-    # -- get messages headers
-    msgs = list()
-    for muid in msgs_ids[0].split():
-        if muid != b'':
-            msg = JMailMessage(muid, mbox_name, headers_only=True)
-            msg.fetch()
-            msgs.append(msg)
-
-    jm.log.dbg('msgs: ', msgs)
-    jm.log.dbg('msgs number: ', len(msgs))
-    jm.tmpl_data({
-        'load_navbar_path': True,
-        'mbox': {
-            'name': mbox_name,
-            'name_encode': mbox_name_enc,
-        },
-        'msgs': msgs,
     })
     return jm.render()
 

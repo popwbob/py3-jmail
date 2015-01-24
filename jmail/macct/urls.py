@@ -7,5 +7,4 @@ urlpatterns = patterns('',
     url(r'^(\d+)/edit/$', 'jmail.macct.views.edit', name='edit'),
 
     url(r'^(\d+)/subs/$', 'jmail.macct.views.subs', name='subs'),
-    url(r'^(\d+)/check/([\w=]+)/$', 'jmail.macct.views.check', name='check'),
 )

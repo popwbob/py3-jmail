@@ -44,7 +44,11 @@ class JMailMessage:
     def __init__(self, mail_uid, mbox_name, headers_only=False, imap=None, read_html=False):
         self.log = JMailBase.log
         self.log.dbg('msg init')
+        if type(mail_uid) is str:
+            mail_uid = mail_uid.encode()
         self.uid = mail_uid
+        if type(mbox_name) is str:
+            mbox_name = mbox_name.encode()
         self.mbox_name = mbox_name
         self._honly = headers_only
         self._imap = JMailBase.imap
@@ -68,7 +72,7 @@ class JMailMessage:
             self._imap.select(self.mbox_name)
             self.log.dbg('msg.fetch: ', fetch_cmd, ' ', self.uid, ' honly:', self._honly)
             typ, mdata = self._imap.uid('FETCH', self.uid, '(FLAGS {})'.format(fetch_cmd))
-            self._imap.close()
+            #~ self._imap.close()
             JMailBase.cache_set(self._ck+':mdata', mdata)
 
         self._msg = JMailBase.cache_get(self._ck+':msg')

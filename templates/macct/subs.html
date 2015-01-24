@@ -2,7 +2,7 @@
 <div class="macct-subs">
     <ul class="buttons">
     {% for child in subs_list %}
-        <li><a href="{% url 'macct:check' macct.id child.name_encode %}">{{child.name}}</a></li>
+        <li><a href="{% url 'mbox:check' macct.id child.name_encode %}">{{child.name}}</a></li>
     {% endfor %}
     </ul>
 </div>

@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'jmail.user',
     'jmail.macct',
     'jmail.mail',
+    'jmail.mbox',
 )
 
 MIDDLEWARE_CLASSES = (

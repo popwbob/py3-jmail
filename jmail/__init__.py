@@ -16,7 +16,7 @@ from jmail.error import JMailError, JMailErrorUserUnauth
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
-IMAP_DEBUG = 0
+IMAP_DEBUG = 4
 B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
 
