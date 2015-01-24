@@ -87,20 +87,26 @@ def edit(req, macct_id):
 
 def subs(req, macct_id):
     try:
-        jm = JMail(req, tmpl_name='macct/subs')
-        macct = jm.macct_get(macct_id)
-        imap = jm.imap_start(macct)
+        jm = JMail(req, tmpl_name='macct/subs', macct_id=macct_id)
     except JMailError as e:
-        if jm:
-            jm.end()
         return e.response()
-    imap.select()
-    subs_list = jm.imap_lsub()
-    imap.close()
-    jm.imap_end(imap)
+
+    subs_list = jm.cache_get('subs_list', None)
+    if subs_list is None:
+        try:
+            jm.imap_start(jm.macct)
+        except JMailError as e:
+            return e.response()
+
+        jm.imap.select()
+        subs_list = jm.imap_lsub()
+        jm.cache_set('subs_list', subs_list, 60)
+
+        jm.imap.close()
+        jm.imap_end()
+
     jm.tmpl_data({
         'load_navbar_path': True,
-        'macct': macct,
         'subs_list': subs_list,
     })
     return jm.render()

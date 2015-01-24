@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.core.context_processors import csrf
 from django.contrib.auth import logout as django_logout
 from django.conf import settings
+from django.core.cache import cache as django_cache
 
 from jmail.log import JMailLog
 from jmail.error import JMailError, JMailErrorUserUnauth
@@ -245,3 +246,29 @@ class JMail(JMailBase):
                 'name_encode': urlsafe_b64encode(c).decode(),
             })
         return r
+
+
+    def _cache_key(self, key):
+        ck = str(self._req.user)
+        ck += ':'+self._tmpl_name
+        ck += ':'+str(self.macct.get('id'))
+        ck += ':'+key
+        self.log.dbg('cache_key: ', ck)
+        return ck
+
+
+    def cache_get(self, key, default=None):
+        ck = self._cache_key(key)
+        cv = django_cache.get(ck, None)
+        if cv is None:
+            return default
+        else:
+            return cv
+
+
+    def cache_set(self, key, val, ttl=None):
+        ck = self._cache_key(key)
+        if ttl is None:
+            django_cache.set(ck, val)
+        else:
+            django_cache.set(ck, val, ttl)
