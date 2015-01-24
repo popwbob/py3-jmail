@@ -27,7 +27,7 @@ TEMPLATE_DIRS = ('/'.join([BASE_DIR, 'templates']),)
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader'
 )
-TEMPLATE_STRING_IF_INVALID = 'TMPL_MISS:%s'
+TEMPLATE_STRING_IF_INVALID = 'TMPL_MISS:[%s]'
 
 # Application definition
 

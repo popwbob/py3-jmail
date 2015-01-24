@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache as django_cache
 
 from jmail.log import JMailLog
-from jmail.error import JMailError, JMailErrorUserUnauth
+from jmail.error import JMailMessage, JMailError, JMailErrorUserUnauth
 
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
@@ -112,7 +112,7 @@ class JMail(JMailBase):
         JMailBase.imap = None
         took = time.time() - self._start_tstamp
         self.log.dbg('end - {}s'.format(took))
-        return took
+        return '{:.3f}'.format(took)
 
 
     def _tmpl_path_get(self):
@@ -173,7 +173,7 @@ class JMail(JMailBase):
             charset = self.charset
         ctype = '{}; charset={}'.format(content_type, charset)
         self._tmpl_data['doc']['charset'] = charset
-        self._tmpl_data['took'] = '{:.3f}'.format(self.end())
+        self._tmpl_data['took'] = self.end()
         return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
 
 
@@ -183,6 +183,7 @@ class JMail(JMailBase):
             'macct': self.macct,
         })
         self._tmpl_data.update(data)
+        return self._tmpl_data
 
 
     def debug_data(self):
@@ -194,10 +195,22 @@ class JMail(JMailBase):
         return dd
 
 
-    def error(self, status, message):
+    def error(self, status, message, tmpl_data=None):
         e = JMailError(status, message)
-        self.end()
-        return e.response()
+        td = dict()
+        if tmpl_data is not None:
+            td.update(tmpl_data)
+        td['took'] = self.end()
+        return e.response(tmpl_data=td)
+
+
+    def message(self, message, tmpl_data=None):
+        e = JMailMessage(message)
+        td = dict()
+        if tmpl_data is not None:
+            td.update(tmpl_data)
+        td['took'] = self.end()
+        return e.response(tmpl_data=td)
 
 
     def redirect(self, location):

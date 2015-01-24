@@ -8,5 +8,7 @@ urlpatterns = patterns('',
     url(r'^(\d+)/([\w=]+)/(\d+)/attach/([\w=]+)/$', 'jmail.mail.views.attach', name='attach'),
 
     url(r'^(\d+)/compose/$', 'jmail.mail.views.compose', name='compose'),
+    url(r'^(\d+)/send/$', 'jmail.mail.views.send', name='send'),
+
     url(r'^(\d+)/([\w=]+)/(\d+)/reply/$', 'jmail.mail.views.reply', name='reply'),
 )

@@ -27,13 +27,17 @@ class JMailMessage(Exception):
                 'title': self._title,
                 'status': self.status,
                 'message': self.message,
-            },
-            'user': self._user,
+            }
         }
         return td
 
-    def response(self):
-        return render(self.req, self._tmpl_path, self.tmpl_data(), status=self.status)
+    def response(self, tmpl_data=None):
+        if tmpl_data is None:
+            td = self.tmpl_data()
+        else:
+            td = tmpl_data
+            td.update(self.tmpl_data())
+        return render(self.req, self._tmpl_path, td, status=self.status)
 
 
 class JMailError(JMailMessage):
