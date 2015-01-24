@@ -12,7 +12,7 @@ from .models import JMailMAcct, JMailMAcctForm
 
 def remove(req, macct_id):
     try:
-        jm = JMail(req)
+        jm = JMail(req, tmpl_name='macct/remove')
         macct = jm.macct_get(macct_id)
     except JMailError as e:
         if jm:
@@ -35,7 +35,7 @@ def remove(req, macct_id):
 
 def create(req):
     try:
-        jm = JMail(req)
+        jm = JMail(req, tmpl_name='macct/create')
     except JMailError as e:
         return e.response()
 
