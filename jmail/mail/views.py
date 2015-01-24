@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from jmail import JMail
 from jmail.error import JMailError
 
@@ -60,8 +62,18 @@ def attach(req, macct_id, mbox_name_enc, mail_uid, filename_enc):
         if ad_filename_enc == filename_enc.encode():
             attach = ad
             break
-    jm.tmpl_data({
-        'mbox': mbox.tmpl_data(),
-        'attach': attach,
-    })
-    return jm.render()
+    if attach is None:
+        return jm.error(500, 'No attach')
+    cs = attach['charset']
+    if cs is None:
+        cs = jm.charset
+    ct = attach['content_type']
+    maintype = attach['content_maintype']
+    subtype = attach['content_subtype']
+    if maintype == 'text':
+        if subtype == 'x-patch':
+            ct = 'text/plain'
+    resp = HttpResponse(content_type='{}; charset={}'.format(ct, cs))
+    resp['Content-Disposition'] = attach['disposition']
+    jm.end()
+    return resp

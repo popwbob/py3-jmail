@@ -257,6 +257,8 @@ class JMailMessage:
         self.log.dbg('msg text: ', type(text))
         tenc = props['transfer_encoding']
         charset = props['charset']
+        if charset is None:
+            charset = JMailBase.charset
         self.log.dbg('transfer encoding: ', tenc)
         # -- quoted-printable
         if tenc == 'quoted-printable':
@@ -337,14 +339,14 @@ class JMailMessage:
 
     def _msg_attachs(self, part, props):
         self.log.dbg('msg attachs')
-        self.attachs.append({
-            'content_maintype': props['content_maintype'],
-            'content_subtype': props['content_subtype'],
-            'content_type': props['content_type'],
-            'filename': props['filename'],
-            'filename_enc': urlsafe_b64encode(props['filename'].encode()),
-            'payload': part.get_payload(),
-        })
+        ad = dict()
+        ad.update(props)
+        ad['filename_enc'] = urlsafe_b64encode(props['filename'].encode())
+        if props['content_maintype'] == 'text':
+            ad['payload'] = self._text_encoding(part.get_payload(), props)
+        else:
+            ad['payload'] = part.get_payload()
+        self.attachs.append(ad)
 
 
     def _body_parts(self, body):
