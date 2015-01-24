@@ -11,7 +11,7 @@
                     <b>
                 {% endif %}
                 {% for hk, hv in msg.headers_short %}
-                    {{hv}} |
+                    <span class="header-button"><a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}" title="{{hk}}">{{hv}}</a></span> |
                 {% endfor %}
                 {% if not msg.seen %}
                     </b>
