@@ -3,7 +3,7 @@
 <ul class="buttons">
     {% for macct in mail.accounts %}
     <li>
-        <a href="{% url 'macct:subs' macct.id %}">{{macct.address}}</a>
+        <a href="{% url 'mbox:subs' macct.id %}">{{macct.address}}</a>
     </li>
     {% endfor %}
 </ul>
