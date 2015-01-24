@@ -5,31 +5,6 @@ from ..mbox import JMailMBox
 from . import JMailMessage
 
 
-def _mdata_debug(jm, mdata):
-    mdata_debug = list()
-    if jm.debug:
-        mdata_debug.append('mdata: {}'.format(type(mdata)))
-        mdata_debug.append('epilogue: {}'.format(mdata.epilogue))
-        mdata_debug.append('get_charset(): {}'.format(mdata.get_charset()))
-        mdata_debug.append('get_charsets(): {}'.format(mdata.get_charsets()))
-        mdata_debug.append('get_content_charset(): {}'.format(mdata.get_content_charset()))
-        mdata_debug.append('get_content_maintype(): {}'.format(mdata.get_content_maintype()))
-        mdata_debug.append('get_content_subtype(): {}'.format(mdata.get_content_subtype()))
-        mdata_debug.append('get_content_type(): {}'.format(mdata.get_content_type()))
-        mdata_debug.append('get_default_type(): {}'.format(mdata.get_default_type()))
-        mdata_debug.append('get_filename(): {}'.format(mdata.get_filename()))
-        #~ mdata_debug.append('get_param(): {}'.format(mdata.get_param()))
-        mdata_debug.append('get_params(): {}'.format(mdata.get_params()))
-        mdata_debug.append('get_payload(): {}'.format(mdata.get_payload()))
-        mdata_debug.append('get_unixfrom(): {}'.format(mdata.get_unixfrom()))
-        mdata_debug.append('is_multipart(): {}'.format(mdata.is_multipart()))
-        mdata_debug.append('preamble: {}'.format(mdata.preamble))
-        mdata_debug.append('')
-        for part in mdata.walk():
-            mdata_debug.append(part.get_content_type())
-    return mdata_debug
-
-
 def read(req, macct_id, mbox_name_enc, mail_uid, read_html=None):
     try:
         jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
@@ -65,5 +40,28 @@ def source(req, macct_id, mbox_name_enc, mail_uid):
         'load_navbar_path': True,
         'mbox': mbox.tmpl_data(),
         'msg': msg,
+    })
+    return jm.render()
+
+
+def attach(req, macct_id, mbox_name_enc, mail_uid, filename_enc):
+    try:
+        jm = JMail(req, tmpl_name='mail/attach', macct_id=macct_id, imap_start=True)
+    except JMailError as e:
+        return e.response()
+    try:
+        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
+        msg = mbox.msg_fetch(mail_uid)
+    except JMailError as e:
+        return e.response()
+    attach = None
+    for ad in msg.attachs:
+        ad_filename_enc = ad.get('filename_enc')
+        if ad_filename_enc == filename_enc.encode():
+            attach = ad
+            break
+    jm.tmpl_data({
+        'mbox': mbox.tmpl_data(),
+        'attach': attach,
     })
     return jm.render()

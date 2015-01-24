@@ -1,7 +1,7 @@
 import email
 
 from email.header import decode_header
-from base64 import b64decode
+from base64 import b64decode, urlsafe_b64encode
 from quopri import decodestring
 from time import strftime, strptime
 
@@ -338,8 +338,12 @@ class JMailMessage:
     def _msg_attachs(self, part, props):
         self.log.dbg('msg attachs')
         self.attachs.append({
+            'content_maintype': props['content_maintype'],
+            'content_subtype': props['content_subtype'],
             'content_type': props['content_type'],
             'filename': props['filename'],
+            'filename_enc': urlsafe_b64encode(props['filename'].encode()),
+            'payload': part.get_payload(),
         })
 
 

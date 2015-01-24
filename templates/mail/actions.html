@@ -1,5 +1,6 @@
 <div class="mail-actions">
     <p class="buttons">
-        <a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">read</a>
+        <a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">reply</a>
+        <a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">reply all</a>
     </p>
 </div>

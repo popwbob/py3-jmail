@@ -17,7 +17,7 @@
             {% endfor %}
 
             {% for attach in msg.attachs %}
-                <a title="{{attach.content_type}}"><q>{{attach.filename}}</q></a>
+                <a href="{% url 'mail:attach' macct.id mbox.name_encode msg.uid attach.filename_enc %}" title="{{attach.content_type}}"><q>{{attach.filename}}</q></a>
             {% endfor %}
         </p>
     </div>
@@ -31,12 +31,4 @@
     {% endif %}
 
 </div><!-- mail-read -->
-
-{% if mdata_debug %}
-<div class="mail-read-debug">
-    <h5>DEBUG</h5>
-    <pre>{% for dline in mdata_debug %}{{dline}}
-{% endfor %}</pre>
-</div><!-- mail-read-debug -->
-{% endif %}
 {% include "tail.html" %}
