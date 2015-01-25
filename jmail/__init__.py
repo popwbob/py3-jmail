@@ -32,6 +32,7 @@ class JMailBase:
     debug = None
     macct = None
     charset = 'utf-8'
+    conf = None
 
     def __str__(self):
         r = '{\n'
@@ -103,6 +104,7 @@ class JMail(JMailBase):
 
     def _load_settings(self):
         self.debug = settings.DEBUG
+        self.conf = settings.JMAIL.copy()
 
 
     def end(self):

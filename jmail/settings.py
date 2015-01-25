@@ -115,3 +115,7 @@ CACHES = {
         'VERSION': 0,
     }
 }
+
+JMAIL = {
+    'DATE_HEADER_FORMAT': '%a, %d %b %Y %H:%M:%S %z',
+}

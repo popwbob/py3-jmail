@@ -1,4 +1,5 @@
 import smtplib
+import time
 
 from base64 import b64decode
 from email.mime.text import MIMEText
@@ -168,6 +169,9 @@ def send(req, macct_id):
     if mail_bcc != '':
         msg['Bcc'] = mail_bcc
 
+    msg['Reply-To'] = msg['From']
+    msg['Message-ID'] = '<{}.{}@jmail>'.format(time.time(), jm.user)
+    msg['Date'] = time.strftime(jm.conf.get('DATE_HEADER_FORMAT'))
     msg['X-Mailer'] = 'jmail v0.0'
 
     # -- save email to cache in case the SMTP fails
