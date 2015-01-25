@@ -168,6 +168,8 @@ def send(req, macct_id):
     if mail_bcc != '':
         msg['Bcc'] = mail_bcc
 
+    msg['X-Mailer'] = 'jmail v0.0'
+
     # -- save email to cache in case the SMTP fails
     jm.cache_set('compose:save', msg)
 

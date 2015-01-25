@@ -71,7 +71,7 @@ def edit(req, macct_id):
         try:
             form = JMailMAcctForm(req.POST, instance=dbobj)
             form.save()
-            return jm.redirect('home')
+            return jm.redirect('macct:edit', macct_id)
         except Exception as e:
             return jm.error(500, str(e))
     else:
