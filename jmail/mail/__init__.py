@@ -25,6 +25,7 @@ class JMailMessage:
     _msg = None
     _html = None
     _ck = None
+    _conf = None
     log = None
     source = None
     headers = None
@@ -56,6 +57,7 @@ class JMailMessage:
             self._imap = imap
         self._html = read_html
         self._ck = self.mbox_name.decode()+':'+self.uid.decode()
+        self._conf = JMailBase.conf
 
 
     def fetch(self, mail_uid=None, headers_only=None):
@@ -112,16 +114,13 @@ class JMailMessage:
 
     def _flags_minimal(self, flags):
         self.log.dbg('msg flags minimal')
-        fm = ''
         # -- seen
         if '\Seen' in flags:
-            fm += 'S'
             self.seen = True
-        else:
-            fm += '.'
         fmc = JMailBase.cache_get(self._ck+':flags_minimal')
         if fmc is not None:
             return fmc
+        fm = ''
         # -- attachs
         if self.attachs is not None and len(self.attachs) > 0:
             fm += 'A'
@@ -173,20 +172,30 @@ class JMailMessage:
 
     def _headers_short(self, headers):
         self.log.dbg('headers short')
+
         hs = JMailBase.cache_get(self._ck+':headers_short')
         if hs is not None:
             return hs
-        hs = list()
-        # '%a, %d %b %Y %H:%M:%S %z'
+        hs = dict()
+
         for hk, hv in headers:
+            # -- date
             if hk.lower() == 'date':
                 dstring = ' '.join(hv.split()[:6])
-                dobj = strptime(dstring, '%a, %d %b %Y %H:%M:%S %z')
+                dobj = strptime(dstring, self._conf.get('DATE_HEADER_FORMAT'))
                 hv = strftime('%Y%m%d.%H:%M', dobj)
+                hs['date'] = hv
+            # -- from / to
             elif hk.lower() == 'from' or hk.lower() == 'to':
-                if len(hv) > 18:
-                    hv = hv[:18] + '..'
-            hs.append((hk, hv))
+                if len(hv) > 23:
+                    hv = hv[:23] + '..'
+                hs[hk.lower()] = hv
+            # -- subject
+            elif hk.lower() == 'subject':
+                if len(hv) > 33:
+                    hv = hv[:33] + '..'
+                hs['subject'] = hv
+
         JMailBase.cache_set(self._ck+':headers_short', hs)
         return hs
 

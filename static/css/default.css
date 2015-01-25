@@ -1,7 +1,7 @@
 body
 {
-    font-size:110%;
-    line-height:140%;
+    font-size:1.1em;
+    line-height:1.4em;
     margin:0;
     padding:3px 9px;
     font-family:monospace;
@@ -26,19 +26,16 @@ body
 
 .mail-read-html iframe
 {
+    min-height:30em;
     min-width:100%;
     border:none;
     overflow:hidden;
 }
 
-.mail-body, .mail-source pre
-{
-    font-size:100%;
-    overflow:auto;
-}
 .mail-source pre
 {
-    font-size:90%;
+    font-size:0.9em;
+    overflow:auto;
 }
 
 input[type=submit]
@@ -49,12 +46,12 @@ input[type=submit]
 {
     text-decoration: underline;
     border:none;
-    color:black;
+    color:blue;
     background-color:white;
 }
 .buttons a:visited
 {
-    color:black;
+    color:blue;
 }
 .buttons a:hover, input[type=submit]:hover
 {
@@ -62,24 +59,22 @@ input[type=submit]
     cursor:pointer;
     border:none;
 }
-.header-button a
-{
-    text-decoration:none;
-}
 
 ul.buttons
 {
-    margin-bottom:7px;
+    margin-bottom:0.7em;
+    line-height:1.6em;
 }
 ul.buttons li
 {
     list-style:none;
-    text-indent:-40px;
+    text-indent:-3em;
 }
 
 .mbox-check
 {
-    font-size:90%;
+    line-height:1em;
+    font-size:1em;
 }
 
 .mail-headers
@@ -88,34 +83,36 @@ ul.buttons li
 }
 .header-key
 {
-    font-weight: bold;
+    font-weight:bold;
 }
 
 .mail-flags
 {
-    line-height:90%;
-    font-size:80%;
+    line-height:0.9em;
+    font-size:0.8em;
     border-bottom:1px dotted black;
 }
 
 .mail-actions
 {
-    line-height:90%;
-    font-size:80%;
+    line-height:0.9em;
+    font-size:0.8em;
     border-bottom:1px dotted black;
 }
 
 .mail-parts
 {
-    line-height:90%;
-    font-size:80%;
+    line-height:0.9em;
+    font-size:0.8em;
     border-bottom:1px dotted black;
 }
 
 .footer p
 {
-    line-height:110%;
-    font-size:70%;
+    margin:0;
+    padding:0;
+    line-height:1.3em;
+    font-size:.7em;
     color:gray;
 }
 
@@ -132,7 +129,7 @@ ul.buttons li
 #mail-from
 {
     width:42.7em;
-    padding:.2em .4em;
+    padding:0.2em 0.4em;
 }
 #mail-from[readonly]
 {
@@ -141,22 +138,22 @@ ul.buttons li
 #mail-to, #mail-cc
 {
     width:42.7em;
-    padding:.2em .4em;
+    padding:0.2em 0.4em;
 }
 #mail-bcc
 {
     width:42.7em;
-    padding:.2em .4em;
+    padding:0.2em 0.4em;
 }
 #mail-subject
 {
     width:42.7em;
-    padding:.2em .4em;
+    padding:0.2em 0.4em;
 }
 #mail-body
 {
     margin-top:1em;
-    padding:.2em .4em;
+    padding:0.2em 0.4em;
     overflow:auto;
     width:48em;
     height:30em;

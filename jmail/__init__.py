@@ -103,8 +103,8 @@ class JMail(JMailBase):
 
 
     def _load_settings(self):
-        self.debug = settings.DEBUG
-        self.conf = settings.JMAIL.copy()
+        JMailBase.debug = settings.DEBUG
+        JMailBase.conf = settings.JMAIL.copy()
 
 
     def end(self):

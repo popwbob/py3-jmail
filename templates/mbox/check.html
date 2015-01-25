@@ -7,15 +7,17 @@
             <p class="buttons">
                 <a title="read" href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">{{msg.flags_minimal}}</a>
 
-                {% if not msg.seen %}
-                    <b>
-                {% endif %}
-                {% for hk, hv in msg.headers_short %}
-                    <span class="header-button"><a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}" title="{{hk}}">{{hv}}</a></span> |
-                {% endfor %}
-                {% if not msg.seen %}
-                    </b>
-                {% endif %}
+                {% if not msg.seen %}<b>{% endif %}
+
+                {{msg.headers_short.date}} |
+
+                {{msg.headers_short.from}} |
+
+                <a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">{{msg.headers_short.subject}}</a> |
+
+                {{msg.headers_short.to}} |
+
+                {% if not msg.seen %}</b>{% endif %}
 
                 <span class="size">{{msg.size}}</span>
             </p>
