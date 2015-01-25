@@ -217,9 +217,9 @@ class JMail(JMailBase):
         return e.response(tmpl_data=td)
 
 
-    def redirect(self, location):
+    def redirect(self, *location):
         self.end()
-        return redirect(location)
+        return redirect(*location)
 
 
     def macct_get(self, macct_id):

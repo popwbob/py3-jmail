@@ -110,6 +110,7 @@ def compose(req, macct_id):
             'mail_bcc': msg_saved['Bcc'] or '',
             'mail_subject': msg_saved['Subject'],
             'mail_body': b64decode(msg_saved.get_payload().encode()),
+            'compose_restore': True,
         }
 
     jm.tmpl_data({
@@ -117,6 +118,11 @@ def compose(req, macct_id):
         'msg': msg,
     })
     return jm.render()
+
+
+def __compose_discard(jm, macct_id):
+    jm.cache_del('compose:save')
+    return jm.redirect('mail:compose', macct_id)
 
 
 def send(req, macct_id):
@@ -135,6 +141,13 @@ def send(req, macct_id):
 
     if req.method != 'POST':
         return jm.error(400, 'bad request', tmpl_data=td)
+
+    jm.log.dbg('POST: ', req.POST)
+
+    req_cmd = req.POST.get('jmail_cmd')
+    if req_cmd == 'discard':
+        # -- discard composing
+        return __compose_discard(jm, macct_id)
 
     try:
         msg = MIMEText(req.POST.get('mail_body'), _charset='utf-8')

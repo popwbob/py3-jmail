@@ -2,8 +2,13 @@
 <div class="mail-compose">
     <form action="{% url 'mail:send' macct.id %}" method="post">
         {% csrf_token %}
-        <p>
-            <input type="submit" name="send" value="send">
+        <p class="buttons">
+            <input type="submit" name="jmail_cmd" value="send">
+            {% if msg.compose_restore %}
+                <input type="submit" name="jmail_cmd" value="discard">
+            {% else %}
+                <a href="{% url 'mbox:subs' macct.id %}">cancel</a>
+            {% endif %}
         </p>
 
         <label for="mail-from">From</label><br>
