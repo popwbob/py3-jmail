@@ -1,8 +1,8 @@
 {% include "head.html" %}
 <div class="mail-read">
-
-    {% include 'mail/attributes.html' %}
+    {% include 'mail/actions.html' %}
     {% include 'mail/headers.html' %}
+    {% include 'mail/attributes.html' %}
 
     <div class="mail-parts">
         <p class="buttons">
@@ -21,8 +21,6 @@
             {% endfor %}
         </p>
     </div>
-
-    {% include 'mail/actions.html' %}
 
     {% if read_html %}
         {% include 'mail/body_html.html' %}
