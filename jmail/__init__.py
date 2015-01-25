@@ -51,7 +51,6 @@ class JMailBase:
     @classmethod
     def _cache_key(self, key):
         ck = str(self._req.user)
-        ck += ':'+str(self._tmpl_name)
         ck += ':'+str(self.macct.get('id'))
         ck += ':'+key
         self.log.dbg('cache_key: ', ck)

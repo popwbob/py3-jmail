@@ -131,7 +131,7 @@ ul.buttons li
 
 #mail-from
 {
-    width:42.6em;
+    width:42.7em;
     padding:.2em .4em;
 }
 #mail-from[readonly]
@@ -140,21 +140,22 @@ ul.buttons li
 }
 #mail-to, #mail-cc
 {
-    width:42.6em;
+    width:42.7em;
     padding:.2em .4em;
 }
 #mail-bcc
 {
-    width:42.6em;
+    width:42.7em;
     padding:.2em .4em;
 }
 #mail-subject
 {
-    width:42.6em;
+    width:42.7em;
     padding:.2em .4em;
 }
 #mail-body
 {
+    margin-top:1em;
     padding:.2em .4em;
     overflow:auto;
     width:48em;

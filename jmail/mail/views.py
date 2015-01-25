@@ -1,5 +1,6 @@
 import smtplib
 
+from base64 import b64decode
 from email.mime.text import MIMEText
 
 from django.http import HttpResponse
@@ -91,26 +92,24 @@ def compose(req, macct_id):
     except JMailError as e:
         return e.response()
 
-    # -- check if any previous sending failed
+    msg = {
+        'mail_from': jm.macct['address'],
+        'mail_to': '',
+        'mail_cc': '',
+        'mail_bcc': '',
+        'mail_subject': '',
+        'mail_body': '',
+    }
+
     msg_saved = jm.cache_get('compose:save')
-    msg = None
-    if msg_saved is None:
+    if msg_saved is not None:
         msg = {
-            'mail_from': jm.macct['address'],
-            'mail_to': '',
-            'mail_cc': '',
-            'mail_bcc': '',
-            'mail_subject': '',
-            'mail_body': '',
-        }
-    else:
-        msg = {
-            'mail_from': msg['From'],
-            'mail_to': msg['To'],
-            'mail_cc': msg['Cc'],
-            'mail_bcc': msg['Bcc'],
-            'mail_subject': msg['Subject'],
-            'mail_body': msg.get_payload()
+            'mail_from': msg_saved['From'],
+            'mail_to': msg_saved['To'],
+            'mail_cc': msg_saved['Cc'] or '',
+            'mail_bcc': msg_saved['Bcc'] or '',
+            'mail_subject': msg_saved['Subject'],
+            'mail_body': b64decode(msg_saved.get_payload().encode()),
         }
 
     jm.tmpl_data({
@@ -130,7 +129,7 @@ def send(req, macct_id):
         jm = JMail(req, macct_id=macct_id)
     except JMailError as e:
         return e.response()
-    jm.log.dbg('mail send: ', jm._req)
+    jm.log.dbg('mail send: ')
 
     td = jm.tmpl_data({'load_navbar_path': True})
 
@@ -159,13 +158,12 @@ def send(req, macct_id):
     # -- save email to cache in case the SMTP fails
     jm.cache_set('compose:save', msg)
 
-    #~ try:
-    smtp = smtplib.SMTP(jm.macct['smtp_server'], jm.macct['smtp_server_port'])
-    #~ smtp.send_message(msg)
-    smtp.sendmail(msg['From'], msg['To'], msg.as_string())
-    smtp.quit()
-    #~ except Exception as e:
-        #~ return jm.error(500, 'SMTP error: '+str(e), tmpl_data=td)
+    try:
+        smtp = smtplib.SMTP(jm.macct['smtp_server'], jm.macct['smtp_server_port'])
+        smtp.send_message(msg)
+        smtp.quit()
+    except Exception as e:
+        return jm.error(500, 'SMTP error: '+str(e), tmpl_data=td)
 
     # -- if all was fine, remove the message from the cache
     jm.cache_del('compose:save')
