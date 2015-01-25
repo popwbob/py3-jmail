@@ -7,22 +7,22 @@
         </p>
 
         <label for="mail-from">From:</label><br>
-        <input id="mail-from" readonly="readonly" type="email" name="mail_from" value="{{macct.address}}"><br>
+        <input id="mail-from" readonly="readonly" type="email" name="mail_from" value="{{msg.mail_from}}"><br>
 
         <label for="mail-to">To:</label><br>
-        <input id="mail-to" required="required" type="email" name="mail_to" value=""><br>
+        <input id="mail-to" required="required" type="email" name="mail_to" value="{{msg.mail_to}}"><br>
 
         <label for="mail-cc">Cc:</label><br>
-        <input id="mail-cc" type="email" name="mail_cc" value=""><br>
+        <input id="mail-cc" type="email" name="mail_cc" value="{{msg.mail_cc}}"><br>
 
         <label for="mail-bcc">Bcc:</label><br>
-        <input id="mail-bcc" type="email" name="mail_bcc" value=""><br>
+        <input id="mail-bcc" type="email" name="mail_bcc" value="{{msg.mail_bcc}}"><br>
 
         <label for="mail-subject">Subject:</label><br>
-        <input id="mail-subject" type="text" name="mail_subject" value=""><br>
+        <input id="mail-subject" required="required" type="text" name="mail_subject" value="{{msg.mail_subject}}"><br>
 
         <label for="mail-body">Message:</label><br>
-        <textarea id="mail-body" name="mail_body" value=""></textarea>
+        <textarea id="mail-body" required="required" name="mail_body" value="{{msg.mail_body}}"></textarea>
     </form>
 </div><!-- mail-compose -->
 {% include "tail.html" %}

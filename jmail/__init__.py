@@ -51,7 +51,7 @@ class JMailBase:
     @classmethod
     def _cache_key(self, key):
         ck = str(self._req.user)
-        ck += ':'+self._tmpl_name
+        ck += ':'+str(self._tmpl_name)
         ck += ':'+str(self.macct.get('id'))
         ck += ':'+key
         self.log.dbg('cache_key: ', ck)
@@ -73,6 +73,11 @@ class JMailBase:
             django_cache.set(ck, val)
         else:
             django_cache.set(ck, val, ttl)
+
+    @classmethod
+    def cache_del(self, key):
+        ck = self._cache_key(key)
+        django_cache.delete(ck)
 
 
 class JMail(JMailBase):
