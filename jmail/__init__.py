@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache as django_cache
 
 from jmail.log import JMailLog
-from jmail.error import JMailMessage, JMailError, JMailErrorUserUnauth
+from jmail.error import JMailMessagePage, JMailError, JMailErrorUserUnauth
 
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
@@ -211,7 +211,7 @@ class JMail(JMailBase):
 
 
     def message(self, message, tmpl_data=None):
-        e = JMailMessage(message)
+        e = JMailMessagePage(message)
         td = dict()
         if tmpl_data is not None:
             td.update(tmpl_data)

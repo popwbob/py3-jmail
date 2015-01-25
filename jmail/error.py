@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 
-class JMailMessage(Exception):
+class JMailMessagePage(Exception):
     _user = None
     _title = None
     _error = None
@@ -40,9 +40,9 @@ class JMailMessage(Exception):
         return render(self.req, self._tmpl_path, td, status=self.status)
 
 
-class JMailError(JMailMessage):
+class JMailError(JMailMessagePage):
     def __init__(self, status, message):
-        JMailMessage.__init__(self, message, status, title='JMail Error', error=True, tmpl_path='error.html')
+        JMailMessagePage.__init__(self, message, status, title='JMail Error', error=True, tmpl_path='error.html')
 
 
 class JMailErrorUserUnauth(JMailError):
