@@ -3,6 +3,12 @@
         <span class="header-key">Date:</span> {{msg.headers.date}}<br>
         <span class="header-key">From:</span> {{msg.headers.from}}<br>
         <span class="header-key">To:</span> {{msg.headers.to}}<br>
+        {% if msg.headers.cc %}
+            <span class="header-key">Cc:</span> {{msg.headers.cc}}<br>
+        {% endif %}
+        {% if msg.headers.bcc %}
+            <span class="header-key">Bcc:</span> {{msg.headers.bcc}}<br>
+        {% endif %}
         <span class="header-key">Subject:</span> {{msg.headers.subject}}<br>
     </p>
 </div>
