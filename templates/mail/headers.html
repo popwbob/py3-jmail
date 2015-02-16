@@ -1,7 +1,8 @@
 <div class="mail-headers">
     <p>
-        {% for hk, hv in msg.headers %}
-        <span class="header-key">{{hk}}:</span> {{hv}}<br />
-        {% endfor %}
+        <span class="header-key">Date:</span> {{msg.headers.date}}<br>
+        <span class="header-key">From:</span> {{msg.headers.from}}<br>
+        <span class="header-key">To:</span> {{msg.headers.to}}<br>
+        <span class="header-key">Subject:</span> {{msg.headers.subject}}<br>
     </p>
 </div>

@@ -1,0 +1,17 @@
+<div class="mail-parts">
+    <p class="buttons">
+        <a href="{% url 'mail:source' macct.id mdir.name_encode mail_uid %}">source</a>
+
+        {% if msg.body_html != '[NO HTML CONTENT]' %}
+            {% if read_html %}
+                <a href="{% url 'mail:read' macct.id mdir.name_encode msg.uid %}">text/plain</a>
+            {% else %}
+                <a href="{% url 'mail:read_html' macct.id mdir.name_encode msg.uid 'html' %}">text/html</a>
+            {% endif %}
+        {% endif %}
+
+        {% for attach in msg.attachs %}
+            <a href="{% url 'mail:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}"><q>{{attach.filename}}</q>({{attach.size_human}})</a>
+        {% endfor %}
+    </p>
+</div>

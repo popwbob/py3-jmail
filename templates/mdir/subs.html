@@ -5,7 +5,7 @@
     </p>
     <ul class="buttons">
     {% for child in subs_list %}
-        <li><a href="{% url 'mbox:check' macct.id child.name_encode %}">{{child.name}}</a></li>
+        <li><a href="{% url 'mdir:check' macct.id child.name_encode %}">{{child.name}}</a></li>
     {% endfor %}
     </ul>
 </div>

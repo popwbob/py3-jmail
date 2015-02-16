@@ -39,6 +39,9 @@ class JMailMessagePage(Exception):
             td.update(self.tmpl_data())
         return render(self.req, self._tmpl_path, td, status=self.status)
 
+    def __str__(self):
+        return '{} {}'.format(self.status, self.message)
+
 
 class JMailError(JMailMessagePage):
     def __init__(self, status, message):

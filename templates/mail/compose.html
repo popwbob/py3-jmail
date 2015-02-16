@@ -7,7 +7,7 @@
             {% if msg.compose_restore %}
                 <input type="submit" name="jmail_cmd" value="discard">
             {% else %}
-                <a href="{% url 'mbox:subs' macct.id %}">cancel</a>
+                <a href="{% url 'mdir:subs' macct.id %}">cancel</a>
             {% endif %}
         </p>
 

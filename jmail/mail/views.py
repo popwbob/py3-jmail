@@ -1,88 +1,97 @@
 import smtplib
 import time
 
+from io import StringIO
 from base64 import b64decode
 from email.mime.text import MIMEText
 
 from django.http import HttpResponse
+from django.core.servers.basehttp import FileWrapper
 
 from jmail import JMail
 from jmail.error import JMailError
 
-from ..mbox import JMailMBox
+from ..mdir import JMailMDir
 from . import JMailMessage
 
 
-def read(req, macct_id, mbox_name_enc, mail_uid, read_html=None):
+def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
     try:
         jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
+
     if read_html is not None:
         read_html = True
     jm.log.dbg('read HTML: ', read_html)
+
     try:
-        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
-        msg = mbox.msg_fetch(mail_uid, read_html=read_html)
+        mdir = JMailMDir(name_encode=mdir_name_enc)
+        msg = mdir.msg_get(mail_uid, peek=False)
     except JMailError as e:
         return e.response()
+
     jm.tmpl_data({
         'load_navbar_path': True,
-        'mbox': mbox.tmpl_data(),
+        'mdir': mdir,
         'msg': msg,
+        'mail_uid': mail_uid,
         'read_html': read_html,
     })
     return jm.render()
 
 
-def source(req, macct_id, mbox_name_enc, mail_uid):
+def source(req, macct_id, mdir_name_enc, mail_uid):
     try:
         jm = JMail(req, tmpl_name='mail/source', macct_id=macct_id, imap_start=True)
-        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
-        msg = mbox.msg_fetch(mail_uid)
+        mdir = JMailMDir(name_encode=mdir_name_enc)
+        msg_source = mdir.msg_source(mail_uid)
     except JMailError as e:
         return e.response()
-    except Exception as e:
-        return jm.error(500, e)
+    #~ except Exception as e:
+        #~ return jm.error(500, e)
     jm.tmpl_data({
         'load_navbar_path': True,
-        'mbox': mbox.tmpl_data(),
-        'msg': msg,
+        'mdir': mdir,
+        'msg': {
+            'uid': mail_uid,
+            'source': msg_source,
+        },
     })
     return jm.render()
 
 
-def attach(req, macct_id, mbox_name_enc, mail_uid, filename_enc):
+def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
     # XXX: Tal vez seteand Content-Disposition como inline ayude a que
     #      lo muestre el server en lugar de bajarlo?
     try:
         jm = JMail(req, tmpl_name='mail/attach', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
+
     try:
-        mbox = JMailMBox(mbox_name_enc, name_encoded=True)
-        msg = mbox.msg_fetch(mail_uid)
+        mdir = JMailMDir(name_encode=mdir_name_enc)
+        msg = mdir.msg_get(mail_uid)
     except JMailError as e:
         return e.response()
+
     attach = None
     for ad in msg.attachs:
-        ad_filename_enc = ad.get('filename_enc')
+        ad_filename_enc = ad.get('filename_encode')
         if ad_filename_enc == filename_enc.encode():
             attach = ad
             break
     if attach is None:
         return jm.error(500, 'No attach')
-    cs = attach['charset']
-    if cs is None:
-        cs = jm.charset
-    ct = attach['content_type']
-    #~ maintype = attach['content_maintype']
-    #~ subtype = attach['content_subtype']
-    #~ if maintype == 'text':
-        #~ if subtype == 'x-patch':
-            #~ ct = 'text/plain'
-    resp = HttpResponse(content_type='{}; charset={}'.format(ct, cs))
-    resp['Content-Disposition'] = attach['disposition']
+
+    resp = HttpResponse(attach['payload'], content_type='{}; charset={}'.format(attach['content_type'], attach['charset']))
+
+    #~ wrapper = FileWrapper(StringIO(attach['payload']))
+    #~ resp = HttpResponse(wrapper, content_type='{}; charset={}'.format(attach['content_type'], attach['charset']))
+
+    resp['Content-Disposition'] = attach['content_disposition']
+    if attach['content_transfer_encoding'] is not None:
+        resp['Content-Transfer-Encoding'] = attach['content_transfer_encoding']
     jm.end()
     return resp
 

@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 
     url(r'^user/', include('jmail.user.urls', namespace='user')),
     url(r'^acct/', include('jmail.macct.urls', namespace='macct')),
-    url(r'^mbox/', include('jmail.mbox.urls', namespace='mbox')),
+    url(r'^mdir/', include('jmail.mdir.urls', namespace='mdir')),
     url(r'^mail/', include('jmail.mail.urls', namespace='mail')),
 
     url(r'^debug/$', 'jmail.views.debug', name='debug'),

@@ -3,30 +3,11 @@
     {% include 'mail/actions.html' %}
     {% include 'mail/headers.html' %}
     {% include 'mail/attributes.html' %}
-
-    <div class="mail-parts">
-        <p class="buttons">
-            <a href="{% url 'mail:source' macct.id mbox.name_encode msg.uid %}">source</a>
-
-            {% for part in msg.body_parts %}
-                {% if read_html %}
-                    <a href="{% url 'mail:read' macct.id mbox.name_encode msg.uid %}">{{part}}</a>
-                {% else %}
-                    <a href="{% url 'mail:read_html' macct.id mbox.name_encode msg.uid 'html' %}">{{part}}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% for attach in msg.attachs %}
-                <a href="{% url 'mail:attach' macct.id mbox.name_encode msg.uid attach.filename_enc %}" title="{{attach.content_type}}"><q>{{attach.filename}}</q></a>
-            {% endfor %}
-        </p>
-    </div>
-
+    {% include 'mail/parts.html' %}
     {% if read_html %}
         {% include 'mail/body_html.html' %}
     {% else %}
         {% include 'mail/body_plain.html' %}
     {% endif %}
-
 </div><!-- mail-read -->
 {% include "tail.html" %}
