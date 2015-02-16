@@ -11,5 +11,5 @@ urlpatterns = patterns('',
     url(r'^(\d+)/send/$', 'jmail.msg.views.send', name='send'),
 
     url(r'^(\d+)/([\w=]+)/(\d+)/reply/$', 'jmail.msg.views.reply', name='reply'),
-    url(r'^(\d+)/([\w=]+)/(\d+)/(replyall)/$', 'jmail.msg.views.reply', name='replyall'),
+    url(r'^(\d+)/([\w=]+)/(\d+)/reply(all)/$', 'jmail.msg.views.reply', name='reply'),
 )

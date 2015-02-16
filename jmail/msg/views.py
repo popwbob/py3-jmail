@@ -185,14 +185,18 @@ def send(req, macct_id):
     return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
 
 
-def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=None):
+def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
     try:
-        jm = JMail(req, tmpl_name='msg/reply', macct_id=macct_id)
+        jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id, imap_start=True)
+    except JMailError as e:
+        return e.response()
+    try:
+        mdir = JMailMDir(name_encode=mdir_name_enc)
+        msg = mdir.msg_get(msg_uid, peek=False)
     except JMailError as e:
         return e.response()
     jm.tmpl_data({
         'load_navbar_path': True,
-        #~ 'mbox': mbox.tmpl_data(),
-        #~ 'msg': msg,
+        'msg': msg,
     })
     return jm.render()

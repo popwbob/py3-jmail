@@ -53,7 +53,7 @@ class JMailMessageHeaders(JMailBase):
 
     def _hdecode(self, hval):
         l = decode_header(hval)
-        self.log.dbg('hdecode: ', hval, ' ', l)
+        #~ self.log.dbg('hdecode: ', hval, ' ', l)
         items = list()
         for t in l:
             s = t[0]
@@ -66,11 +66,11 @@ class JMailMessageHeaders(JMailBase):
                 else:
                     items.append(s.decode(c))
         r = ' '.join(items)
-        self.log.dbg('hdecode return: ', r)
+        #~ self.log.dbg('hdecode return: ', r)
         return r
 
     def short(self):
-        self.log.dbg('headers short')
+        #~ self.log.dbg('headers short')
         hs = dict()
         # -- date
         hdate = self.get_raw('date')
@@ -105,8 +105,6 @@ class JMailMessage(JMailBase):
     seen = None
 
     def __init__(self, mdata=None, uid=None):
-        self.log.dbg('mdata type:', type(mdata))
-        self.log.dbg('mdata:', mdata)
         self._init_empty()
         if mdata is not None:
             self.uid = uid
@@ -166,7 +164,7 @@ class JMailMessage(JMailBase):
             data = data.encode()
         msg = email.message_from_bytes(data)
         self.headers = JMailMessageHeaders(msg.items())
-        msg_text = ['[NO TEXT CONTENT]']
+        msg_text = '[NO TEXT CONTENT]'
         msg_html = '[NO HTML CONTENT]'
         for part in msg.walk():
             content_type = part.get_content_type()
