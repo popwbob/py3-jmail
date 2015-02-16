@@ -106,24 +106,30 @@ SESSION_COOKIE_NAME = 'jmail_sid'
     #~ },
 #~ }
 
+JMAIL_DATA_DIR = '/opt/jmail'
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/opt/jmail/cache/default',
+        'LOCATION': os.path.join(JMAIL_DATA_DIR, 'cache', 'default'),
         'TIMEOUT': 3600,
         'KEY_PREFIX': 'jmail_cache',
         'VERSION': 0,
     },
     'mdir-cache': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/opt/jmail/cache/mdir',
-        'TIMEOUT': 60,
+        'LOCATION': os.path.join(JMAIL_DATA_DIR, 'cache', 'mdir'),
+        'TIMEOUT': 15,
         'KEY_PREFIX': 'jmail_cache_mdir',
         'VERSION': 0,
     }
 }
 
 JMAIL = {
+    #~ 'DATA_DIR': JMAIL_DATA_DIR,
+    #~ 'CONF_LOCAL': os.path.join(JMAIL_DATA_DIR, 'jmail.json')
     'DATE_HEADER_FORMAT': '%a, %d %b %Y %H:%M:%S %z',
     'MDIR_CACHE_ENABLE': True,
+    'MDIR_CACHE_FLAGS_TTL': 30,
+    'MDIR_CACHE_SOURCE_TTL': 900,
 }

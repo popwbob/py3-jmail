@@ -107,15 +107,15 @@ class JMailMessage(JMailBase):
     uid = None
     seen = None
 
-    def __init__(self, mdata=None, uid=None):
+    def __init__(self, meta=None, source=None, uid=None):
         self._init_empty()
-        if mdata is not None:
-            self.uid = uid
-            if mdata[0] is not None:
-                self.flags = self._flags_parse(mdata[0])
-            self.body, self.body_html = self._parse_message(mdata[1])
-            self.headers_short = self.headers.short()
+        self.uid = uid
+        if meta is not None:
+            self.flags = self._flags_parse(meta)
             self.flags_short = self._flags_short(self.flags)
+        if source is not None:
+            self.body, self.body_html = self._parse_message(source)
+            self.headers_short = self.headers.short()
 
 
     def __str__(self):

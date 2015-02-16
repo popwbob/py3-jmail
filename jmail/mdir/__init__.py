@@ -69,10 +69,6 @@ class JMailMDir(JMailBase):
 
 
     def msg_getlist(self, uid_list='__ALL__', peek=True):
-        ml = self.__cache.get('msgs:list', None)
-        if ml is not None:
-            self.log.dbg('CACHE hit: msgs list')
-            return ml
         if type(uid_list) is str:
             if uid_list == '__ALL__':
                 typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
@@ -82,36 +78,48 @@ class JMailMDir(JMailBase):
         for muid in uid_list:
             if muid != b'':
                 msgs.append(self.msg_get(muid, peek))
-        self.__cache.set('msgs:list', msgs)
         return msgs
 
 
     def msg_get(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        ck = 'msg:imap:data:{}'.format(str(mail_uid))
-        mdata = self.__cache.get(ck, None)
-        if mdata is None:
-            mdata = self._imap_fetch(mail_uid, peek)
-            self.__cache.set(ck, mdata, 3600)
-        else:
-            self.log.dbg('CACHE hit: msg get')
-        m = JMailMessage(mdata, uid=mail_uid)
-        del mdata
+        meta = self.msg_flags(mail_uid, peek)
+        source = self.msg_source(mail_uid, peek)
+        m = JMailMessage(meta, source, uid=mail_uid)
+        del meta
+        del source
         return m
 
 
     def msg_source(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        ck = 'msg:imap:data:{}'.format(str(mail_uid))
-        mdata = self.__cache.get(ck, None)
-        if mdata is not None:
-            self.log.dbg('CACHE hit: msg source')
-            return mdata[1]
-        mdata = self._imap_fetch(mail_uid, peek)
-        self.__cache.set(ck, mdata, 3600)
-        return mdata[1]
+        ck = 'msg:{}:source'.format(int(mail_uid))
+        source = self.__cache.get(ck, None)
+        if source is None:
+            mdata = self._imap_fetch(mail_uid, peek)
+            source = mdata[1]
+        else:
+            self.log.dbg('CACHE hit: msg source(', mail_uid, ')')
+            return source
+        self.__cache.set(ck, source, self.conf.get('MDIR_CACHE_SOURCE_TTL', 900))
+        return source
+
+
+    def msg_flags(self, mail_uid, peek=True):
+        if type(mail_uid) is str:
+            mail_uid = mail_uid.encode()
+        ck = 'msg:{}:flags'.format(int(mail_uid))
+        flags = self.__cache.get(ck, None)
+        if flags is None:
+            mdata = self._imap_fetch(mail_uid, peek)
+            flags = mdata[0]
+        else:
+            self.log.dbg('CACHE hit: msg flags(', mail_uid, ')')
+            return flags
+        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_FLAGS_TTL', 30))
+        return flags
 
 
     def _imap_fetch(self, mail_uid, peek):
