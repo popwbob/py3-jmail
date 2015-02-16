@@ -1,6 +1,11 @@
 import re
+import os.path
 import imaplib
+
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+
+from django.conf import settings as django_settings
+from django.core.cache.backends.filebased import FileBasedCache
 
 from .. import JMailBase
 from ..error import JMailError
@@ -8,6 +13,7 @@ from ..msg import JMailMessage
 
 
 class JMailMDir(JMailBase):
+    __cache = None
     name = None
     name_encode = None
     msgs_no = None
@@ -19,11 +25,13 @@ class JMailMDir(JMailBase):
         self.name_encode = name_encode
         self._name_parse()
         self._mdir_select()
+        self._cache_init()
 
 
     def __del__(self):
         if self.imap and self.imap.state == 'SELECTED':
             self.imap.close()
+        del self.__cache
 
 
     def _name_parse(self):
@@ -102,7 +110,11 @@ class JMailMDir(JMailBase):
 
     def subs_list(self):
         mbox = self.imap.lsub()
-        self.log.dbg(mbox)
+        self.log.dbg('subs list mbox: ', mbox)
+        sl = self.__cache.get('subs:list', None)
+        if sl is not None:
+            self.log.dbg('subs list cache hit')
+            return sl
         sl = []
         for d in mbox[1]:
             if d != b'':
@@ -126,4 +138,19 @@ class JMailMDir(JMailBase):
                 'imap_name': c.decode(),
                 'name_encode': urlsafe_b64encode(c).decode(),
             })
+        self.__cache.set('subs:list', r, 60)
         return r
+
+
+    def _cache_init(self):
+        if self.__cache:
+            del self.__cache
+        cache_conf = django_settings.CACHES['mdir-cache']
+        cache_location = os.path.join(cache_conf.get('LOCATION'), str(self.macct.get('id')), self.name_encode.decode())
+
+        self.log.dbg('cache_conf: ', cache_conf)
+        self.log.dbg('cache_location: ', cache_location)
+
+        #~ cache_conf['LOCATION'] = cache_location
+        self.__cache = FileBasedCache(cache_location, cache_conf)
+        self.log.dbg('mdir cache: ', self.__cache)

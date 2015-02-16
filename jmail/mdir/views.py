@@ -7,17 +7,12 @@ def subs(req, macct_id):
         jm = JMail(req, tmpl_name='mdir/subs', macct_id=macct_id)
     except JMailError as e:
         return e.response()
-
-    subs_list = jm.cache_get('subs_list', None)
-    if subs_list is None:
-        try:
-            jm.imap_start(jm.macct)
-            mdir = JMailMDir(name='INBOX')
-        except JMailError as e:
-            return e.response()
-        subs_list = mdir.subs_list()
-        jm.cache_set('subs_list', subs_list, 60)
-
+    try:
+        jm.imap_start(jm.macct)
+        mdir = JMailMDir(name='INBOX')
+    except JMailError as e:
+        return e.response()
+    subs_list = mdir.subs_list()
     jm.tmpl_data({
         'load_navbar_path': True,
         'subs_list': subs_list,
