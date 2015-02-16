@@ -125,4 +125,5 @@ CACHES = {
 
 JMAIL = {
     'DATE_HEADER_FORMAT': '%a, %d %b %Y %H:%M:%S %z',
+    'MDIR_CACHE_ENABLE': True,
 }
