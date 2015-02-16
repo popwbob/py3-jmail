@@ -109,7 +109,7 @@ SESSION_COOKIE_NAME = 'jmail_sid'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/home/jrms/tmp/jmail_cache',
+        'LOCATION': '/opt/jmail/cache',
         'TIMEOUT': 3600,
         'KEY_PREFIX': 'jmail_cache',
         'VERSION': 0,
