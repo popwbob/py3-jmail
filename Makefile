@@ -13,7 +13,7 @@ lib-pyo:
 	@python3 -O -m compileall jmail/ | grep -Ev '^Listing '
 
 django-runserver:
-	@python3 manage.py runserver 127.10.10.10:8000
+	@JMAIL_DEVMODE=1 python3 manage.py runserver 127.10.10.10:8000
 
 smtpd-debug-server:
 	@python3 -m smtpd -n -c DebuggingServer localhost:1025

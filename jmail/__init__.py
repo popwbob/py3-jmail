@@ -1,3 +1,4 @@
+import os
 import json
 import imaplib
 import time
@@ -33,6 +34,7 @@ class JMailBase:
     macct = None
     charset = 'utf-8'
     conf = None
+    devmode = None
 
     @classmethod
     def bytes2human(self, size_bytes):
@@ -99,6 +101,7 @@ class JMail(JMailBase):
     def _load_settings(self):
         JMailBase.debug = settings.DEBUG
         JMailBase.conf = settings.JMAIL.copy()
+        JMailBase.devmode = os.getenv('JMAIL_DEVMODE', None)
 
 
     def end(self):
