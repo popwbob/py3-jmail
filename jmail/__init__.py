@@ -203,7 +203,6 @@ class JMail(JMailBase):
             td = self.tmpl_data({})
         else:
             td.update(tmpl_data)
-        self.log.dbg('tmpl_data:', tmpl_data)
         td['took'] = self.end()
         return e.response(tmpl_data=td)
 
