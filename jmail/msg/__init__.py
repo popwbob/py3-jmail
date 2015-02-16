@@ -17,7 +17,7 @@ re_msg_size = re.compile(b'{(\d+)}$')
 class JMailMessageHeaders(JMailBase):
     _data = None
 
-    def __init__(self, data):
+    def __init__(self, data=[]):
         self._data = data
 
     def __len__(self):
@@ -34,7 +34,10 @@ class JMailMessageHeaders(JMailBase):
         k = self._parse_key(k)
         return k in [self._parse_key(hk) for hk, hv in self._data]
 
-    def get(self, k, d=None):
+    def set_hdr(self, k, v):
+        self._data.append((k, v))
+
+    def get(self, k, d=''):
         k = self._parse_key(k)
         for hk, hv in self._data:
             if self._parse_key(hk) == k:
@@ -69,16 +72,24 @@ class JMailMessageHeaders(JMailBase):
     def short(self):
         self.log.dbg('headers short')
         hs = dict()
+        # -- date
         hdate = self.get_raw('date')
-        dstring = ' '.join(hdate.split()[:6])
-        dobj = strptime(dstring, JMailBase.conf.get('DATE_HEADER_FORMAT'))
-        hs['date'] = strftime('%Y%m%d %H:%M', dobj)
+        if hdate is None:
+            hs['date'] = ''
+        else:
+            dstring = ' '.join(hdate.split()[:6])
+            dobj = strptime(dstring, JMailBase.conf.get('DATE_HEADER_FORMAT'))
+            hs['date'] = strftime('%Y%m%d %H:%M', dobj)
+        # -- from, to, subject
         for k in ('from', 'to', 'subject'):
             v = self.get(k)
             if len(v) > 30:
                 v = v[:30] + '..'
             hs[k] = v
         return hs
+
+    def __str__(self):
+        return str(self._data)
 
 
 class JMailMessage(JMailBase):
@@ -93,18 +104,38 @@ class JMailMessage(JMailBase):
     uid = None
     seen = None
 
-    def __init__(self, mdata, uid=None):
-        self.uid = uid
-        self.flags = self._flags_parse(mdata[0])
-        self.body, self.body_html = self._parse_message(mdata[1])
-        self.headers_short = self.headers.short()
-        self.flags_short = self._flags_short(self.flags)
+    def __init__(self, mdata=None, uid=None):
+        self.log.dbg('mdata type:', type(mdata))
+        self.log.dbg('mdata:', mdata)
+        self._init_empty()
+        if mdata is not None:
+            self.uid = uid
+            if mdata[0] is not None:
+                self.flags = self._flags_parse(mdata[0])
+            self.body, self.body_html = self._parse_message(mdata[1])
+            self.headers_short = self.headers.short()
+            self.flags_short = self._flags_short(self.flags)
+
+
+    def __str__(self):
+        return '(.headers={})'.format(self.headers)
+
+
+    def _init_empty(self):
+        self.flags = list()
+        self.body = self.body_html = ''
+        self.headers = JMailMessageHeaders()
+        self.headers_short = dict()
+        self.flags_short = dict()
 
 
     def _flags_parse(self, fs):
         self.log.dbg('flags parse')
         m = re.search(re_msg_size, fs)
-        self.size = int(m.group(1))
+        if m is None:
+            self.size = 0
+        else:
+            self.size = int(m.group(1))
         flags = imaplib.ParseFlags(fs)
         if b'\\Seen' in flags:
             self.seen = True
@@ -131,6 +162,8 @@ class JMailMessage(JMailBase):
         self.log.dbg('parse message')
         self.attachs = list()
         attach_no = 0
+        if type(data) is str:
+            data = data.encode()
         msg = email.message_from_bytes(data)
         self.headers = JMailMessageHeaders(msg.items())
         msg_text = ['[NO TEXT CONTENT]']
@@ -154,7 +187,7 @@ class JMailMessage(JMailBase):
                 if subtype == 'plain':
                     # -- text plain
                     #~ msg_text = self._text_encoding(part.get_payload(), tenc, charset).splitlines()
-                    msg_text = part.get_payload(decode=True).splitlines()
+                    msg_text = part.get_payload(decode=True)
                 elif subtype == 'html':
                     # -- text html
                     msg_html = self._text_encoding(part.get_payload(), tenc, charset)
@@ -207,3 +240,7 @@ class JMailMessage(JMailBase):
 
     def size_human(self):
         return JMailBase.bytes2human(self.size)
+
+
+    def body_lines(self):
+        return self.body.splitlines()

@@ -101,31 +101,17 @@ def compose(req, macct_id):
         jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id)
     except JMailError as e:
         return e.response()
-
-    msg = {
-        'mail_from': jm.macct['address'],
-        'mail_to': '',
-        'mail_cc': '',
-        'mail_bcc': '',
-        'mail_subject': '',
-        'mail_body': '',
-    }
-
+    msg = JMailMessage()
+    msg.headers.set_hdr('From', jm.macct['address'])
     msg_saved = jm.cache_get('compose:save')
+    compose_restore = False
     if msg_saved is not None:
-        msg = {
-            'mail_from': msg_saved['From'],
-            'mail_to': msg_saved['To'],
-            'mail_cc': msg_saved['Cc'] or '',
-            'mail_bcc': msg_saved['Bcc'] or '',
-            'mail_subject': msg_saved['Subject'],
-            'mail_body': b64decode(msg_saved.get_payload().encode()),
-            'compose_restore': True,
-        }
-
+        msg = JMailMessage((None, msg_saved))
+        compose_restore = True
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
+        'compose_restore': compose_restore,
     })
     return jm.render()
 
@@ -184,7 +170,7 @@ def send(req, macct_id):
     msg['X-Mailer'] = 'jmail v0.0'
 
     # -- save email to cache in case the SMTP fails
-    jm.cache_set('compose:save', msg)
+    jm.cache_set('compose:save', msg.as_string())
 
     try:
         smtp = smtplib.SMTP(jm.macct['smtp_server'], jm.macct['smtp_server_port'])
@@ -199,7 +185,7 @@ def send(req, macct_id):
     return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
 
 
-def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=False):
+def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=None):
     try:
         jm = JMail(req, tmpl_name='msg/reply', macct_id=macct_id)
     except JMailError as e:
