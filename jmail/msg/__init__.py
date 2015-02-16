@@ -35,6 +35,9 @@ class JMailMessageHeaders(JMailBase):
         return k in [self._parse_key(hk) for hk, hv in self._data]
 
     def set_hdr(self, k, v):
+        for hk, hv in self._data:
+            if self._parse_key(hk) == self._parse_key(k):
+                self._data.remove((hk, hv))
         self._data.append((k, v))
 
     def get(self, k, d=''):
