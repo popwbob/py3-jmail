@@ -68,6 +68,10 @@ class JMailMDir(JMailBase):
 
 
     def msg_getlist(self, uid_list='__ALL__', peek=True):
+        ml = self.__cache.get('msgs:list', None)
+        if ml is not None:
+            self.log.dbg('CACHE hit: msgs list')
+            return ml
         if type(uid_list) is str:
             if uid_list == '__ALL__':
                 typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
@@ -77,14 +81,24 @@ class JMailMDir(JMailBase):
         for muid in uid_list:
             if muid != b'':
                 msgs.append(self.msg_get(muid, peek))
+        self.__cache.set('msgs:list', msgs)
         return msgs
 
 
     def msg_get(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        mdata = self._imap_fetch(mail_uid, peek)
+        ck = 'msg:imap:data:{}'.format(str(mail_uid))
+        mdata = self.__cache.get(ck, None)
+        cache_save = False
+        if mdata is None:
+            mdata = self._imap_fetch(mail_uid, peek)
+            cache_save = True
+        else:
+            self.log.dbg('CACHE hit: msg get')
         m = JMailMessage(mdata, uid=mail_uid)
+        if cache_save:
+            self.__cache.set(ck, mdata, 3600)
         del mdata
         return m
 
@@ -92,7 +106,13 @@ class JMailMDir(JMailBase):
     def msg_source(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
+        ck = 'msg:imap:data:{}'.format(str(mail_uid))
+        mdata = self.__cache.get(ck, None)
+        if mdata is not None:
+            self.log.dbg('CACHE hit: msg source')
+            return mdata[1]
         mdata = self._imap_fetch(mail_uid, peek)
+        self.__cache.set(ck, mdata, 3600)
         return mdata[1]
 
 
@@ -113,7 +133,7 @@ class JMailMDir(JMailBase):
         self.log.dbg('subs list mbox: ', mbox)
         sl = self.__cache.get('subs:list', None)
         if sl is not None:
-            self.log.dbg('subs list cache hit')
+            self.log.dbg('CACHE hit: subs list')
             return sl
         sl = []
         for d in mbox[1]:

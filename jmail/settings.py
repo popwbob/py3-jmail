@@ -117,7 +117,7 @@ CACHES = {
     'mdir-cache': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': '/opt/jmail/cache/mdir',
-        'TIMEOUT': 3600,
+        'TIMEOUT': 60,
         'KEY_PREFIX': 'jmail_cache_mdir',
         'VERSION': 0,
     }
