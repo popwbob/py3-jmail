@@ -199,8 +199,11 @@ class JMail(JMailBase):
     def error(self, status, message, tmpl_data=None):
         e = JMailError(status, message)
         td = dict()
-        if tmpl_data is not None:
+        if tmpl_data is None:
+            td = self.tmpl_data({})
+        else:
             td.update(tmpl_data)
+        self.log.dbg('tmpl_data:', tmpl_data)
         td['took'] = self.end()
         return e.response(tmpl_data=td)
 
