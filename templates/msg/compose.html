@@ -1,6 +1,6 @@
 {% include "head.html" %}
 <div class="mail-compose">
-    <form action="{% url 'mail:send' macct.id %}" method="post">
+    <form action="{% url 'msg:send' macct.id %}" method="post">
         {% csrf_token %}
         <p class="buttons">
             <input type="submit" name="jmail_cmd" value="send">

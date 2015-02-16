@@ -1,0 +1,13 @@
+{% include "head.html" %}
+<div class="mail-read">
+    {% include 'msg/actions.html' %}
+    {% include 'msg/headers.html' %}
+    {% include 'msg/attributes.html' %}
+    {% include 'msg/parts.html' %}
+    {% if read_html %}
+        {% include 'msg/body_html.html' %}
+    {% else %}
+        {% include 'msg/body_plain.html' %}
+    {% endif %}
+</div><!-- mail-read -->
+{% include "tail.html" %}

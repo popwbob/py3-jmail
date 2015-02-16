@@ -1,7 +1,7 @@
 {% include 'head.html' %}
 <div class="mail-source">
     <p class="buttons">
-        <a href="{% url 'mail:read' macct.id mdir.name_encode msg.uid %}">read</a>
+        <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">read</a>
     </p>
     <pre>{{msg.source}}</pre>
 </div>

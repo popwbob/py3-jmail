@@ -17,7 +17,7 @@ from . import JMailMessage
 
 def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
     try:
-        jm = JMail(req, tmpl_name='mail/read', macct_id=macct_id, imap_start=True)
+        jm = JMail(req, tmpl_name='msg/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
 
@@ -43,7 +43,7 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
 
 def source(req, macct_id, mdir_name_enc, mail_uid):
     try:
-        jm = JMail(req, tmpl_name='mail/source', macct_id=macct_id, imap_start=True)
+        jm = JMail(req, tmpl_name='msg/source', macct_id=macct_id, imap_start=True)
         mdir = JMailMDir(name_encode=mdir_name_enc)
         msg_source = mdir.msg_source(mail_uid)
     except JMailError as e:
@@ -65,7 +65,7 @@ def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
     # XXX: Tal vez seteand Content-Disposition como inline ayude a que
     #      lo muestre el server en lugar de bajarlo?
     try:
-        jm = JMail(req, tmpl_name='mail/attach', macct_id=macct_id, imap_start=True)
+        jm = JMail(req, tmpl_name='msg/attach', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
 
@@ -98,7 +98,7 @@ def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
 
 def compose(req, macct_id):
     try:
-        jm = JMail(req, tmpl_name='mail/compose', macct_id=macct_id)
+        jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id)
     except JMailError as e:
         return e.response()
 
@@ -132,7 +132,7 @@ def compose(req, macct_id):
 
 def __compose_discard(jm, macct_id):
     jm.cache_del('compose:save')
-    return jm.redirect('mail:compose', macct_id)
+    return jm.redirect('msg:compose', macct_id)
 
 
 def send(req, macct_id):
@@ -201,7 +201,7 @@ def send(req, macct_id):
 
 def reply(req, macct_id, mbox_name_enc, mail_uid, reply_all=False):
     try:
-        jm = JMail(req, tmpl_name='mail/reply', macct_id=macct_id)
+        jm = JMail(req, tmpl_name='msg/reply', macct_id=macct_id)
     except JMailError as e:
         return e.response()
     jm.tmpl_data({

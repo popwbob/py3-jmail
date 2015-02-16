@@ -4,7 +4,7 @@ from base64 import urlsafe_b64encode, urlsafe_b64decode
 
 from .. import JMailBase
 from ..error import JMailError
-from ..mail import JMailMessage
+from ..msg import JMailMessage
 
 
 class JMailMDir(JMailBase):

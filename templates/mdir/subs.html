@@ -1,7 +1,7 @@
 {% include "head.html" %}
 <div class="mbox-subs">
     <p class="buttons">
-        <a href="{% url 'mail:compose' macct.id %}">compose</a>
+        <a href="{% url 'msg:compose' macct.id %}">compose</a>
     </p>
     <ul class="buttons">
     {% for child in subs_list %}
