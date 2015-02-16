@@ -91,15 +91,12 @@ class JMailMDir(JMailBase):
             mail_uid = mail_uid.encode()
         ck = 'msg:imap:data:{}'.format(str(mail_uid))
         mdata = self.__cache.get(ck, None)
-        cache_save = False
         if mdata is None:
             mdata = self._imap_fetch(mail_uid, peek)
-            cache_save = True
+            self.__cache.set(ck, mdata, 3600)
         else:
             self.log.dbg('CACHE hit: msg get')
         m = JMailMessage(mdata, uid=mail_uid)
-        if cache_save:
-            self.__cache.set(ck, mdata, 3600)
         del mdata
         return m
 
