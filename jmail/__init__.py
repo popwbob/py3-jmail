@@ -17,6 +17,7 @@ from jmail.error import JMailMessagePage, JMailError, JMailErrorUserUnauth
 from jmail.user.models import JMailUser
 from jmail.macct.models import JMailMAcct
 
+VERSION = '0.0'
 IMAP_DEBUG = 0
 B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
@@ -35,6 +36,7 @@ class JMailBase:
     charset = 'utf-8'
     conf = None
     devmode = None
+    version = VERSION
 
     @classmethod
     def bytes2human(self, size_bytes):

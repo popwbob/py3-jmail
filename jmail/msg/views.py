@@ -138,8 +138,6 @@ def send(req, macct_id):
     if req.method != 'POST':
         return jm.error(400, 'bad request', tmpl_data=td)
 
-    jm.log.dbg('POST: ', req.POST)
-
     req_cmd = req.POST.get('jmail_cmd')
     if req_cmd == 'discard':
         # -- discard composing
@@ -167,7 +165,7 @@ def send(req, macct_id):
     msg['Reply-To'] = msg['From']
     msg['Message-ID'] = '<{}.{}@jmail>'.format(time.time(), jm.user)
     msg['Date'] = time.strftime(jm.conf.get('DATE_HEADER_FORMAT'))
-    msg['X-Mailer'] = 'jmail v0.0'
+    msg['X-Mailer'] = 'jmail v{}'.format(jm.version)
 
     # -- save email to cache in case the SMTP fails
     jm.cache_set('compose:save', msg.as_string())
@@ -195,6 +193,9 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
         msg = mdir.msg_get(msg_uid, peek=False)
     except JMailError as e:
         return e.response()
+    # TODO / FIXME
+    # * El From pasa a ser el To y viceversa.
+    # * Salvo que sea un replyall, limpiar CC y BCC
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
