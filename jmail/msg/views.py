@@ -44,13 +44,11 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
     try:
         jm = JMail(req, tmpl_name='msg/source', macct_id=macct_id, imap_start=True)
         mdir = JMailMDir(name_encode=mdir_name_enc)
-        msg_source = mdir.msg_source(mail_uid)
+        msg_source = mdir.msg_source(mail_uid, peek=False)
     except JMailError as e:
         return e.response()
     #~ except Exception as e:
         #~ return jm.error(500, e)
-    # -- mark as read
-    msg.flag_seen()
     jm.tmpl_data({
         'load_navbar_path': True,
         'mdir': mdir,
