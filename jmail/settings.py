@@ -130,6 +130,6 @@ JMAIL = {
     #~ 'CONF_LOCAL': os.path.join(JMAIL_DATA_DIR, 'jmail.json')
     'DATE_HEADER_FORMAT': '%a, %d %b %Y %H:%M:%S %z',
     'MDIR_CACHE_ENABLE': True,
-    'MDIR_CACHE_FLAGS_TTL': 30,
-    'MDIR_CACHE_SOURCE_TTL': 900,
+    'MDIR_CACHE_FLAGS_TTL': 10,
+    'MDIR_CACHE_SOURCE_TTL': 30,
 }

@@ -84,7 +84,7 @@ class JMailMDir(JMailBase):
     def msg_get(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        meta = self.msg_flags(mail_uid, peek)
+        meta = self.msg_flags(mail_uid)
         source = self.msg_source(mail_uid, peek)
         m = JMailMessage(meta, source, uid=mail_uid)
         del meta
@@ -98,8 +98,7 @@ class JMailMDir(JMailBase):
         ck = 'msg:{}:source'.format(int(mail_uid))
         source = self.__cache.get(ck, None)
         if source is None:
-            mdata = self._imap_fetch(mail_uid, peek)
-            source = mdata[1]
+            source = self._imap_fetch_source(mail_uid, peek)
         else:
             self.log.dbg('CACHE hit: msg source(', mail_uid, ')')
             return source
@@ -107,14 +106,13 @@ class JMailMDir(JMailBase):
         return source
 
 
-    def msg_flags(self, mail_uid, peek=True):
+    def msg_flags(self, mail_uid):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
         ck = 'msg:{}:flags'.format(int(mail_uid))
         flags = self.__cache.get(ck, None)
         if flags is None:
-            mdata = self._imap_fetch(mail_uid, peek)
-            flags = mdata[0]
+            flags = self._imap_fetch_flags(mail_uid)
         else:
             self.log.dbg('CACHE hit: msg flags(', mail_uid, ')')
             return flags
@@ -122,16 +120,23 @@ class JMailMDir(JMailBase):
         return flags
 
 
-    def _imap_fetch(self, mail_uid, peek):
-        self.log.dbg('mdir state: ', self.imap.state)
+    def _imap_fetch(self, mail_uid, cmd):
+        #~ self.log.dbg('mdir state: ', self.imap.state)
         if self.imap.state != 'SELECTED':
             raise JMailError(500, 'mdir not selected, imap state: '+self.imap.state)
+        typ, data = self.imap.uid('FETCH', mail_uid, cmd)
+        return data
+
+
+    def _imap_fetch_source(self, mail_uid, peek):
+        cmd = 'BODY[]'
         if peek:
-            cmd = '(FLAGS BODY.PEEK[])'
-        else:
-            cmd = '(FLAGS BODY[])'
-        typ, mdata = self.imap.uid('FETCH', mail_uid, cmd)
-        return mdata[0]
+            cmd = 'BODY.PEEK[]'
+        return self._imap_fetch(mail_uid, cmd)[0][1]
+
+
+    def _imap_fetch_flags(self, mail_uid):
+        return self._imap_fetch(mail_uid, 'FLAGS')[0]
 
 
     def subs_list(self):

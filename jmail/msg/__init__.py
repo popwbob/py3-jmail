@@ -1,4 +1,3 @@
-import re
 import email
 import imaplib
 
@@ -9,9 +8,6 @@ from base64 import b64decode, urlsafe_b64encode
 
 from .. import JMailBase
 from ..error import JMailError
-
-
-re_msg_size = re.compile(b'{(\d+)}$')
 
 
 class JMailMessageHeaders(JMailBase):
@@ -116,6 +112,7 @@ class JMailMessage(JMailBase):
         if source is not None:
             self.body, self.body_html = self._parse_message(source)
             self.headers_short = self.headers.short()
+            self.size = len(source)
 
 
     def __str__(self):
@@ -128,15 +125,11 @@ class JMailMessage(JMailBase):
         self.headers = JMailMessageHeaders()
         self.headers_short = dict()
         self.flags_short = dict()
+        self.size = 0
 
 
     def _flags_parse(self, fs):
-        self.log.dbg('flags parse')
-        m = re.search(re_msg_size, fs)
-        if m is None:
-            self.size = 0
-        else:
-            self.size = int(m.group(1))
+        self.log.dbg('flags parse: ', fs)
         flags = imaplib.ParseFlags(fs)
         if b'\\Seen' in flags:
             self.seen = True
@@ -160,7 +153,7 @@ class JMailMessage(JMailBase):
 
 
     def _parse_message(self, data):
-        self.log.dbg('parse message')
+        self.log.dbg('parse message: ', type(data))
         self.attachs = list()
         attach_no = 0
         if type(data) is str:
