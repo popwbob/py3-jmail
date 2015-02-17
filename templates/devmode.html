@@ -1,0 +1,46 @@
+{% if jmail.devmode %}
+<div id="debug">
+
+<style>
+#debug
+{
+    font-size:1em;
+    border:none;
+}
+#debug_button
+{
+    font-size:0.8em;
+}
+#tmpl_debug
+{
+    display:none;
+}
+</style>
+
+<script>
+function debug_toggle()
+{
+  var debug_info = document.getElementById("debug");
+  var toggle_button = document.getElementById("debug_button");
+  var tmpl_debug = document.getElementById("tmpl_debug");
+
+  if (toggle_button.value == "+")
+  {
+    tmpl_debug.style.display = "block";
+    debug_info.style.border = "solid 1px gray";
+    toggle_button.value = "-";
+  }
+  else
+  {
+    tmpl_debug.style.display = "none";
+    debug_info.style.border = "none";
+    toggle_button.value = "+";
+  }
+}
+</script>
+
+<input onclick="debug_toggle()" id="debug_button" value="+" type="submit">
+<pre id="tmpl_debug">{{jmail.tmpl_debug}}</pre>
+
+</div>
+{% endif %}

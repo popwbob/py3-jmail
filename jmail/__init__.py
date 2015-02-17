@@ -3,6 +3,8 @@ import json
 import imaplib
 import time
 
+from io import StringIO
+from pprint import pprint
 from base64 import urlsafe_b64encode
 
 from django.shortcuts import render, redirect
@@ -138,6 +140,10 @@ class JMail(JMailBase):
         JMailBase._tmpl_name = tmpl_name
         JMailBase._tmpl_path = self._tmpl_path_get()
         td = {
+            'jmail': {
+                'devmode': self.devmode,
+                'tmpl_debug': None,
+            },
             'doc': {
                 'error': False,
                 'title': 'JMail - {}'.format(self._req.path),
@@ -149,10 +155,9 @@ class JMail(JMailBase):
         else:
             td.update({
                 'user': {
-                    'name': self._req.user
+                    'name': str(self._req.user)
                 }
             })
-        td.update(csrf(self._req))
         return td
 
 
@@ -179,6 +184,8 @@ class JMail(JMailBase):
             charset = self.charset
         ctype = '{}; charset={}'.format(content_type, charset)
         self._tmpl_data['doc']['charset'] = charset
+        if self.devmode:
+            self._tmpl_data['jmail']['tmpl_debug'] = self._tmpl_data_debug()
         self._tmpl_data['took'] = self.end()
         return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
 
@@ -192,12 +199,17 @@ class JMail(JMailBase):
         return self._tmpl_data
 
 
+    def _tmpl_data_debug(self):
+        rs = StringIO()
+        pprint(self._tmpl_data, stream=rs)
+        rs.seek(0, 0)
+        return rs.read()
+
+
     def debug_data(self):
         dd = list()
         dd.append('JMail: {}'.format(str(self)))
         dd.append('')
-        #~ dd.append('tmpl_data: {}'.format(json.dumps(self._tmpl_data, indent=4)))
-        #~ dd.append('')
         return dd
 
 
