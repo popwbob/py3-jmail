@@ -102,9 +102,10 @@ class JMailMessage(JMailBase):
     attachs = None
     uid = None
     seen = None
+    mdir_cache = None
 
     def __init__(self, meta=None, source=None, uid=None):
-        self._init_empty()
+        self.__init_empty()
         self.uid = uid
         if meta is not None:
             self.flags = self._flags_parse(meta)
@@ -113,19 +114,25 @@ class JMailMessage(JMailBase):
             self.body, self.body_html = self._parse_message(source)
             self.headers_short = self.headers.short()
             self.size = len(source)
+        self.__mdir_cache_init()
 
 
     def __str__(self):
         return '(.headers={})'.format(self.headers)
 
 
-    def _init_empty(self):
+    def __init_empty(self):
         self.flags = list()
         self.body = self.body_html = ''
         self.headers = JMailMessageHeaders()
         self.headers_short = dict()
         self.flags_short = dict()
         self.size = 0
+
+
+    def __mdir_cache_init(self):
+        from ..mdir import JMailMDirCache
+        self.mdir_cache = JMailMDirCache
 
 
     def _flags_parse(self, fs):
@@ -238,3 +245,17 @@ class JMailMessage(JMailBase):
 
     def body_lines(self):
         return self.body.splitlines()
+
+
+    def flags_store(self, flags, command='+FLAGS'):
+        self.log.dbg('msg flags store: ', flags)
+        typ, data = self.imap.uid('STORE', self.uid, command, '({})'.format(flags))
+        self.log.dbg('store: ', typ, data)
+        if data is not None:
+            self._flags_parse(data[0])
+            self.mdir_cache.msg_flags_set(self.uid, data[0])
+
+
+    def flag_seen(self):
+        if not self.seen:
+            self.flags_store('\\Seen')

@@ -20,17 +20,16 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         jm = JMail(req, tmpl_name='msg/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
-
     if read_html is not None:
         read_html = True
     jm.log.dbg('read HTML: ', read_html)
-
     try:
         mdir = JMailMDir(name_encode=mdir_name_enc)
         msg = mdir.msg_get(mail_uid, peek=False)
     except JMailError as e:
         return e.response()
-
+    # -- mark as read
+    msg.flag_seen()
     jm.tmpl_data({
         'load_navbar_path': True,
         'mdir': mdir,
@@ -50,6 +49,8 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
         return e.response()
     #~ except Exception as e:
         #~ return jm.error(500, e)
+    # -- mark as read
+    msg.flag_seen()
     jm.tmpl_data({
         'load_navbar_path': True,
         'mdir': mdir,
@@ -68,13 +69,11 @@ def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
         jm = JMail(req, tmpl_name='msg/attach', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
-
     try:
         mdir = JMailMDir(name_encode=mdir_name_enc)
         msg = mdir.msg_get(mail_uid)
     except JMailError as e:
         return e.response()
-
     attach = None
     for ad in msg.attachs:
         ad_filename_enc = ad.get('filename_encode')
@@ -83,12 +82,7 @@ def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
             break
     if attach is None:
         return jm.error(500, 'No attach')
-
     resp = HttpResponse(attach['payload'], content_type='{}; charset={}'.format(attach['content_type'], attach['charset']))
-
-    #~ wrapper = FileWrapper(StringIO(attach['payload']))
-    #~ resp = HttpResponse(wrapper, content_type='{}; charset={}'.format(attach['content_type'], attach['charset']))
-
     resp['Content-Disposition'] = attach['content_disposition']
     if attach['content_transfer_encoding'] is not None:
         resp['Content-Transfer-Encoding'] = attach['content_transfer_encoding']

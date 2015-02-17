@@ -13,6 +13,45 @@ from ..error import JMailError
 from ..msg import JMailMessage
 
 
+class JMailMDirCache(JMailBase):
+    __cache = None
+    set = None
+    get = None
+    delete = None
+
+    @classmethod
+    def init(self, name_encode):
+        cache_conf = django_settings.CACHES['mdir-cache']
+        cache_location = os.path.join(cache_conf.get('LOCATION'), str(self.macct.get('id')), name_encode.decode())
+        self.log.dbg('cache_conf: ', cache_conf)
+        self.log.dbg('cache_location: ', cache_location)
+        if self.conf.get('MDIR_CACHE_ENABLE', False):
+            self.__cache = FileBasedCache(cache_location, cache_conf)
+        else:
+            self.__cache = DummyCache('localhost', cache_conf)
+        self.log.dbg('mdir cache: ', self.__cache)
+        self.set = self.__cache.set
+        self.get = self.__cache.get
+        self.delete = self.__cache.delete
+
+
+    @classmethod
+    def __msg_flags_cache_key(self, msg_uid):
+        return 'msg:{}:flags'.format(int(msg_uid))
+
+
+    @classmethod
+    def msg_flags_set(self, msg_uid, flags):
+        ck = self.__msg_flags_cache_key(msg_uid)
+        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_FLAGS_TTL', 15))
+
+
+    @classmethod
+    def msg_flags_get(self, msg_uid):
+        ck = self.__msg_flags_cache_key(msg_uid)
+        return self.__cache.get(ck, None)
+
+
 class JMailMDir(JMailBase):
     __cache = None
     name = None
@@ -109,14 +148,13 @@ class JMailMDir(JMailBase):
     def msg_flags(self, mail_uid):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        ck = 'msg:{}:flags'.format(int(mail_uid))
-        flags = self.__cache.get(ck, None)
+        flags = self.__cache.msg_flags_get(mail_uid)
         if flags is None:
             flags = self._imap_fetch_flags(mail_uid)
         else:
             self.log.dbg('CACHE hit: msg flags(', mail_uid, ')')
             return flags
-        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_FLAGS_TTL', 30))
+        self.__cache.msg_flags_set(mail_uid, flags)
         return flags
 
 
@@ -174,14 +212,5 @@ class JMailMDir(JMailBase):
 
 
     def _cache_init(self):
-        if self.__cache:
-            del self.__cache
-        cache_conf = django_settings.CACHES['mdir-cache']
-        cache_location = os.path.join(cache_conf.get('LOCATION'), str(self.macct.get('id')), self.name_encode.decode())
-        self.log.dbg('cache_conf: ', cache_conf)
-        self.log.dbg('cache_location: ', cache_location)
-        if self.conf.get('MDIR_CACHE_ENABLE', False):
-            self.__cache = FileBasedCache(cache_location, cache_conf)
-        else:
-            self.__cache = DummyCache('localhost', cache_conf)
-        self.log.dbg('mdir cache: ', self.__cache)
+        self.__cache = JMailMDirCache
+        self.__cache.init(self.name_encode)
