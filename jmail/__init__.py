@@ -274,10 +274,12 @@ class JMail(JMailBase):
             return self.imap
         except Exception as e:
             self.log.err('imap_start: [{}] {}'.format(type(e), str(e)))
-            if e.args[0].startswith(b'[AUTHENTICATIONFAILED]'):
-                raise JMailError(401, 'IMAP Authentication failed')
-            else:
-                raise JMailError(500, e.args[0].decode())
+            try:
+                if e.args[0].startswith(b'[AUTHENTICATIONFAILED]'):
+                    raise JMailError(401, 'IMAP Authentication failed')
+            except:
+                pass
+            raise JMailError(500, str(e.args))
 
 
     def imap_end(self, imap=None):
