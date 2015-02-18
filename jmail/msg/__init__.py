@@ -121,6 +121,15 @@ class JMailMessage(JMailBase):
         return '(.headers={})'.format(self.headers)
 
 
+    def __repr__(self):
+        return str({
+            'flags': self.flags,
+            'seen': self.seen,
+            'size': self.size,
+            'uid': self.uid,
+        })
+
+
     def __init_empty(self):
         self.flags = list()
         self.body = self.body_html = ''
