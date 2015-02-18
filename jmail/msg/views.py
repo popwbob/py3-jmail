@@ -226,6 +226,9 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         msg.headers.set_hdr('to', '')
     else:
         msg.headers.set_hdr('to', from_orig)
+    # -- remove CC if not replyall
+    if subcmd == 'reply':
+        msg.headers.set_hdr('cc', '')
     # -- quote body
     date_orig = msg.headers.get('date', None)
     msg.body = __msg_body_quote(msg.body, date_orig, from_orig)
