@@ -109,16 +109,19 @@ class JMailMDir(JMailBase):
 
 
     def _mdir_attribs(self, mdir_name):
-        commands = ['MESSAGES', 'RECENT', 'UNSEEN']
-        attribs = dict()
+        attribs = dict(messages=-1, recent=-1, unseen=-1)
         try:
-            for cmd in commands:
-                typ, data = self.imap.status(mdir_name, '({})'.format(cmd))
-                m = re.search('{} (\d+)\)$'.format(cmd).encode(), data[0])
-                attribs[cmd.lower()] = int(m.group(1))
+            typ, data = self.imap.status(mdir_name, '(MESSAGES RECENT UNSEEN)')
+            self.log.dbg('mdir attribs: ', typ, ' ', data)
+            if typ == 'OK':
+                m = re.search(b'^[^ ]* \(MESSAGES (\d+) RECENT (\d+) UNSEEN (\d+)\)$', data[0])
+                attribs = {
+                    'messages': int(m.group(1)),
+                    'recent': int(m.group(2)),
+                    'unseen': int(m.group(3)),
+                }
         except Exception as e:
             self.log.err('mdir attribs: ', e)
-        self.log.dbg('mdir attribs: ', attribs)
         return attribs
 
 
