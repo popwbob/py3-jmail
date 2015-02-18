@@ -175,6 +175,21 @@ def send(req, macct_id):
     return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
 
 
+def __msg_body_quote(body, date_orig, from_orig):
+    if type(body) is str:
+        body = body.encode()
+    if type(date_orig) is str:
+        date_orig = date_orig.encode()
+    if type(from_orig) is str:
+        from_orig = from_orig.encode()
+    rl = list()
+    rl.append(b'> '+date_orig+b', '+from_orig+b':')
+    rl.append(b'> ')
+    for l in body.splitlines():
+        rl.append(b'> '+l)
+    return b'\n'.join(rl)
+
+
 def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
     try:
         jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id, imap_start=True)
@@ -194,10 +209,12 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
     reply_to_orig = msg.headers.get('reply_to', None)
     if reply_to_orig is None:
         jm.log.dbg('reply using header: To')
-        msg.headers.set_hdr('to', from_orig)
     else:
+        from_orig = reply_to_orig
         jm.log.dbg('reply using header: Reply-To')
-        msg.headers.set_hdr('to', reply_to_orig)
+    msg.headers.set_hdr('to', from_orig)
+    date_orig = msg.headers.get('date', None)
+    msg.body = __msg_body_quote(msg.body, date_orig, from_orig)
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
