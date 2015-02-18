@@ -34,22 +34,33 @@ class JMailMDirCache(JMailBase):
         self.get = self.__cache.get
         self.delete = self.__cache.delete
 
-
     @classmethod
     def __msg_flags_cache_key(self, msg_uid):
         return 'msg:{}:flags'.format(int(msg_uid))
 
-
     @classmethod
     def msg_flags_set(self, msg_uid, flags):
         ck = self.__msg_flags_cache_key(msg_uid)
-        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_FLAGS_TTL', 15))
-
+        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_META_TTL'))
 
     @classmethod
     def msg_flags_get(self, msg_uid):
         ck = self.__msg_flags_cache_key(msg_uid)
         return self.__cache.get(ck, None)
+
+    @classmethod
+    def __msg_source_cache_key(self, msg_uid):
+        return 'msg:{}:source'.format(int(msg_uid))
+
+    @classmethod
+    def msg_source_get(self, msg_uid):
+        ck = self.__msg_source_cache_key(msg_uid)
+        return self.__cache.get(ck, None)
+
+    @classmethod
+    def msg_source_set(self, msg_uid, source):
+        ck = self.__msg_source_cache_key(msg_uid)
+        self.__cache.set(ck, source, self.conf.get('MDIR_CACHE_DATA_TTL'))
 
 
 class JMailMDir(JMailBase):
@@ -138,14 +149,13 @@ class JMailMDir(JMailBase):
     def msg_source(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        ck = 'msg:{}:source'.format(int(mail_uid))
-        source = self.__cache.get(ck, None)
+        source = self.__cache.msg_source_get(mail_uid)
         if source is None:
             source = self._imap_fetch_source(mail_uid, peek)
         else:
             self.log.dbg('CACHE hit: msg source(', mail_uid, ')')
             return source
-        self.__cache.set(ck, source, self.conf.get('MDIR_CACHE_SOURCE_TTL', 900))
+        self.__cache.msg_source_set(mail_uid, source)
         return source
 
 
