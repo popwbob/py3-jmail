@@ -76,10 +76,15 @@ ul.buttons li
     text-indent:-3em;
 }
 
-.mbox-check
+.mdir-check
 {
     line-height:1em;
     font-size:1em;
+}
+
+.mdir-attrib
+{
+    font-size:0.8em;
 }
 
 .mail-headers
