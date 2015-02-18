@@ -210,12 +210,13 @@ class JMailMDir(JMailBase):
 
 
     def subs_list(self):
-        mbox = self.imap.lsub()
-        self.log.dbg('subs list mbox: ', mbox)
-        sl = self.__cache.subs_list_get()
-        if sl is not None:
+        mbox = self.__cache.subs_list_get()
+        if mbox is not None:
             self.log.dbg('CACHE hit: subs list')
-            return sl
+        else:
+            mbox = self.imap.lsub()
+            self.__cache.subs_list_set(mbox)
+        self.log.dbg('subs list mbox: ', mbox)
         sl = []
         for d in mbox[1]:
             if d != b'':
@@ -240,7 +241,6 @@ class JMailMDir(JMailBase):
                 'name_encode': urlsafe_b64encode(c).decode(),
                 'attr': self._mdir_attribs(c)
             })
-        self.__cache.subs_list_set(r)
         return r
 
 
