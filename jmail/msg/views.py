@@ -237,5 +237,6 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
+        'mdir': mdir,
     })
     return jm.render()
