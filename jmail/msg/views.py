@@ -187,16 +187,17 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
         return e.response()
     # TODO / FIXME
     # * Salvo que sea un replyall, limpiar CC y BCC
-    # -- From
+    # -- set From
     from_orig = msg.headers.get('from')
-    jm.log.dbg('reply from orig: ', from_orig)
     msg.headers.set_hdr('from', jm.macct['address'])
-    jm.log.dbg('reply from: ', msg.headers.get('from'))
-    # -- To
-    to_orig = msg.headers.get('to')
-    jm.log.dbg('reply to orig: ', to_orig)
-    msg.headers.set_hdr('to', from_orig)
-    jm.log.dbg('reply to: ', msg.headers.get('to'))
+    # -- set To
+    reply_to_orig = msg.headers.get('reply_to', None)
+    if reply_to_orig is None:
+        jm.log.dbg('reply using header: To')
+        msg.headers.set_hdr('to', from_orig)
+    else:
+        jm.log.dbg('reply using header: Reply-To')
+        msg.headers.set_hdr('to', reply_to_orig)
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
