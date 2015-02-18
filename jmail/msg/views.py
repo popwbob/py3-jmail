@@ -183,8 +183,7 @@ def __msg_body_quote(body, date_orig, from_orig):
     if type(from_orig) is str:
         from_orig = from_orig.encode()
     rl = list()
-    rl.append(b'> '+date_orig+b', '+from_orig+b':')
-    rl.append(b'> ')
+    rl.append(date_orig+b', '+from_orig+b':')
     for l in body.splitlines():
         rl.append(b'> '+l)
     return b'\n'.join(rl)
