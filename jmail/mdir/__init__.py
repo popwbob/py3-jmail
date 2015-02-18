@@ -15,6 +15,8 @@ from ..msg import JMailMessage
 
 class JMailMDirCache(JMailBase):
     __cache = None
+    _meta_ttl = None
+    _data_ttl = None
     set = None
     get = None
     delete = None
@@ -33,6 +35,8 @@ class JMailMDirCache(JMailBase):
         self.set = self.__cache.set
         self.get = self.__cache.get
         self.delete = self.__cache.delete
+        self._meta_ttl = self.conf.get('MDIR_CACHE_META_TTL')
+        self._data_ttl = self.conf.get('MDIR_CACHE_DATA_TTL')
 
     @classmethod
     def __msg_flags_cache_key(self, msg_uid):
@@ -41,7 +45,7 @@ class JMailMDirCache(JMailBase):
     @classmethod
     def msg_flags_set(self, msg_uid, flags):
         ck = self.__msg_flags_cache_key(msg_uid)
-        self.__cache.set(ck, flags, self.conf.get('MDIR_CACHE_META_TTL'))
+        self.__cache.set(ck, flags, self._meta_ttl)
 
     @classmethod
     def msg_flags_get(self, msg_uid):
@@ -60,7 +64,15 @@ class JMailMDirCache(JMailBase):
     @classmethod
     def msg_source_set(self, msg_uid, source):
         ck = self.__msg_source_cache_key(msg_uid)
-        self.__cache.set(ck, source, self.conf.get('MDIR_CACHE_DATA_TTL'))
+        self.__cache.set(ck, source, self._data_ttl)
+
+    @classmethod
+    def subs_list_get(self):
+        return self.__cache.get('subs:list', None)
+
+    @classmethod
+    def subs_list_set(self, sl):
+        self.__cache.set('subs:list', sl, self._meta_ttl)
 
 
 class JMailMDir(JMailBase):
@@ -200,7 +212,7 @@ class JMailMDir(JMailBase):
     def subs_list(self):
         mbox = self.imap.lsub()
         self.log.dbg('subs list mbox: ', mbox)
-        sl = self.__cache.get('subs:list', None)
+        sl = self.__cache.subs_list_get()
         if sl is not None:
             self.log.dbg('CACHE hit: subs list')
             return sl
@@ -228,7 +240,7 @@ class JMailMDir(JMailBase):
                 'name_encode': urlsafe_b64encode(c).decode(),
                 'attr': self._mdir_attribs(c)
             })
-        self.__cache.set('subs:list', r, 60)
+        self.__cache.subs_list_set(r)
         return r
 
 
