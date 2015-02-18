@@ -94,17 +94,21 @@ class JMailMDir(JMailBase):
         self.log.dbg('mdir select: ', typ, ' ', sdata)
         if typ != 'OK':
             raise JMailError(500, 'mdir select failed: '+typ)
-        self._mdir_attribs()
+        self.attr = self._mdir_attribs(self.name)
 
 
-    def _mdir_attribs(self):
+    def _mdir_attribs(self, mdir_name):
         commands = ['MESSAGES', 'RECENT', 'UNSEEN']
-        self.attr = dict()
-        for cmd in commands:
-            typ, data = self.imap.status(self.name, '({})'.format(cmd))
-            m = re.search('{} (\d+)\)$'.format(cmd).encode(), data[0])
-            self.attr[cmd.lower()] = int(m.group(1))
-        self.log.dbg('mdir attribs: ', self.attr)
+        attribs = dict()
+        try:
+            for cmd in commands:
+                typ, data = self.imap.status(mdir_name, '({})'.format(cmd))
+                m = re.search('{} (\d+)\)$'.format(cmd).encode(), data[0])
+                attribs[cmd.lower()] = int(m.group(1))
+        except Exception as e:
+            self.log.err('mdir attribs: ', e)
+        self.log.dbg('mdir attribs: ', attribs)
+        return attribs
 
 
     def msg_getlist(self, uid_list='__ALL__', peek=True):
@@ -206,6 +210,7 @@ class JMailMDir(JMailBase):
                 'name': show_name,
                 'imap_name': c.decode(),
                 'name_encode': urlsafe_b64encode(c).decode(),
+                'attr': self._mdir_attribs(c)
             })
         self.__cache.set('subs:list', r, 60)
         return r

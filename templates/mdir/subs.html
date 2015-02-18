@@ -5,7 +5,10 @@
     </p>
     <ul class="buttons">
     {% for child in subs_list %}
-        <li><a href="{% url 'mdir:check' macct.id child.name_encode %}">{{child.name}}</a></li>
+        <li>
+            <a href="{% url 'mdir:check' macct.id child.name_encode %}">{{child.name}}{% if child.attr.recent > 0 %}({{child.attr.recent}}){% endif %}</a>
+            {{child.attr.messages}}{% if child.attr.unseen > 0 %}/{{child.attr.unseen}}{% endif %}
+        </li>
     {% endfor %}
     </ul>
 </div>
