@@ -125,11 +125,14 @@ class JMailMDir(JMailBase):
     def msg_getlist(self, uid_list='__ALL__', peek=True):
         if type(uid_list) is str:
             if uid_list == '__ALL__':
-                typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
-                uid_list = msgs_ids[0].split()
-        self.log.dbg('msgs_ids: ', uid_list)
+                #~ typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
+                #~ uid_list = msgs_ids[0].split()
+                #~ self.log.dbg('msgs_ids: ', uid_list)
+                typ, msgs_ids = self.imap.uid('SORT', '(REVERSE DATE)', 'utf-8', '(ALL)')
+                sorted_uid_list = msgs_ids[0].split()
+                self.log.dbg('msgs_ids sorted: ', sorted_uid_list)
         msgs = list()
-        for muid in uid_list:
+        for muid in sorted_uid_list:
             if muid != b'':
                 msgs.append(self.msg_get(muid, peek))
         return msgs
