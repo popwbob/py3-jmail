@@ -190,7 +190,17 @@ def __msg_body_quote(body, date_orig, from_orig):
     return b'\n'.join(rl)
 
 
-def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
+def __msg_subject_update(subcmd, subject_orig):
+    if subcmd.startswith('reply'):
+        if not subject_orig.lower().startswith('re:'):
+            return 'Re: '+subject_orig
+    elif subcmd == 'forward':
+        if not subject_orig.lower().startswith('fw:'):
+            return 'Fw: '+subject_orig
+    return subject_orig
+
+
+def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
     try:
         jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id, imap_start=True)
     except JMailError as e:
@@ -212,9 +222,16 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, reply_all=None):
     else:
         from_orig = reply_to_orig
         jm.log.dbg('reply using header: Reply-To')
-    msg.headers.set_hdr('to', from_orig)
+    if subcmd == 'forward':
+        msg.headers.set_hdr('to', '')
+    else:
+        msg.headers.set_hdr('to', from_orig)
+    # -- quote body
     date_orig = msg.headers.get('date', None)
     msg.body = __msg_body_quote(msg.body, date_orig, from_orig)
+    # -- update subject
+    subject_new = __msg_subject_update(subcmd, msg.headers.get('subject', ''))
+    msg.headers.set_hdr('subject', subject_new)
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
