@@ -1,3 +1,7 @@
 * La password de la cuenta imap NO debería vivir en la base de datos.
   Podría guardarla en el cache durante un tiempo configurable por el usuario, encriptándola usando su clave jmail.
   Entonces la primera vez que se conecta al imap pido la password, la encripto y la guardo y la use hasta que expire y la vuelvo a pedir.
+
+* Setear In-Reply-To y References when replying (hacer lo que corresponda para forward también).
+
+* Poner el mensaje a enviar en Queue primero, luego disparar el proceso para enviar el/los mensajes en Queue. Una vez enviado satisfactoriamente guardarlo en Sent.
