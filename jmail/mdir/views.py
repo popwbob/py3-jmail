@@ -4,11 +4,10 @@ from ..mdir import JMailMDir
 
 def subs(req, macct_id):
     try:
-        jm = JMail(req, tmpl_name='mdir/subs', macct_id=macct_id)
+        jm = JMail(req, tmpl_name='mdir/subs', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
     try:
-        jm.imap_start(jm.macct)
         mdir = JMailMDir(name='INBOX')
     except JMailError as e:
         return e.response()

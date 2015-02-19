@@ -96,6 +96,7 @@ class JMailBase:
             imap = self.imap
         if imap is not None:
             imap.logout()
+        self.log.dbg('imap logged out')
 
     @classmethod
     def end(self):
@@ -106,8 +107,6 @@ class JMailBase:
                 self.log.warn('imap_end: ', e)
         if self.user is not None:
             self.user.save()
-        self.macct = None
-        self.imap = None
         took = time.time() - self._start_tstamp
         self.log.dbg('end - {}s'.format(took))
         return '{:.3f}'.format(took)
@@ -260,7 +259,6 @@ class JMail(JMailBase):
             raise JMailError(404, 'Mail account not found')
         if macct is None:
             raise JMailError(400, 'Bad mail account')
-        #~ self.log.dbg('macct: ', macct)
         return macct
 
 

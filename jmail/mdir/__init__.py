@@ -25,7 +25,7 @@ class JMailMDirCache(JMailBase):
     def init(self, name_encode):
         cache_conf = django_settings.CACHES['mdir-cache']
         cache_location = os.path.join(cache_conf.get('LOCATION'), str(self.macct.get('id')), name_encode.decode())
-        self.log.dbg('cache_conf: ', cache_conf)
+        #~ self.log.dbg('cache_conf: ', cache_conf)
         self.log.dbg('cache_location: ', cache_location)
         if self.conf.get('MDIR_CACHE_ENABLE', False):
             self.__cache = FileBasedCache(cache_location, cache_conf)
