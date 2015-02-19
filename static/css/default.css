@@ -78,13 +78,19 @@ ul.buttons li
 
 .mdir-check
 {
-    line-height:1em;
     font-size:1em;
 }
 
 .mdir-attrib
 {
     font-size:0.8em;
+}
+
+.msg-list-sep
+{
+    color:gray;
+    border:none;
+    border-bottom:solid 1px lightgray;
 }
 
 .mail-headers

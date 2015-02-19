@@ -3,19 +3,18 @@
     {% if msgs|length_is:"0" %}
         <pre>[NO MESSAGES]</pre>
     {% else %}
+        <p class="buttons">
+            <hr class="msg-list-sep">
         {% for msg in msgs %}
-            <p class="buttons">
-                {% if not msg.seen %}<b>{% endif %}
-                {{msg.headers_short.date}} |
-                {{msg.headers_short.from}} |
-
-                <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject}}</a> |
-
-                {{msg.headers_short.to}} |
-                {% if not msg.seen %}</b>{% endif %}
-                {{msg.size_human}} {{msg.flags_short}}
-            </p>
+            {% if not msg.seen %}<b>{% endif %}
+            {{msg.headers_short.date}}
+            <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject}}</a>
+            {{msg.headers_short.from}}
+            {% if not msg.seen %}</b>{% endif %}
+            {{msg.size_human}} {{msg.flags_short}}
+            <hr class="msg-list-sep">
         {% endfor %}
+        </p>
     {% endif %}
 </div>
 {% include "tail.html" %}

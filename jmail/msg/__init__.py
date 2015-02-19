@@ -82,8 +82,8 @@ class JMailMessageHeaders(JMailBase):
         # -- from, to, subject
         for k in ('from', 'to', 'subject'):
             v = self.get(k)
-            if len(v) > 30:
-                v = v[:30] + '..'
+            if len(v) > 128:
+                v = v[:128] + '..'
             hs[k] = v
         return hs
 
@@ -158,13 +158,9 @@ class JMailMessage(JMailBase):
         # -- attachs
         if self.attachs and len(self.attachs) > 0:
             fs += 'A'
-        else:
-            fs += '.'
         # -- replied
         if b'\\Answered' in flags:
             fs += 'R'
-        else:
-            fs += '.'
         return fs
 
 
