@@ -86,17 +86,13 @@ ul.buttons li
     font-size:0.8em;
 }
 
-.msg-list-sep
+hr.sep
 {
     color:gray;
     border:none;
     border-bottom:solid 1px lightgray;
 }
 
-.mail-headers
-{
-    border-bottom:1px dotted black;
-}
 .header-key
 {
     font-weight:bold;
@@ -106,21 +102,18 @@ ul.buttons li
 {
     line-height:0.9em;
     font-size:0.8em;
-    border-bottom:1px dotted black;
 }
 
 .mail-actions
 {
     line-height:0.9em;
     font-size:1em;
-    border-bottom:1px dotted black;
 }
 
 .mail-parts
 {
     line-height:0.9em;
     font-size:0.8em;
-    border-bottom:1px dotted black;
 }
 
 .footer p

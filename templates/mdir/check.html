@@ -4,7 +4,7 @@
         <pre>[NO MESSAGES]</pre>
     {% else %}
         <p class="buttons">
-            <hr class="msg-list-sep">
+            <hr class="sep">
         {% for msg in msgs %}
             {% if not msg.seen %}<b>{% endif %}
             {{msg.headers_short.date}}
@@ -12,7 +12,7 @@
             {{msg.headers_short.from}}
             {% if not msg.seen %}</b>{% endif %}
             {{msg.size_human}} {{msg.flags_short}}
-            <hr class="msg-list-sep">
+            <hr class="sep">
         {% endfor %}
         </p>
     {% endif %}
