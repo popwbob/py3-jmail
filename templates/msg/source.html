@@ -1,12 +1,12 @@
 {% include 'head.html' %}
 <div class="mail-source">
-    <hr class="sep">
     <div class="mail-actions">
         <p class="buttons">
+            <hr class="sep">
             <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">read</a>
+            <hr class="sep">
         </p>
     </div>
-    <hr class="sep">
     <pre>{{msg.source}}</pre>
     <hr class="sep">
 </div>
