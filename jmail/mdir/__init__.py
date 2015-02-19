@@ -39,32 +39,41 @@ class JMailMDirCache(JMailBase):
         self._data_ttl = self.conf.get('MDIR_CACHE_DATA_TTL')
 
     @classmethod
-    def __msg_flags_cache_key(self, msg_uid):
-        return 'msg:{}:flags'.format(int(msg_uid))
+    def __msg_cache_key(self, dtype, msg_uid):
+        return 'msg:{}:{}'.format(dtype, int(msg_uid))
 
     @classmethod
     def msg_flags_set(self, msg_uid, flags):
-        ck = self.__msg_flags_cache_key(msg_uid)
+        ck = self.__msg_cache_key('flags', msg_uid)
         self.__cache.set(ck, flags, self._meta_ttl)
 
     @classmethod
     def msg_flags_get(self, msg_uid):
-        ck = self.__msg_flags_cache_key(msg_uid)
+        ck = self.__msg_cache_key('flags', msg_uid)
         return self.__cache.get(ck, None)
 
     @classmethod
-    def __msg_source_cache_key(self, msg_uid):
-        return 'msg:{}:source'.format(int(msg_uid))
-
-    @classmethod
     def msg_source_get(self, msg_uid):
-        ck = self.__msg_source_cache_key(msg_uid)
+        ck = self.__msg_cache_key('source', msg_uid)
         return self.__cache.get(ck, None)
 
     @classmethod
     def msg_source_set(self, msg_uid, source):
-        ck = self.__msg_source_cache_key(msg_uid)
+        ck = self.__msg_cache_key('source', msg_uid)
         self.__cache.set(ck, source, self._data_ttl)
+
+    @classmethod
+    def mdir_attribs_set(self, mdir_name, attribs):
+        if type(mdir_name) is bytes:
+            mdir_name = mdir_name.decode()
+        self.__cache.set('mdir:attribs:'+mdir_name, attribs, self._meta_ttl)
+        self.log.dbg('CACHE save: ', 'mdir:attribs:'+mdir_name)
+
+    @classmethod
+    def mdir_attribs_get(self, mdir_name):
+        if type(mdir_name) is bytes:
+            mdir_name = mdir_name.decode()
+        return self.__cache.get('mdir:attribs:'+mdir_name, None)
 
     @classmethod
     def subs_list_get(self):
@@ -87,8 +96,8 @@ class JMailMDir(JMailBase):
         self.name = name
         self.name_encode = name_encode
         self._name_parse()
-        self._mdir_select()
         self._cache_init()
+        self._mdir_select()
 
 
     def __del__(self):
@@ -117,10 +126,14 @@ class JMailMDir(JMailBase):
         self.log.dbg('mdir select: ', typ, ' ', sdata)
         if typ != 'OK':
             raise JMailError(500, 'mdir select failed: '+typ)
-        self.attr = self._mdir_attribs(self.name)
+        self.attr = self._mdir_attribs(self.name, self.name_encode)
 
 
-    def _mdir_attribs(self, mdir_name):
+    def _mdir_attribs(self, mdir_name, name_encode):
+        attribs = self.__cache.mdir_attribs_get(name_encode)
+        if attribs is not None:
+            self.log.dbg('CACHE hit: mdir attribs ', mdir_name)
+            return attribs
         attribs = dict(messages=-1, recent=-1, unseen=-1)
         try:
             typ, data = self.imap.status(mdir_name, '(MESSAGES RECENT UNSEEN)')
@@ -132,6 +145,7 @@ class JMailMDir(JMailBase):
                     'recent': int(m.group(2)),
                     'unseen': int(m.group(3)),
                 }
+                self.__cache.mdir_attribs_set(name_encode, attribs)
         except Exception as e:
             self.log.err('mdir attribs: ', e)
         return attribs
@@ -230,6 +244,7 @@ class JMailMDir(JMailBase):
         #~ sl = sorted(sl)
         r = list()
         for c in sl:
+            name_encode = urlsafe_b64encode(c).decode()
             show_name = c
             if show_name.startswith(b'"'):
                 show_name = show_name[1:]
@@ -238,8 +253,8 @@ class JMailMDir(JMailBase):
             r.append({
                 'name': show_name,
                 'imap_name': c.decode(),
-                'name_encode': urlsafe_b64encode(c).decode(),
-                'attr': self._mdir_attribs(c)
+                'name_encode': name_encode,
+                'attr': self._mdir_attribs(c, name_encode)
             })
         return r
 
