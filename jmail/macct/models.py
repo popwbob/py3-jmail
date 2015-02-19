@@ -11,6 +11,7 @@ class JMailMAcct(models.Model):
     imap_server = models.CharField(max_length=254, default='localhost')
     imap_server_port = models.PositiveSmallIntegerField(default=993)
     imap_server_ssl = models.BooleanField(default=True)
+    smtp_authenticate = models.BooleanField(default=True)
     smtp_server = models.CharField(max_length=254, default='localhost')
     smtp_server_port = models.PositiveSmallIntegerField(default=25)
     smtp_server_tls = models.BooleanField(default=True)
@@ -35,4 +36,5 @@ class JMailMAcctForm(ModelForm):
             'smtp_server',
             'smtp_server_port',
             'smtp_server_tls',
+            'smtp_authenticate',
         ]
