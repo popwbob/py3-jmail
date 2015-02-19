@@ -167,6 +167,7 @@ def send(req, macct_id):
         smtp.send_message(msg)
         smtp.quit()
     except Exception as e:
+        self.log.err('msg send: ', str(e))
         return jm.error(500, 'SMTP error: '+str(e), tmpl_data=td)
 
     # -- if all was fine, remove the message from the cache

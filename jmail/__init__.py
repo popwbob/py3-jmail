@@ -2,6 +2,7 @@ import os
 import json
 import imaplib
 import time
+import socket
 
 from io import StringIO
 from pprint import pprint
@@ -264,6 +265,8 @@ class JMail(JMailBase):
     def imap_start(self, macct):
         use_ssl = macct.get('imap_server_ssl')
         try:
+            socket.setdefaulttimeout(self.conf.get('SOCKETLIB_TIMEOUT', 15))
+            self.log.dbg('socket timeout: ', socket.getdefaulttimeout())
             if use_ssl:
                 JMailBase.imap = imaplib.IMAP4_SSL(macct.get('imap_server'), macct.get('imap_server_port'))
             else:
