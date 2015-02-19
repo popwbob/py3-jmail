@@ -7,7 +7,7 @@
     {% for child in subs_list %}
         <li>
             <a href="{% url 'mdir:check' macct.id child.name_encode %}">{{child.name}}{% if child.attr.recent > 0 %}<span class="mdir-attrib">({{child.attr.recent}})</span>{% endif %}</a>
-            <span class="mdir-attrib">{{child.attr.messages}}{% if child.attr.unseen > 0 %}/{{child.attr.unseen}}{% endif %}</span>
+            <span class="mdir-attrib">{% if child.attr.unseen > 0 %}{{child.attr.unseen}}/{% endif %}{{child.attr.messages}}</span>
         </li>
     {% endfor %}
     </ul>
