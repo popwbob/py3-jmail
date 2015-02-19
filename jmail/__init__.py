@@ -27,12 +27,12 @@ B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
 
 class JMailBase:
-    log = None
     _req = None
     _tmpl_name = None
     _tmpl_path = None
     _tmpl_data = None
     _start_tstamp = None
+    log = None
     imap = None
     user = None
     debug = None
@@ -81,11 +81,42 @@ class JMailBase:
         ck = self._cache_key(key)
         django_cache.delete(ck)
 
+    @classmethod
+    def tmpl_data(self, data):
+        self._tmpl_data.update({
+            'date_time': time.strftime('%a, %d %b %Y %H:%M:%S %z', time.localtime()),
+            'macct': self.macct,
+        })
+        self._tmpl_data.update(data)
+        return self._tmpl_data
+
+    @classmethod
+    def imap_end(self, imap=None):
+        if imap is None:
+            imap = self.imap
+        if imap is not None:
+            imap.logout()
+
+    @classmethod
+    def end(self):
+        if self.imap:
+            try:
+                self.imap_end()
+            except Exception as e:
+                self.log.warn('imap_end: ', e)
+        if self.user is not None:
+            self.user.save()
+        self.macct = None
+        self.imap = None
+        took = time.time() - self._start_tstamp
+        self.log.dbg('end - {}s'.format(took))
+        return '{:.3f}'.format(took)
+
 
 class JMail(JMailBase):
 
     def __init__(self, req, user_auth=True, tmpl_name=None, macct_id=None, imap_start=False):
-        self._start_tstamp = time.time()
+        JMailBase._start_tstamp = time.time()
         JMailBase.log = JMailLog()
         self.log.dbg('start')
         self._load_settings()
@@ -111,21 +142,6 @@ class JMail(JMailBase):
         JMailBase.debug = settings.DEBUG
         JMailBase.conf = settings.JMAIL.copy()
         JMailBase.devmode = os.getenv('JMAIL_DEVMODE', None)
-
-
-    def end(self):
-        if self.imap:
-            try:
-                self.imap_end()
-            except Exception as e:
-                self.log.warn('imap_end: ', e)
-        if self.user is not None:
-            self.user.save()
-        JMailBase.macct = None
-        JMailBase.imap = None
-        took = time.time() - self._start_tstamp
-        self.log.dbg('end - {}s'.format(took))
-        return '{:.3f}'.format(took)
 
 
     def _tmpl_path_get(self):
@@ -193,15 +209,6 @@ class JMail(JMailBase):
             self._tmpl_data['jmail']['tmpl_debug'] = self._tmpl_data_debug()
         self._tmpl_data['took'] = self.end()
         return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
-
-
-    def tmpl_data(self, data):
-        self._tmpl_data.update({
-            'date_time': time.strftime('%a, %d %b %Y %H:%M:%S %z', time.localtime()),
-            'macct': self.macct,
-        })
-        self._tmpl_data.update(data)
-        return self._tmpl_data
 
 
     def _tmpl_data_debug(self):
@@ -285,13 +292,6 @@ class JMail(JMailBase):
             except:
                 pass
             raise JMailError(500, str(e.args))
-
-
-    def imap_end(self, imap=None):
-        if imap is None:
-            imap = self.imap
-        if imap is not None:
-            imap.logout()
 
 
     def smtp_init(self):

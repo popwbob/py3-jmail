@@ -19,24 +19,27 @@ class JMailMessagePage(Exception):
         self._title = title
         self._error = error
         self._tmpl_path = tmpl_path
+        self._jm_tmpl_data = JMailBase.tmpl_data
+        self._jm_end = JMailBase.end
 
-    def tmpl_data(self):
-        td = {
+    def _tmpl_data(self):
+        td = self._jm_tmpl_data({
             'doc': {
                 'error': self._error,
                 'title': self._title,
                 'status': self.status,
                 'message': self.message,
             }
-        }
+        })
         return td
 
     def response(self, tmpl_data=None):
         if tmpl_data is None:
-            td = self.tmpl_data()
+            td = self._tmpl_data()
         else:
             td = tmpl_data
-            td.update(self.tmpl_data())
+            td.update(self._tmpl_data())
+        td['took'] = self._jm_end()
         return render(self.req, self._tmpl_path, td, status=self.status)
 
     def __str__(self):
