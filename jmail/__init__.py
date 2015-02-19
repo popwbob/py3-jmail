@@ -100,13 +100,18 @@ class JMailBase:
 
     @classmethod
     def end(self):
+        # -- imap
         if self.imap:
-            try:
-                self.imap_end()
-            except Exception as e:
-                self.log.warn('imap_end: ', e)
+            self.log.dbg('imap state: ', self.imap.state)
+            if self.imap.state != 'LOGOUT':
+                try:
+                    self.imap_end()
+                except Exception as e:
+                    self.log.warn('imap_end: ', e)
+        # -- user
         if self.user is not None:
             self.user.save()
+        # -- run time
         took = time.time() - self._start_tstamp
         self.log.dbg('end - {}s'.format(took))
         return '{:.3f}'.format(took)
