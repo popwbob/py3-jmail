@@ -89,7 +89,7 @@ class JMailMessageHeaders(JMailBase):
         return str(self._data)
 
 
-class JMailMessageDistParser(JMailBase):
+class JMailParserMsg(JMailBase):
     body = None
     body_html = None
     headers = None
@@ -100,6 +100,10 @@ class JMailMessageDistParser(JMailBase):
         self.headers = list()
         self.attachs = list()
 
+
+class JMailMessageDistParser(JMailParserMsg):
+    def __init__(self):
+        JMailParserMsg.__init__(self)
 
     def parse(self, data):
         self.log.dbg('parse message: ', type(data))
