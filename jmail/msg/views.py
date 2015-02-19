@@ -1,4 +1,3 @@
-import smtplib
 import time
 
 from io import StringIO
@@ -163,7 +162,7 @@ def send(req, macct_id):
     jm.cache_set('compose:save', msg.as_string())
 
     try:
-        smtp = smtplib.SMTP(jm.macct['smtp_server'], jm.macct['smtp_server_port'])
+        smtp = jm.smtp_init()
         smtp.send_message(msg)
         smtp.quit()
     except Exception as e:

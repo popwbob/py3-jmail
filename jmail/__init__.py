@@ -3,6 +3,7 @@ import json
 import imaplib
 import time
 import socket
+import smtplib
 
 from io import StringIO
 from pprint import pprint
@@ -98,6 +99,9 @@ class JMail(JMailBase):
         # -- mail account
         if macct_id is not None:
             JMailBase.macct = self.macct_get(macct_id)
+        # -- network/socket timeout
+        socket.setdefaulttimeout(self.conf.get('SOCKETLIB_TIMEOUT', 15))
+        self.log.dbg('socket timeout: ', socket.getdefaulttimeout())
         # -- IMAP
         if imap_start:
             self.imap_start(self.macct)
@@ -265,8 +269,6 @@ class JMail(JMailBase):
     def imap_start(self, macct):
         use_ssl = macct.get('imap_server_ssl')
         try:
-            socket.setdefaulttimeout(self.conf.get('SOCKETLIB_TIMEOUT', 15))
-            self.log.dbg('socket timeout: ', socket.getdefaulttimeout())
             if use_ssl:
                 JMailBase.imap = imaplib.IMAP4_SSL(macct.get('imap_server'), macct.get('imap_server_port'))
             else:
@@ -290,3 +292,14 @@ class JMail(JMailBase):
             imap = self.imap
         if imap is not None:
             imap.logout()
+
+
+    def smtp_init(self):
+        s = smtplib.SMTP(self.macct['smtp_server'], self.macct['smtp_server_port'])
+        if self.macct['smtp_server_tls']:
+            self.log.dbg('smtp starttls')
+            s.starttls()
+        if self.macct.get('smtp_authenticate', True):
+            self.log.dbg('smtp authenticate')
+            s.login(self.macct.get('address'), self.macct.get('password', ''))
+        return s
