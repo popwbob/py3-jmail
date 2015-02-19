@@ -95,6 +95,8 @@ class JMailBase:
         if imap is None:
             imap = self.imap
         if imap is not None:
+            if imap.state == 'SELECTED':
+                imap.close()
             imap.logout()
         self.log.dbg('imap logged out')
 
