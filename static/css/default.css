@@ -118,40 +118,29 @@ hr.sep
     line-height:1.3em;
 }
 
+.mail-compose input
+{
+    width:43em;
+    padding:0.2em 0.4em;
+    margin-bottom:0.5em;
+}
+
 .mail-compose label
 {
     vertical-align:top;
     font-weight:bold;
 }
 
-#mail-from
-{
-    width:42.7em;
-    padding:0.2em 0.4em;
-}
 #mail-from[readonly]
 {
     color:gray;
 }
-#mail-to, #mail-cc
-{
-    width:42.7em;
-    padding:0.2em 0.4em;
-}
-#mail-bcc
-{
-    width:42.7em;
-    padding:0.2em 0.4em;
-}
-#mail-subject
-{
-    width:42.7em;
-    padding:0.2em 0.4em;
-}
+
 #mail-body
 {
     padding:0.2em 0.4em;
     overflow:auto;
     width:48em;
     height:30em;
+    margin-top:1em;
 }
