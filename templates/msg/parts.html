@@ -11,7 +11,7 @@
         {% endif %}
 
         {% for attach in msg.attachs %}
-            <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}"><q>{{attach.filename}}</q>({{attach.size_human}})</a>
+            <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}">{{attach.filename}}</a>({{attach.size_human}})
         {% endfor %}
    </p>
 </div>
