@@ -92,13 +92,14 @@ def compose(req, macct_id):
         jm = JMail(req, tmpl_name='msg/compose', macct_id=macct_id)
     except JMailError as e:
         return e.response()
-    msg = JMailMessage()
-    msg.headers.set_hdr('From', jm.macct['address'])
     msg_saved = jm.cache_get('compose:save')
     compose_restore = False
     if msg_saved is not None:
         msg = JMailMessage(None, msg_saved)
         compose_restore = True
+    else:
+        msg = JMailMessage(None, b'')
+        msg.headers.set_hdr('From', jm.macct['address'])
     jm.tmpl_data({
         'load_navbar_path': True,
         'msg': msg,
