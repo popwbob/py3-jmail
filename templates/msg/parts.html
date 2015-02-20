@@ -1,6 +1,10 @@
 <div class="mail-parts">
     <p class="buttons">
-        <a href="{% url 'msg:source' macct.id mdir.name_encode mail_uid %}">source</a>
+        <!-- attributes -->
+        {{msg.size_human}}
+        {% for flag in msg.flags %}
+            {{flag}}
+        {% endfor %}
 
         {% if msg.body_html != '[NO HTML CONTENT]' %}
             {% if read_html %}
