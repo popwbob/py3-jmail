@@ -7,12 +7,12 @@ clean:
 compile-all: clean lib-pyc lib-pyo
 
 lib-pyc:
-	@python3 -m compileall jmail/ | grep -Ev '^Listing '
+	@python3 -m compileall jmail/ | grep -Ev '^Listing ' || true
 
 lib-pyo:
 	@python3 -O -m compileall jmail/ | grep -Ev '^Listing '
 
-django-runserver:
+django-runserver: lib-pyc
 	@JMAIL_DEVMODE=1 python3 manage.py runserver 127.10.10.10:8000
 
 smtpd-debug-server:
