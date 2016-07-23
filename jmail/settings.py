@@ -13,6 +13,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 JMAIL_DATA_DIR = '/opt/jmail'
+THEME_DIR = os.path.join(BASE_DIR, 'themes', 'default')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -28,7 +29,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': False,
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(THEME_DIR, 'templates')],
         'OPTIONS': {
             'debug': DEBUG,
             'loaders': [
@@ -93,7 +94,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(THEME_DIR, 'static')]
 
 # 1209600 -> 2 weeks
 CSRF_COOKIE_AGE = 1209600
