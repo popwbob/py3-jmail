@@ -17,9 +17,6 @@ class JMailMDirCache(JMailBase):
     __cache = None
     _meta_ttl = None
     _data_ttl = None
-    set = None
-    get = None
-    delete = None
 
     @classmethod
     def init(self, name_encode):
@@ -32,9 +29,6 @@ class JMailMDirCache(JMailBase):
         else:
             self.__cache = DummyCache('localhost', cache_conf)
         self.log.dbg('mdir cache: ', self.__cache)
-        self.set = self.__cache.set
-        self.get = self.__cache.get
-        self.delete = self.__cache.delete
         self._meta_ttl = self.conf.get('MDIR_CACHE_META_TTL')
         self._data_ttl = self.conf.get('MDIR_CACHE_DATA_TTL')
 
