@@ -24,12 +24,24 @@ SECRET_KEY = 'yof4hw@+2appuvzg(v+5twtf&qduqn8zxwqzj75dy0k&kac0#2'
 DEBUG = True
 ALLOWED_HOSTS = []
 
-TEMPLATE_DEBUG = True
-TEMPLATE_DIRS = ('/'.join([BASE_DIR, 'templates']),)
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader'
-)
-TEMPLATE_STRING_IF_INVALID = 'TMPL_MISS:[%s]'
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': False,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'OPTIONS': {
+            'debug': DEBUG,
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                #~ 'django.template.loaders.app_directories.Loader',
+            ],
+            'string_if_invalid': 'TMPL_MISS:[%s]',
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+            ],
+        },
+    }
+]
 
 # Application definition
 
