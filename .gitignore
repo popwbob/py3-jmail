@@ -2,6 +2,7 @@
 *.pyo
 jmaildev_at_jrms.com.ar
 jmail/mail/OLD__init__.py
+appskel/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -18,9 +18,6 @@ from django.core.cache import cache as django_cache
 from jmail.log import JMailLog
 from jmail.error import JMailMessagePage, JMailError, JMailErrorUserUnauth
 
-from jmail.user.models import JMailUser
-from jmail.macct.models import JMailMAcct
-
 VERSION = '0.0'
 IMAP_DEBUG = 0
 B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
@@ -189,6 +186,7 @@ class JMail(JMailBase):
 
 
     def _user_auth(self):
+        from jmail.user.models import JMailUser
         if self._req.user.is_authenticated():
             if self._req.user.groups.filter(name='wmail').exists():
                 try:
@@ -257,6 +255,7 @@ class JMail(JMailBase):
 
 
     def macct_get(self, macct_id):
+        from jmail.macct.models import JMailMAcct
         self.log.dbg('macct_id: ', macct_id)
         try:
             macct = JMailMAcct.objects.filter(pk=macct_id, user=self.user).values()[0]
@@ -270,6 +269,7 @@ class JMail(JMailBase):
 
 
     def macct_get_all(self):
+        from jmail.macct.models import JMailMAcct
         try:
             accounts = JMailMAcct.objects.filter(user=self.user).values()
         except JMailMAcct.DoesNotExist:

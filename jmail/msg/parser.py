@@ -58,8 +58,8 @@ class JMailMessageHeaders(JMailBase):
             if type(s) is str:
                 items.append(s)
             else:
-                if c is None:
-                    items.append(s.decode())
+                if c is None or c.startswith('unknown'):
+                    items.append(str(s))
                 else:
                     items.append(s.decode(c))
         r = ' '.join(items)

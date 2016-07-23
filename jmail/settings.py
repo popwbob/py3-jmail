@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+JMAIL_DATA_DIR = '/opt/jmail'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -38,10 +40,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jmail.user',
-    'jmail.macct',
-    'jmail.msg',
-    'jmail.mdir',
+    'jmail.user.apps.JMailUserConfig',
+    'jmail.macct.apps.JMailMAcctConfig',
+    'jmail.msg.apps.JMailMsgConfig',
+    'jmail.mdir.apps.JMailMDirConfig',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -63,7 +65,7 @@ WSGI_APPLICATION = 'jmail.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '/opt/jmail/db.sqlite3'),
+        'NAME': os.path.join(JMAIL_DATA_DIR, 'db.sqlite3'),
     }
 }
 
@@ -105,8 +107,6 @@ SESSION_COOKIE_NAME = 'jmail_sid'
         #~ },
     #~ },
 #~ }
-
-JMAIL_DATA_DIR = '/opt/jmail'
 
 CACHES = {
     'default': {

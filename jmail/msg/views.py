@@ -5,7 +5,6 @@ from base64 import b64decode
 from email.mime.text import MIMEText
 
 from django.http import HttpResponse
-from django.core.servers.basehttp import FileWrapper
 
 from jmail import JMail
 from jmail.error import JMailError
@@ -23,7 +22,7 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         read_html = True
     jm.log.dbg('read HTML: ', read_html)
     try:
-        mdir = JMailMDir(name_encode=mdir_name_enc)
+        mdir = JMailMDir(name_encode=str(mdir_name_enc))
         msg = mdir.msg_get(mail_uid, peek=False)
     except JMailError as e:
         return e.response()
