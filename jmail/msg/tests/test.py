@@ -3,7 +3,7 @@ from django.conf import settings
 from jmail import JMailBase
 from jmail.log import JMailLog
 from jmail.tests import JMailTest
-from jmail.msg import JMailMessage
+from jmail.msg import JMailMessage, parser
 
 class TestMsg(JMailTest):
 
@@ -51,7 +51,13 @@ class TestMsg(JMailTest):
         m = JMailMessage(meta=b'32 (UID 316 FLAGS (\\Answered))')
         self.assertEqual(m.flags_short, 'R')
 
+    def test_message_parse(self):
+        m = JMailMessage(source=b'')
+        self.assertIsInstance(m.headers, parser.JMailMessageHeaders)
+        self.assertEqual(m.body, '')
+        self.assertEqual(m.body_html, '[NO HTML CONTENT]')
+
+    # this should be always the last one
     def test_zzz_cleanup_message(self):
-        """this should be always the last one"""
         JMailBase.conf = None
         JMailBase.log = None
