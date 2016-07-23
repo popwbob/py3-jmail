@@ -13,3 +13,7 @@ class TestJMailError(JMailTest):
         self.assertDictEqual(d['doc'],  {
             'error': False, 'message': 'fake msg',
             'status': 200, 'title': 'JMail'})
+
+    def test_jmail_error(self):
+        e = error.JMailError(500, "fake error")
+        self.assertEqual(str(e), "500 fake error")
