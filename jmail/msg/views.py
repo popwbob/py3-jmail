@@ -180,7 +180,9 @@ def send(req, macct_id):
 def __msg_body_quote(body, date_orig, from_orig):
     if type(body) is str:
         body = body.encode()
-    if type(date_orig) is str:
+    if date_orig is None:
+        date_orig = b'(no date)'
+    elif type(date_orig) is str:
         date_orig = date_orig.encode()
     if type(from_orig) is str:
         from_orig = from_orig.encode()
