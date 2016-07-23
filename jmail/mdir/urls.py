@@ -1,6 +1,7 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import url
+from jmail.mdir import views
 
-urlpatterns = patterns('',
-    url(r'^(\d+)/subs/$', 'jmail.mdir.views.subs', name='subs'),
-    url(r'^(\d+)/check/([\w=]+)/$', 'jmail.mdir.views.check', name='check'),
-)
+urlpatterns = [
+    url(r'^(\d+)/subs/$', views.subs, name='subs'),
+    url(r'^(\d+)/check/([\w=]+)/$', views.check, name='check'),
+]
