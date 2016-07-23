@@ -35,7 +35,7 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         'mail_uid': mail_uid,
         'read_html': read_html,
     })
-    return jm.render()
+    return jm.render(charset=msg.charset)
 
 
 def source(req, macct_id, mdir_name_enc, mail_uid):
@@ -57,7 +57,7 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
             'source': msg_source.decode(msg.charset),
         },
     })
-    return jm.render()
+    return jm.render(charset=msg.charset)
 
 
 def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
@@ -106,7 +106,7 @@ def compose(req, macct_id):
         'msg': msg,
         'compose_restore': compose_restore,
     })
-    return jm.render()
+    return jm.render(charset=msg.charset)
 
 
 def __compose_discard(jm, macct_id):
@@ -243,4 +243,4 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         'msg': msg,
         'mdir': mdir,
     })
-    return jm.render()
+    return jm.render(charset=msg.charset)
