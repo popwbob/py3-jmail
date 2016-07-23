@@ -5,6 +5,7 @@ omit =
     */apps.py
     */urls.py
     */migrations/*.py
+    */tests/*.py
     jmail/wsgi.py
 
 [report]
