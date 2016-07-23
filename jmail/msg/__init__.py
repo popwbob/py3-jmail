@@ -83,6 +83,7 @@ class JMailMessage(JMailBase):
         msg_text = msg.body
         msg_html = msg.body_html
         self.attachs = msg.attachs
+        self.charset = msg.charset
         del msg
         return (msg_text, msg_html)
 

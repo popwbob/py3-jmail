@@ -47,12 +47,14 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
         return e.response()
     #~ except Exception as e:
         #~ return jm.error(500, e)
+    msg = JMailMessage(source=msg_source)
+    jm.log.dbg('msg source: %s' % msg.charset)
     jm.tmpl_data({
         'load_navbar_path': True,
         'mdir': mdir,
         'msg': {
             'uid': mail_uid,
-            'source': msg_source,
+            'source': msg_source.decode(msg.charset),
         },
     })
     return jm.render()

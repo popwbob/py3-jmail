@@ -128,14 +128,14 @@ class JMailMessageDistParser(JMailParserMsg):
                 self._attach(part, attach_no)
             elif maintype == 'text':
                 # -- text parts
-                charset = self._charset_get(part)
+                self.charset = self._charset_get(part)
                 tenc = part.get('content-transfer-encoding', None)
                 if subtype == 'plain':
                     # -- text plain
-                    msg_text = self._text_encoding(part.get_payload(), tenc, charset)
+                    msg_text = self._text_encoding(part.get_payload(), tenc)
                 elif subtype == 'html':
                     # -- text html
-                    msg_html = self._text_encoding(part.get_payload(), tenc, charset)
+                    msg_html = self._text_encoding(part.get_payload(), tenc)
         del msg
         self.body = msg_text
         self.body_html = msg_html
@@ -173,12 +173,12 @@ class JMailMessageDistParser(JMailParserMsg):
         return part.get_param('charset', JMailBase.charset)
 
 
-    def _text_encoding(self, text, transfer_encoding, charset):
+    def _text_encoding(self, text, transfer_encoding):
         self.log.dbg('text encoding')
         # -- quoted-printable
         if transfer_encoding == 'quoted-printable':
-            text = decodestring(text.encode()).decode(charset)
+            text = decodestring(text.encode()).decode(self.charset)
         # -- base64
         elif transfer_encoding == 'base64':
-            text = b64decode(text.encode()).decode(charset)
+            text = b64decode(text.encode()).decode(self.charset)
         return text
