@@ -6,7 +6,7 @@ from jmail.log import JMailLog
 from jmail import mdir, JMailBase
 
 class TestMdir(JMailTest):
-    fixtures = ['macct']
+    fixtures = ['user', 'macct']
 
     def test_mdir_cache(self):
         JMailBase.conf = settings.JMAIL.copy()

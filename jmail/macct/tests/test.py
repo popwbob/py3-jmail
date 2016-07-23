@@ -2,7 +2,7 @@ from jmail.tests import JMailTest
 from jmail.macct.models import JMailMAcct
 
 class TestMdir(JMailTest):
-    fixtures = ['macct']
+    fixtures = ['user', 'macct']
 
     def test_macct(self):
         a = JMailMAcct.objects.filter(pk=1, user=2)[0]

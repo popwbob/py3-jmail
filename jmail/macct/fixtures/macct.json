@@ -1,38 +1,5 @@
 [
 {
-    "model": "auth.group",
-    "pk": 1,
-    "fields": {
-        "name": "wmail",
-        "permissions": []
-    }
-},
-{
-    "model": "auth.user",
-    "pk": 2,
-    "fields": {
-        "password": "pbkdf2_sha256$24000$dTGhGFw0GNuM$QjXRg3vcne8qDBmbTmhPuwfjucmay4etO9Us0LEe0uw=",
-        "last_login": "2016-07-23T08:10:41.951Z",
-        "is_superuser": false,
-        "username": "jmailuser",
-        "first_name": "",
-        "last_name": "",
-        "email": "",
-        "is_staff": false,
-        "is_active": true,
-        "date_joined": "2016-07-23T04:14:34Z",
-        "groups": [
-            1
-        ],
-        "user_permissions": []
-    }
-},
-{
-    "model": "user.jmailuser",
-    "pk": 2,
-    "fields": {}
-},
-{
     "model": "macct.jmailmacct",
     "pk": 1,
     "fields": {
