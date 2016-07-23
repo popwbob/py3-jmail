@@ -132,8 +132,7 @@ class JMailMessageDistParser(JMailParserMsg):
                 tenc = part.get('content-transfer-encoding', None)
                 if subtype == 'plain':
                     # -- text plain
-                    #~ msg_text = self._text_encoding(part.get_payload(), tenc, charset).splitlines()
-                    msg_text = part.get_payload(decode=True)
+                    msg_text = self._text_encoding(part.get_payload(), tenc, charset)
                 elif subtype == 'html':
                     # -- text html
                     msg_html = self._text_encoding(part.get_payload(), tenc, charset)
