@@ -7,7 +7,11 @@
             <hr class="sep">
         {% for msg in msgs %}
             {% if not msg.seen %}<b>{% endif %}
-            {{msg.headers_short.date}}
+            {% if msg.headers_short.date %}
+                {{msg.headers_short.date}}
+            {% else %}
+                &nbsp;&nbsp;(no date)&nbsp;&nbsp;&nbsp;
+            {% endif %}
             <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject}}</a>
             {{msg.headers_short.from}}
             {% if not msg.seen %}</b>{% endif %}
