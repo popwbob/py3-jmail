@@ -5,6 +5,10 @@ class TestMdir(JMailTest):
     fixtures = ['macct']
 
     def test_macct(self):
+        a = JMailMAcct.objects.filter(pk=1, user=2)[0]
+        self.assertEqual(str(a), 'jmailuser: [1] jmailuser@jmail.test')
+
+    def test_macct_dict(self):
         a = JMailMAcct.objects.filter(pk=1, user=2).values()[0]
         self.assertIsInstance(a, dict)
         self.assertEqual(a['id'], 1)
