@@ -1,8 +1,8 @@
 <div class="navbar">
     {% if user %}
     <p class="buttons">
-        <a href="{% url 'user:home' %}">{{user.name}}</a>
-        - <a href="{% url 'home' %}">home</a>
+        <a href="{% url 'home' %}">{{user.name}}</a>
+        - <a href="{% url 'user:home' %}">user</a>
     </p>
     {% endif %}
     {% include 'navbar-path.html' %}
