@@ -6,7 +6,7 @@ body
 
 .container input,textarea
 {
-    border-color:black;
+    border:1px solid black;
 }
 
 .buttons a, input[type=submit]
@@ -27,14 +27,14 @@ body
 
 hr.sep
 {
-    color:gray;
-    border-bottom-color:lightgray;
+    border:none;
+    border-bottom:solid 1px lightgray;
 }
 
 .mail-headers p
 {
     background-color:aliceblue;
-    border-color:lightblue;
+    border:solid 1px lightblue;
 }
 
 .footer p

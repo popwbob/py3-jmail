@@ -9,11 +9,6 @@ body
     font-family:monospace;
 }
 
-.container input,textarea
-{
-    border:1px solid black;
-}
-
 .content
 {
     padding:0;
@@ -65,15 +60,8 @@ ul.buttons li
     font-size:0.8em;
 }
 
-hr.sep
-{
-    border:none;
-    border-bottom:solid 1px black;
-}
-
 .mail-headers p
 {
-    border:solid 1px black;
     padding:0.5em;
 }
 

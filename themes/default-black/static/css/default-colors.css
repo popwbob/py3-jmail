@@ -1,0 +1,54 @@
+body
+{
+    color:white;
+    background-color:black;
+}
+
+.container input,textarea
+{
+    border:1px solid white;
+}
+
+a
+{
+    color:white;
+}
+
+.buttons a, input[type=submit]
+{
+    color:white;
+    background-color:black;
+}
+
+.buttons a:visited
+{
+    color:white;
+}
+
+.buttons a:hover, input[type=submit]:hover
+{
+    color:white;
+}
+
+hr.sep
+{
+    border:none;
+    border-bottom:solid 1px gray;
+}
+
+.mail-headers p
+{
+    background-color:lightgray;
+    border:solid 1px gray;
+    color:black;
+}
+
+.footer p
+{
+    color:gray;
+}
+
+#mail-from[readonly]
+{
+    color:gray;
+}
