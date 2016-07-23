@@ -6,6 +6,7 @@ omit =
     */models.py
     */urls.py
     */migrations/*.py
+    jmail/wsgi.py
 
 [report]
 exclude_lines = coverage: exclude

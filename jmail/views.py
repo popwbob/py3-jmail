@@ -7,7 +7,7 @@ from jmail.error import JMailError
 from django.conf import settings
 
 
-def debug(req):
+def debug(req): # coverage: exclude
     jm = JMail(req, user_auth=False)
     if not jm.devmode:
         return jm.error(400, 'Bad request')
