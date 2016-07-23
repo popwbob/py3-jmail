@@ -44,7 +44,7 @@ class JMailMessage(JMailBase):
 
 
     def __init_empty(self):
-        self.flags = list()
+        self.flags = tuple()
         self.headers_short = dict()
         self.flags_short = dict()
         self.size = 0
@@ -60,6 +60,7 @@ class JMailMessage(JMailBase):
         flags = imaplib.ParseFlags(fs)
         if b'\\Seen' in flags:
             self.seen = True
+        self.log.dbg('flags: ', flags)
         return flags
 
 
