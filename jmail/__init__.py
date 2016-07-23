@@ -121,7 +121,7 @@ class JMail(JMailBase):
     def __init__(self, req, user_auth=True, tmpl_name=None, macct_id=None, imap_start=False):
         JMailBase._start_tstamp = time.time()
         JMailBase.log = JMailLog()
-        self.log.dbg('start')
+        self.log.dbg('start: v%s' % VERSION)
         self._load_settings()
         JMailBase._req = req
         # -- user auth
