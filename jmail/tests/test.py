@@ -1,5 +1,5 @@
 import time
-from .. import JMailTest
+from . import JMailTest
 from jmail import JMailBase, JMail
 
 class TestJMail(JMailTest):

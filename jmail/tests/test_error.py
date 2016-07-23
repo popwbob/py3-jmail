@@ -1,4 +1,4 @@
-from .. import JMailTest
+from . import JMailTest
 from jmail import error
 
 class TestJMailError(JMailTest):

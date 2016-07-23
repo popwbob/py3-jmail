@@ -1,5 +1,5 @@
 from io import StringIO
-from .. import JMailTest
+from . import JMailTest
 from jmail.log import JMailLog
 
 class TestJMailLog(JMailTest):
