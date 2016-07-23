@@ -3,7 +3,6 @@ source = jmail
 omit =
     */admin.py
     */apps.py
-    */models.py
     */urls.py
     */migrations/*.py
     jmail/wsgi.py
