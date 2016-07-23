@@ -19,4 +19,12 @@ django-runserver: lib-pyc
 smtpd-debug-server:
 	python3 -m smtpd -n -c DebuggingServer localhost:1025
 
-.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server
+test:
+	@python3 manage.py test
+
+test-coverage:
+	@python3 -m coverage run manage.py test
+	@python3 -m coverage report
+	@python3 -m coverage html
+
+.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage
