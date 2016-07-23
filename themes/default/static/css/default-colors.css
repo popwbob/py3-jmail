@@ -1,0 +1,48 @@
+body
+{
+    color:black;
+    background-color:white;
+}
+
+.container input,textarea
+{
+    border-color:black;
+}
+
+.buttons a, input[type=submit]
+{
+    color:blue;
+    background-color:white;
+}
+
+.buttons a:visited
+{
+    color:blue;
+}
+
+.buttons a:hover, input[type=submit]:hover
+{
+    color:blue;
+}
+
+hr.sep
+{
+    color:gray;
+    border-bottom-color:lightgray;
+}
+
+.mail-headers p
+{
+    background-color:aliceblue;
+    border-color:lightblue;
+}
+
+.footer p
+{
+    color:gray;
+}
+
+#mail-from[readonly]
+{
+    color:gray;
+}
