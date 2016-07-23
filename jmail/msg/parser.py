@@ -97,7 +97,7 @@ class JMailParserMsg(JMailBase):
 
     def __init__(self):
         self.body = self.body_html = ''
-        self.headers = list()
+        self.headers = JMailMessageHeaders()
         self.attachs = list()
 
 

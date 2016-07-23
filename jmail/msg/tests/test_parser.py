@@ -5,7 +5,7 @@ from django.conf import settings
 from jmail import JMailBase
 from jmail.log import JMailLog
 from jmail.tests import JMailTest
-from jmail.msg.parser import JMailMessageHeaders
+from jmail.msg.parser import JMailMessageHeaders, JMailMessageDistParser
 
 class TestMsg(JMailTest):
 
@@ -76,6 +76,37 @@ class TestMsg(JMailTest):
     def test_message_headers_short_date(self):
         h = JMailMessageHeaders([('Date', 'Fri, 22 Apr 2016 07:34:25 +0000')])
         self.assertEqual(h.short()['date'], '20160422 07:34')
+
+    def test_parser(self):
+        m = JMailMessageDistParser()
+        self.assertEqual(m.body, '')
+        self.assertEqual(m.body_html, m.body)
+        self.assertIsInstance(m.headers, JMailMessageHeaders)
+        self.assertListEqual(m.attachs, [])
+
+    def test_message_parse(self):
+        m = JMailMessageDistParser()
+        m.parse("")
+        self.assertEqual(m.body, '')
+        self.assertEqual(m.body_html, '[NO HTML CONTENT]')
+
+    def test_message_parse_headers(self):
+        m = JMailMessageDistParser()
+        m.parse("K1: V1\nK2: V2\nK3: V3\n\n")
+        self.assertEqual(m.body, '')
+        self.assertEqual(m.body_html, '[NO HTML CONTENT]')
+        self.assertIsInstance(m.headers, JMailMessageHeaders)
+        self.assertListEqual(m.headers._data,
+                [('K1', 'V1'), ('K2', 'V2'), ('K3', 'V3')])
+
+    def test_message_parse_headers_and_body(self):
+        m = JMailMessageDistParser()
+        m.parse("K1: V1\nK2: V2\nK3: V3\n\nBL1\nBL2\nBL3\nBL4\nBL5\n")
+        self.assertEqual(m.body, "BL1\nBL2\nBL3\nBL4\nBL5\n")
+        self.assertEqual(m.body_html, '[NO HTML CONTENT]')
+        self.assertIsInstance(m.headers, JMailMessageHeaders)
+        self.assertListEqual(m.headers._data,
+                [('K1', 'V1'), ('K2', 'V2'), ('K3', 'V3')])
 
     # this should be always the last one
     def test_zzz_cleanup_message(self):
