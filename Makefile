@@ -3,6 +3,7 @@ default:
 
 clean:
 	@find . -type d -name __pycache__ | xargs rm -vrf
+	@rm -rf htmlcov
 
 compile-all: clean lib-pyc lib-pyo
 
