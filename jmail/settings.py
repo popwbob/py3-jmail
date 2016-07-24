@@ -143,7 +143,7 @@ JMAIL = {
     #~ 'CONF_LOCAL': os.path.join(JMAIL_DATA_DIR, 'jmail.json')
     'DATE_HEADER_FORMAT': '%a, %d %b %Y %H:%M:%S %z',
     'MDIR_CACHE_ENABLE': True,
-    'MDIR_CACHE_META_TTL': 30,
-    'MDIR_CACHE_DATA_TTL': 900,
+    'MDIR_CACHE_META_TTL': 60*30,
+    'MDIR_CACHE_DATA_TTL': 60*60*3,
     'SOCKETLIB_TIMEOUT': 10,
 }
