@@ -59,7 +59,14 @@ class JMailMessageHeaders(JMailBase):
                 items.append(s)
             else:
                 if c is None or c.startswith('unknown'):
-                    items.append(str(s))
+                    if isinstance(s, str):
+                        items.append(s)
+                    else:
+                        try:
+                            items.append(s.decode(self.charset))
+                        except UnicodeDecodeError as e:
+                            self.log.error("message header decode: ", e)
+                            items.append(str(s))
                 else:
                     items.append(s.decode(c))
         r = ' '.join(items)
@@ -129,6 +136,8 @@ class JMailMessageDistParser(JMailParserMsg):
             elif maintype == 'text':
                 # -- text parts
                 self.charset = self._charset_get(part)
+                # tell headers which is the charset
+                self.headers.charset = self.charset
                 tenc = part.get('content-transfer-encoding', None)
                 if subtype == 'plain':
                     # -- text plain
@@ -170,7 +179,9 @@ class JMailMessageDistParser(JMailParserMsg):
 
 
     def _charset_get(self, part):
-        return part.get_param('charset', JMailBase.charset)
+        cs = part.get_param('charset', JMailBase.charset)
+        self.log.dbg('parser get charset: ', cs)
+        return cs
 
 
     def _text_encoding(self, text, transfer_encoding):

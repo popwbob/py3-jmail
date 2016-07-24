@@ -46,8 +46,8 @@ class TestMsg(JMailTest):
         self.assertEqual(h.get_raw('HK1'), '=?UTF-8?B?SmVyZW3DrWFz?=')
 
     def test_message_headers_decode(self):
-        h = JMailMessageHeaders([('HK1', '=?UTF-8?B?SmVyZW3DrWFz?=')])
-        self.assertEqual(h.get('HK1'), 'Jeremías')
+        h = JMailMessageHeaders([('HK1', '=?UTF-8?B?SmVyZW3DrWFz?= Castegl')])
+        self.assertEqual(h.get('HK1'), 'Jeremías  Castegl')
 
     def test_message_headers_len(self):
         h = JMailMessageHeaders([('HK1', ''), ('HK2', '')])
