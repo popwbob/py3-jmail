@@ -176,11 +176,6 @@ class JMailMDir(JMailBase):
         return JMailMessage(source=src, uid=mail_uid)
 
 
-    def msg_source(self, mail_uid, peek=True):
-        self.log.dbg('Mdir message source: %s' % mail_uid)
-        return self.msg_get(mail_uid, peek).get_source()
-
-
     def msg_flags(self, mail_uid):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
