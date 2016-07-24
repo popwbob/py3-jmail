@@ -1,5 +1,6 @@
 *.pyc
 *.pyo
+*.swp
 jmaildev_at_jrms.com.ar
 jmail/mail/OLD__init__.py
 appskel/
@@ -61,3 +62,4 @@ docs/_build/
 
 # PyBuilder
 target/
+htdocs

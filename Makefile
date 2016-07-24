@@ -3,7 +3,7 @@ default:
 
 clean:
 	@find . -type d -name __pycache__ | xargs rm -vrf
-	@rm -rf htmlcov
+	@rm -rf htmlcov htdocs
 
 compile-all: clean lib-pyc lib-pyo
 
@@ -27,4 +27,15 @@ test-coverage:
 	@python3 -m coverage report
 	@python3 -m coverage html
 
-.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage
+htdocs:
+	@PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=jmail.settings \
+		sphinx-build -b html docs/ htdocs/
+
+apidoc:
+	@sphinx-apidoc -o docs/ jmail/ \
+		jmail/urls.py jmail/*/urls.py \
+		jmail/admin.py jmail/*/admin.py \
+		jmail/apps.py jmail/*/apps.py \
+		jmail/tests jmail/*/migrations jmail/*/tests
+
+.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage htdocs apidoc
