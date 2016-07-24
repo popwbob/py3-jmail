@@ -164,11 +164,8 @@ class JMailMDir(JMailBase):
     def msg_get(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        meta = self.msg_flags(mail_uid)
-        source = self.msg_source(mail_uid, peek)
-        m = JMailMessage(meta, source, uid=mail_uid)
-        del meta
-        del source
+        m = JMailMessage(meta=self.msg_flags(mail_uid),
+                source=self.msg_source(mail_uid, peek), uid=mail_uid)
         return m
 
 

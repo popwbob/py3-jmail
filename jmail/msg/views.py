@@ -96,10 +96,10 @@ def compose(req, macct_id):
     msg_saved = jm.cache_get('compose:save')
     compose_restore = False
     if msg_saved is not None:
-        msg = JMailMessage(None, msg_saved)
+        msg = JMailMessage(source=msg_saved)
         compose_restore = True
     else:
-        msg = JMailMessage(None, b'')
+        msg = JMailMessage(source=b'')
         msg.headers.set_hdr('From', jm.macct['address'])
     jm.tmpl_data({
         'load_navbar_path': True,
