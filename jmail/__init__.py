@@ -18,7 +18,7 @@ from django.core.cache import cache as django_cache
 from jmail.log import JMailLog
 from jmail.error import JMailMessagePage, JMailError, JMailErrorUserUnauth
 
-VERSION = '0.2'
+VERSION = '0.3-devel'
 IMAP_DEBUG = 0
 B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
