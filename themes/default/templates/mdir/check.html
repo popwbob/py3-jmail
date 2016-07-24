@@ -12,7 +12,7 @@
             {% else %}
                 &nbsp;&nbsp;(no date)&nbsp;&nbsp;&nbsp;
             {% endif %}
-            <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject}}</a>
+            <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject | default:"(no subject)"}}</a>
             {{msg.headers_short.from}}
             {% if not msg.seen %}</b>{% endif %}
             <small>{{msg.size_human}} {{msg.flags_short}}</small>
