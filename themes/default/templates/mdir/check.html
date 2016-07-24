@@ -15,7 +15,7 @@
             <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">{{msg.headers_short.subject}}</a>
             {{msg.headers_short.from}}
             {% if not msg.seen %}</b>{% endif %}
-            {{msg.size_human}} {{msg.flags_short}}
+            <small>{{msg.size_human}} {{msg.flags_short}}</small>
             <hr class="sep">
         {% endfor %}
         </p>
