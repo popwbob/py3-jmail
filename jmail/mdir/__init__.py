@@ -166,20 +166,22 @@ class JMailMDir(JMailBase):
             mail_uid = mail_uid.encode()
         m = JMailMessage(meta=self.msg_flags(mail_uid),
                 source=self.msg_source(mail_uid, peek), uid=mail_uid)
+        self.log.dbg('Mdir message get: %s - %s' % (mail_uid.decode(), type(m)))
         return m
 
 
     def msg_source(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        source = self.__cache.msg_source_get(mail_uid)
-        if source is None:
-            source = self._imap_fetch_source(mail_uid, peek)
+        self.log.dbg('Mdir message source: %s' % mail_uid.decode())
+        src = self.__cache.msg_source_get(mail_uid)
+        if src is None:
+            src = self._imap_fetch_source(mail_uid, peek)
+            self.__cache.msg_source_set(mail_uid, src)
+            self.log.dbg('CACHE save: msg source %s' % mail_uid.decode())
         else:
-            self.log.dbg('CACHE hit: msg source(', mail_uid, ')')
-            return source
-        self.__cache.msg_source_set(mail_uid, source)
-        return source
+            self.log.dbg('CACHE hit: msg source %s' % mail_uid.decode())
+        return JMailMessage(source=src, uid=mail_uid).get_source()
 
 
     def msg_flags(self, mail_uid):

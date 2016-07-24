@@ -193,3 +193,19 @@ class JMailMessageDistParser(JMailParserMsg):
         elif transfer_encoding == 'base64':
             text = b64decode(text.encode()).decode(self.charset)
         return text
+
+
+# --- parser next generation
+
+from email.message import Message
+from email import policy
+
+class JMailMsgParser(Message, JMailBase):
+    """class to parse email messages"""
+
+    def parse(self, blob):
+        """parse email content as binary/bytes source"""
+        m = email.message_from_bytes(blob, policy=policy.default)
+        self.log.dbg('Parsed message blob: ', type(m), sorted(dir(m)),
+            ' - charsets: ', m.get_charset(), ' - ', m.get_charsets(), ' - ', m.get_content_charset())
+        return m

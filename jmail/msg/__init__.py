@@ -1,10 +1,11 @@
 import imaplib
 
 from .. import JMailBase
-from .parser import JMailMessageDistParser
+from .parser import JMailMessageDistParser, JMailMsgParser
 
 
 class JMailMessage(JMailBase):
+    _m = None
     flags = None
     flags_short = None
     size = None
@@ -86,6 +87,9 @@ class JMailMessage(JMailBase):
         self.attachs = msg.attachs
         self.charset = msg.charset
         del msg
+        # --- parser next generation
+        p = JMailMsgParser()
+        self._m = p.parse(data) # should return m instead of setting self._m
         return (msg_text, msg_html)
 
 
@@ -109,3 +113,8 @@ class JMailMessage(JMailBase):
     def flag_seen(self):
         if not self.seen:
             self.flags_store('\\Seen')
+
+    # --- parser next generation
+
+    def get_source(self):
+        return self._m.as_bytes()
