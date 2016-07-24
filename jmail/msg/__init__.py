@@ -78,7 +78,7 @@ class JMailMessage(JMailBase):
 
 
     def _parse_message(self, data):
-        self.log.dbg('parse message: ', type(data))
+        self.log.dbg('message parse data: ', type(data))
         msg = JMailMessageDistParser()
         msg.parse(data)
         self.headers = msg.headers
@@ -117,4 +117,7 @@ class JMailMessage(JMailBase):
     # --- parser next generation
 
     def get_source(self):
-        return self._m.as_bytes()
+        return self._m.as_string()
+
+    def get_charset(self):
+        return self._m.get_content_charset()

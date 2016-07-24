@@ -42,22 +42,15 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
     try:
         jm = JMail(req, tmpl_name='msg/source', macct_id=macct_id, imap_start=True)
         mdir = JMailMDir(name_encode=mdir_name_enc)
-        msg_source = mdir.msg_source(mail_uid, peek=False)
+        msg = mdir.msg_get(mail_uid, peek=False)
+        jm.tmpl_data({
+            'load_navbar_path': True,
+            'mdir': mdir,
+            'msg': msg,
+        })
     except JMailError as e:
         return e.response()
-    #~ except Exception as e:
-        #~ return jm.error(500, e)
-    msg = JMailMessage(source=msg_source)
-    jm.log.dbg('msg source: %s' % msg.charset)
-    jm.tmpl_data({
-        'load_navbar_path': True,
-        'mdir': mdir,
-        'msg': {
-            'uid': mail_uid,
-            'source': msg_source.decode(msg.charset),
-        },
-    })
-    return jm.render(charset=msg.charset)
+    return jm.render(charset=msg.get_charset())
 
 
 def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):

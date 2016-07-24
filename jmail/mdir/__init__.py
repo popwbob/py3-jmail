@@ -146,6 +146,7 @@ class JMailMDir(JMailBase):
 
 
     def msg_getlist(self, uid_list='__ALL__', peek=True):
+        self.dbg.log('Mdir msg getlist')
         if type(uid_list) is str:
             if uid_list == '__ALL__':
                 #~ typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
@@ -164,16 +165,7 @@ class JMailMDir(JMailBase):
     def msg_get(self, mail_uid, peek=True):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
-        m = JMailMessage(meta=self.msg_flags(mail_uid),
-                source=self.msg_source(mail_uid, peek), uid=mail_uid)
-        self.log.dbg('Mdir message get: %s - %s' % (mail_uid.decode(), type(m)))
-        return m
-
-
-    def msg_source(self, mail_uid, peek=True):
-        if type(mail_uid) is str:
-            mail_uid = mail_uid.encode()
-        self.log.dbg('Mdir message source: %s' % mail_uid.decode())
+        self.log.dbg('Mdir message get: %s' % mail_uid.decode())
         src = self.__cache.msg_source_get(mail_uid)
         if src is None:
             src = self._imap_fetch_source(mail_uid, peek)
@@ -181,7 +173,12 @@ class JMailMDir(JMailBase):
             self.log.dbg('CACHE save: msg source %s' % mail_uid.decode())
         else:
             self.log.dbg('CACHE hit: msg source %s' % mail_uid.decode())
-        return JMailMessage(source=src, uid=mail_uid).get_source()
+        return JMailMessage(source=src, uid=mail_uid)
+
+
+    def msg_source(self, mail_uid, peek=True):
+        self.log.dbg('Mdir message source: %s' % mail_uid)
+        return self.msg_get(mail_uid, peek).get_source()
 
 
     def msg_flags(self, mail_uid):
