@@ -201,7 +201,7 @@ class JMailMDir(JMailBase):
 
     def _imap_fetch_flags(self, mail_uid):
         self.log.dbg('Mdir imap fetch flags: %d' % int(mail_uid))
-        meta, _ = self._imap_fetch(mail_uid, 'FLAGS')
+        meta = self._imap_fetch(mail_uid, 'FLAGS')
         self.__cache.msg_meta_set(mail_uid, meta)
         return meta
 
