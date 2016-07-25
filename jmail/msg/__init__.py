@@ -96,10 +96,6 @@ class JMailMessage(JMailBase):
     def size_human(self):
         return JMailBase.bytes2human(self.size)
 
-
-    def body_lines(self):
-        return self.body.splitlines()
-
     # --- parser next generation
 
     def get_source(self):
@@ -107,3 +103,11 @@ class JMailMessage(JMailBase):
 
     def get_charset(self):
         return self._m.get_content_charset()
+
+    def body_lines(self):
+        """return a list of message body lines"""
+        if self._m.is_multipart():
+            return ['(multipart message)']
+        else:
+            payload = self._m.get_payload(decode=True)
+            return payload.decode(self.get_charset()).splitlines()
