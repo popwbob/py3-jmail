@@ -8,14 +8,14 @@
 
         {% if msg.body_html != '[NO HTML CONTENT]' %}
             {% if read_html %}
-                <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">text/plain</a>
+                - <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">text/plain</a>
             {% else %}
-                <a href="{% url 'msg:read_html' macct.id mdir.name_encode msg.uid 'html' %}">text/html</a>
+                - <a href="{% url 'msg:read_html' macct.id mdir.name_encode msg.uid 'html' %}">text/html</a>
             {% endif %}
         {% endif %}
 
         {% for attach in msg.attachs %}
-            <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}">{{attach.filename}}</a>({{attach.size_human}})
+            - <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}">{{attach.filename}}</a> <small>({{attach.size_human}})</small>
         {% endfor %}
    </p>
 </div>
