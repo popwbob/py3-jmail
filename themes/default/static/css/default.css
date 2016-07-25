@@ -27,11 +27,6 @@ body
     overflow:hidden;
 }
 
-.mail-source pre
-{
-    overflow:auto;
-}
-
 input[type=submit]
 {
     padding:0;
@@ -60,7 +55,7 @@ ul.buttons li
     font-size:0.8em;
 }
 
-.mail-headers p
+.mail-headers
 {
     padding:0.5em;
 }
@@ -88,7 +83,7 @@ ul.buttons li
     line-height:1em;
 }
 
-.footer p
+.footer
 {
     margin:0;
     padding:0;

@@ -1,25 +1,13 @@
-<div class="mail-parts">
-    <p class="buttons">
-        <!-- attributes -->
-        {{msg.size_human}}
-        {% for flag in msg.flags %}
-            {{flag}}
-        {% endfor %}
-
-        {% if msg.body_html != '[NO HTML CONTENT]' %}
-            {% if read_html %}
-                - <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}">text/plain</a>
-            {% else %}
-                - <a href="{% url 'msg:read_html' macct.id mdir.name_encode msg.uid 'html' %}">text/html</a>
-            {% endif %}
-        {% endif %}
-
-        <!-- next generation -->
-        {% for part in msg.parts %}
-            {% if part.uid > 0 %}
-                - {{part.filename | default:part.content_type}}
-                <small>({{part.size_human}})</small>
-            {% endif %}
-        {% endfor %}
-   </p>
-</div>
+<p class="mail-flags">
+{{msg.size_human}}
+{% for flag in msg.flags %}
+    {{flag}}
+{% endfor %}
+</p>
+<p class="buttons mail-parts">
+    {% for part in msg.parts %}
+        {% if part.uid > 0 %} - {% endif %}
+        {{part.filename | default:part.content_type}}
+        ({{part.size_human}})
+    {% endfor %}
+</p>

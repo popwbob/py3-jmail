@@ -1,8 +1,6 @@
-<div class="mail-actions">
-    <p class="buttons">
-        <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid %}">reply</a>
-        <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid 'replyall' %}">reply all</a>
-        <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid 'forward' %}">forward</a>
-        <a href="{% url 'msg:source' macct.id mdir.name_encode msg.uid %}">source</a>
-    </p>
-</div>
+<p class="buttons mail-actions">
+    <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid %}">reply</a>
+    <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid 'replyall' %}">reply all</a>
+    <a href="{% url 'msg:reply' macct.id mdir.name_encode msg.uid 'forward' %}">forward</a>
+    <a href="{% url 'msg:source' macct.id mdir.name_encode msg.uid %}">source</a>
+</p>

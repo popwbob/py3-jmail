@@ -31,13 +31,13 @@ hr.sep
     border-bottom:solid 1px lightgray;
 }
 
-.mail-headers p
+.mail-headers
 {
     background-color:aliceblue;
     border:solid 1px lightblue;
 }
 
-.footer p
+.footer
 {
     color:gray;
 }
