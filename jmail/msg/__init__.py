@@ -198,11 +198,24 @@ class JMailMessage(JMailBase):
                 payload = p.get_payload(decode=True)
                 break # pick up the first one!
             self.log.dbg('Msg multipart body lines: ', len(payload))
-            return payload.splitlines()
         else:
             payload = self._m.get_payload(decode=True)
-            self.log.dbg('Msg body lines: ', len(payload))
-            return payload.decode(self.get_charset()).splitlines()
+            self.log.dbg('Msg body lines: ', type(payload), len(payload))
+        return payload.decode(self.get_charset()).splitlines()
+
+
+    def body_html(self):
+        """return message html body (if any)"""
+        if self._m.is_multipart():
+            payload = '(multipart message)'
+            for p in typed_subpart_iterator(self._m, maintype='text', subtype='html'):
+                payload = p.get_payload(decode=True)
+                break # pick up the first one!
+            self.log.dbg('Msg multipart body html: ', len(payload))
+        else:
+            payload = self._m.get_payload(decode=True)
+            self.log.dbg('Msg body html: ', len(payload))
+        return payload.decode(self.get_charset())
 
 
     def parts(self):

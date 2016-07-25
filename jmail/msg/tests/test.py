@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from io import StringIO
 from django.conf import settings
 from jmail import JMailBase

@@ -1,5 +1,4 @@
-# coding: utf-8
-
+import email
 from io import StringIO
 from django.conf import settings
 from jmail import JMailBase
@@ -13,10 +12,9 @@ class TestMsg(JMailTest):
         JMailBase.conf = settings.JMAIL.copy()
         JMailBase.log = JMailLog(outfile=StringIO())
 
-    #~ def test_parser(self):
-        #~ m = JMailMsgParser()
-        #~ self.assertEqual(m.body_html, '')
-        #~ self.assertListEqual(m.attachs, [])
+    def test_parser(self):
+        m = JMailMsgParser().parse(b'')
+        self.assertIsInstance(m, email.message.EmailMessage)
 
     # this should be always the last one
     def test_zzz_cleanup_message(self):
