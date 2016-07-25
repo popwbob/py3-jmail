@@ -111,7 +111,7 @@ class JMailMsgParser(Message, JMailBase):
     def parse(self, blob):
         """parse email content as binary/bytes source"""
         m = email.message_from_bytes(blob, policy=policy.default)
-        self.log.dbg('Parsed message blob: ', type(m), sorted(dir(m)),
-                ' - charsets: ', m.get_charset(), ' - ', m.get_charsets(),
+        self.log.dbg('Parsed message blob: ', type(m), ' - charsets: ',
+                m.get_charset(), ' - ', m.get_charsets(),
                 ' - ', m.get_content_charset())
         return m

@@ -213,6 +213,7 @@ class JMail(JMailBase):
         if self.devmode:
             self._tmpl_data['jmail']['tmpl_debug'] = self._tmpl_data_debug()
         self._tmpl_data['took'] = self.end()
+        self.log.dbg('Render: ', ctype, ' ', self._tmpl_path)
         return render(self._req, self._tmpl_path, self._tmpl_data, content_type=ctype)
 
 

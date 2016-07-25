@@ -32,7 +32,7 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         'msg': msg,
         'read_html': read_html,
     })
-    return jm.render(charset=msg.charset)
+    return jm.render(charset=msg.get_charset())
 
 
 def source(req, macct_id, mdir_name_enc, mail_uid):
@@ -96,7 +96,7 @@ def compose(req, macct_id):
         'msg': msg,
         'compose_restore': compose_restore,
     })
-    return jm.render(charset=msg.charset)
+    return jm.render(charset=msg.get_charset())
 
 
 def __compose_discard(jm, macct_id):
@@ -233,4 +233,4 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         'msg': msg,
         'mdir': mdir,
     })
-    return jm.render(charset=msg.charset)
+    return jm.render(charset=msg.get_charset())

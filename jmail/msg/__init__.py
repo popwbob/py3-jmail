@@ -181,7 +181,17 @@ class JMailMessage(JMailBase):
     # --- parser next generation
 
     def get_charset(self):
-        return self._m.get_content_charset()
+        cs = self._m.get_content_charset()
+        if cs is None:
+            cs = self._m.get_charset()
+            if cs is None:
+                for cs in self._m.get_charsets():
+                    if cs is not None: break
+        if cs is None:
+            self.log.dbg('Msg guessing default charset')
+            cs = self.charset # jmail default
+        self.log.dbg('Msg charset: ', cs)
+        return cs
 
     def source_lines(self):
         return self._m.as_string().splitlines()
