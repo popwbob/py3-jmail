@@ -201,6 +201,8 @@ class JMailMessage(JMailBase):
         else:
             payload = self._m.get_payload(decode=True)
             self.log.dbg('Msg body lines: ', type(payload), len(payload))
+        if not payload:
+            payload = b'(empty)'
         return payload.decode(self.get_charset()).splitlines()
 
 
@@ -215,6 +217,8 @@ class JMailMessage(JMailBase):
         else:
             payload = self._m.get_payload(decode=True)
             self.log.dbg('Msg body html: ', len(payload))
+        if not payload:
+            payload = b'<body>(empty)</body>'
         return payload.decode(self.get_charset())
 
 
