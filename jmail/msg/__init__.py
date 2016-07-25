@@ -4,6 +4,7 @@ from time import strptime, strftime
 from .. import JMailBase
 from .parser import JMailMessageDistParser, JMailMsgParser
 from email.iterators import typed_subpart_iterator
+from base64 import urlsafe_b64encode
 
 
 class JMailMessageHeaders(JMailBase):
@@ -240,3 +241,6 @@ class JMailMessage(JMailBase):
                     ext = '.bin'
                 fn = 'part-{}{}'.format(self.uid, ext)
         return fn
+
+    def filename_encode(self):
+        return urlsafe_b64encode(self.filename().encode()).decode()

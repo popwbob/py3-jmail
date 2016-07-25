@@ -5,9 +5,18 @@
 {% endfor %}
 </p>
 <p class="buttons mail-parts">
-    {% for part in msg.parts %}
-        {% if part.uid > 0 %} - {% endif %}
-        {{part.filename | default:part.content_type}}
-        ({{part.size_human}})
-    {% endfor %}
+{% for part in msg.parts %}
+    {% if part.uid > 0 %} - {% endif %}
+    {% if part.content_type == 'text/plain' %}
+        <a href="{% url 'msg:read' macct.id mdir.name_encode msg.uid %}"
+        >{{part.content_type}}</a>
+    {% elif part.content_type == 'text/html' %}
+        <a href="{% url 'msg:read_html' macct.id mdir.name_encode msg.uid 'html' %}"
+        >{{part.content_type}}</a>
+    {% else %}
+        <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid part.filename_encode %}"
+        >{{part.filename | default:part.content_type}}</a>
+    {% endif %}
+    <sub>({{part.size_human}})</sub>
+{% endfor %}
 </p>
