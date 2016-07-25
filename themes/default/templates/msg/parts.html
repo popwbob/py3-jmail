@@ -14,8 +14,12 @@
             {% endif %}
         {% endif %}
 
-        {% for attach in msg.attachs %}
-            - <a href="{% url 'msg:attach' macct.id mdir.name_encode msg.uid attach.filename_encode %}" title="{{attach.content_type}}">{{attach.filename}}</a> <small>({{attach.size_human}})</small>
+        <!-- next generation -->
+        {% for part in msg.parts %}
+            {% if part.uid > 0 %}
+                - {{part.filename | default:part.content_type}}
+                <small>({{part.size_human}})</small>
+            {% endif %}
         {% endfor %}
    </p>
 </div>

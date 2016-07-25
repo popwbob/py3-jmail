@@ -178,9 +178,8 @@ class JMailMessage(JMailBase):
 
 
     def size_human(self):
-        return JMailBase.bytes2human(self.size)
+        return self.bytes2human(self.size)
 
-    # --- parser next generation
 
     def get_charset(self):
         """return message charset (or try to guess)"""
@@ -196,8 +195,10 @@ class JMailMessage(JMailBase):
         self.log.dbg('Msg got charset: ', cs)
         return cs
 
+
     def source_lines(self):
         return self._m.as_string().splitlines()
+
 
     def body_lines(self):
         """return a list of message body lines"""
@@ -213,5 +214,29 @@ class JMailMessage(JMailBase):
             self.log.dbg('Msg body lines: ', len(payload))
             return payload.decode(self.get_charset()).splitlines()
 
+
     def parts(self):
-        return self._m.walk()
+        pl = list()
+        idx = 0
+        for p in self._m.walk():
+            if p.get_content_maintype() == 'multipart':
+                continue
+            pl.append(JMailMessage(source=p.as_bytes(), uid=idx))
+            idx += 1
+        return pl
+
+
+    def content_type(self):
+        return self._m.get_content_type()
+
+
+    def filename(self):
+        ctype = self.content_type()
+        fn = self._m.get_filename()
+        if not fn:
+            if not ctype.startswith('text/'):
+                ext = mimetypes.guess_extension(ctype)
+                if not ext:
+                    ext = '.bin'
+                fn = 'part-{}{}'.format(self.uid, ext)
+        return fn
