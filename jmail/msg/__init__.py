@@ -2,7 +2,7 @@ import imaplib
 
 from .. import JMailBase
 from .parser import JMailMessageDistParser, JMailMsgParser
-
+from email.iterators import typed_subpart_iterator
 
 class JMailMessage(JMailBase):
     _m = None
@@ -11,7 +11,6 @@ class JMailMessage(JMailBase):
     size = None
     headers = None
     headers_short = None
-    body = None
     body_html = None
     attachs = None
     uid = None
@@ -26,7 +25,7 @@ class JMailMessage(JMailBase):
             self.flags = self._flags_parse(meta)
             self.flags_short = self._flags_short(self.flags)
         if source is not None:
-            self.body, self.body_html = self._parse_message(source)
+            self.body_html = self._parse_message(source)
             self.headers_short = self.headers.short()
             self.size = len(source)
 
@@ -82,7 +81,6 @@ class JMailMessage(JMailBase):
         msg = JMailMessageDistParser()
         msg.parse(data)
         self.headers = msg.headers
-        msg_text = msg.body
         msg_html = msg.body_html
         self.attachs = msg.attachs
         self.charset = msg.charset
@@ -90,7 +88,7 @@ class JMailMessage(JMailBase):
         # --- parser next generation
         p = JMailMsgParser()
         self._m = p.parse(data) # should return m instead of setting self._m
-        return (msg_text, msg_html)
+        return msg_html
 
 
     def size_human(self):
@@ -107,7 +105,11 @@ class JMailMessage(JMailBase):
     def body_lines(self):
         """return a list of message body lines"""
         if self._m.is_multipart():
-            return ['(multipart message)']
+            payload = '(multipart message)'
+            for p in typed_subpart_iterator(self._m, maintype='text', subtype='plain'):
+                payload = p.get_payload(decode=True)
+                break # pick up the first one!
+            return payload.splitlines()
         else:
             payload = self._m.get_payload(decode=True)
             return payload.decode(self.get_charset()).splitlines()

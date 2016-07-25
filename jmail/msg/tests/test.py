@@ -54,7 +54,6 @@ class TestMsg(JMailTest):
     def test_message_parse(self):
         m = JMailMessage(source=b'')
         self.assertIsInstance(m.headers, parser.JMailMessageHeaders)
-        self.assertEqual(m.body, '')
         self.assertEqual(m.body_html, '[NO HTML CONTENT]')
 
     def test_message_size_human(self):
