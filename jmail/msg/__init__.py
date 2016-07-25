@@ -1,8 +1,97 @@
 import imaplib
-
+from email.header import decode_header
+from time import strptime, strftime
 from .. import JMailBase
 from .parser import JMailMessageDistParser, JMailMsgParser
 from email.iterators import typed_subpart_iterator
+
+
+class JMailMessageHeaders(JMailBase):
+    _data = None
+
+    def __init__(self, data=[]):
+        self._data = data
+
+    def __len__(self):
+        return len(self._data)
+
+    def _parse_key(self, k):
+        k = k.lower()
+        return k.replace('-', '_')
+
+    def __getitem__(self, k):
+        return self.get(k)
+
+    def __contains__(self, k):
+        k = self._parse_key(k)
+        return k in [self._parse_key(hk) for hk, hv in self._data]
+
+    def set_hdr(self, k, v):
+        for hk, hv in self._data:
+            if self._parse_key(hk) == self._parse_key(k):
+                self._data.remove((hk, hv))
+        self._data.append((k, v))
+
+    def get(self, k, d=''):
+        k = self._parse_key(k)
+        for hk, hv in self._data:
+            if self._parse_key(hk) == k:
+                return self._hdecode(hv)
+        return d
+
+    def get_raw(self, k, d=None):
+        k = self._parse_key(k)
+        for hk, hv in self._data:
+            if self._parse_key(hk) == k:
+                return hv
+        return d
+
+    def _hdecode(self, hval):
+        l = decode_header(hval)
+        #~ self.log.dbg('hdecode: ', hval, ' ', l)
+        items = list()
+        for t in l:
+            s = t[0]
+            c = t[1]
+            if type(s) is str:
+                items.append(s)
+            else:
+                if c is None or c.startswith('unknown'):
+                    if isinstance(s, str):
+                        items.append(s)
+                    else:
+                        try:
+                            items.append(s.decode(self.charset))
+                        except UnicodeDecodeError as e:
+                            self.log.error("message header decode: ", e)
+                            items.append(str(s))
+                else:
+                    items.append(s.decode(c))
+        r = ' '.join(items)
+        #~ self.log.dbg('hdecode return: ', r)
+        return r
+
+    def short(self):
+        #~ self.log.dbg('headers short')
+        hs = dict()
+        # -- date
+        hdate = self.get_raw('date')
+        if hdate is None:
+            hs['date'] = ''
+        else:
+            dstring = ' '.join(hdate.split()[:6])
+            dobj = strptime(dstring, JMailBase.conf.get('DATE_HEADER_FORMAT'))
+            hs['date'] = strftime('%Y%m%d %H:%M', dobj)
+        # -- from, to, subject
+        for k in ('from', 'to', 'subject'):
+            v = self.get(k)
+            if len(v) > 128:
+                v = v[:128] + '..'
+            hs[k] = v
+        return hs
+
+    def __str__(self):
+        return str(self._data)
 
 
 class JMailMessage(JMailBase):
@@ -75,7 +164,6 @@ class JMailMessage(JMailBase):
         self.log.dbg('message parse data: ', type(data))
         msg = JMailMessageDistParser()
         msg.parse(data)
-        self.headers = msg.headers
         msg_html = msg.body_html
         self.attachs = msg.attachs
         self.charset = msg.charset
@@ -83,6 +171,7 @@ class JMailMessage(JMailBase):
         # --- parser next generation
         p = JMailMsgParser()
         self._m = p.parse(data) # should return m instead of setting self._m
+        self.headers = JMailMessageHeaders(self._m.items())
         return msg_html
 
 
@@ -108,3 +197,6 @@ class JMailMessage(JMailBase):
         else:
             payload = self._m.get_payload(decode=True)
             return payload.decode(self.get_charset()).splitlines()
+
+    def parts(self):
+        return self._m.walk()

@@ -1,110 +1,17 @@
 import email
 
-from email.header import decode_header
 from quopri import decodestring
-from time import strptime, strftime
 from base64 import b64decode, urlsafe_b64encode
 
 from .. import JMailBase
 
 
-class JMailMessageHeaders(JMailBase):
-    _data = None
-
-    def __init__(self, data=[]):
-        self._data = data
-
-    def __len__(self):
-        return len(self._data)
-
-    def _parse_key(self, k):
-        k = k.lower()
-        return k.replace('-', '_')
-
-    def __getitem__(self, k):
-        return self.get(k)
-
-    def __contains__(self, k):
-        k = self._parse_key(k)
-        return k in [self._parse_key(hk) for hk, hv in self._data]
-
-    def set_hdr(self, k, v):
-        for hk, hv in self._data:
-            if self._parse_key(hk) == self._parse_key(k):
-                self._data.remove((hk, hv))
-        self._data.append((k, v))
-
-    def get(self, k, d=''):
-        k = self._parse_key(k)
-        for hk, hv in self._data:
-            if self._parse_key(hk) == k:
-                return self._hdecode(hv)
-        return d
-
-    def get_raw(self, k, d=None):
-        k = self._parse_key(k)
-        for hk, hv in self._data:
-            if self._parse_key(hk) == k:
-                return hv
-        return d
-
-    def _hdecode(self, hval):
-        l = decode_header(hval)
-        #~ self.log.dbg('hdecode: ', hval, ' ', l)
-        items = list()
-        for t in l:
-            s = t[0]
-            c = t[1]
-            if type(s) is str:
-                items.append(s)
-            else:
-                if c is None or c.startswith('unknown'):
-                    if isinstance(s, str):
-                        items.append(s)
-                    else:
-                        try:
-                            items.append(s.decode(self.charset))
-                        except UnicodeDecodeError as e:
-                            self.log.error("message header decode: ", e)
-                            items.append(str(s))
-                else:
-                    items.append(s.decode(c))
-        r = ' '.join(items)
-        #~ self.log.dbg('hdecode return: ', r)
-        return r
-
-    def short(self):
-        #~ self.log.dbg('headers short')
-        hs = dict()
-        # -- date
-        hdate = self.get_raw('date')
-        if hdate is None:
-            hs['date'] = ''
-        else:
-            dstring = ' '.join(hdate.split()[:6])
-            dobj = strptime(dstring, JMailBase.conf.get('DATE_HEADER_FORMAT'))
-            hs['date'] = strftime('%Y%m%d %H:%M', dobj)
-        # -- from, to, subject
-        for k in ('from', 'to', 'subject'):
-            v = self.get(k)
-            if len(v) > 128:
-                v = v[:128] + '..'
-            hs[k] = v
-        return hs
-
-    def __str__(self):
-        return str(self._data)
-
-
 class JMailParserMsg(JMailBase):
-    body = None
     body_html = None
-    headers = None
     attachs = None
 
     def __init__(self):
-        self.body = self.body_html = ''
-        self.headers = JMailMessageHeaders()
+        self.body_html = ''
         self.attachs = list()
 
 
@@ -118,7 +25,6 @@ class JMailMessageDistParser(JMailParserMsg):
         if type(data) is str:
             data = data.encode()
         msg = email.message_from_bytes(data)
-        self.headers = JMailMessageHeaders(msg.items())
         msg_text = '[NO TEXT CONTENT]'
         msg_html = '[NO HTML CONTENT]'
         for part in msg.walk():
@@ -137,7 +43,6 @@ class JMailMessageDistParser(JMailParserMsg):
                 # -- text parts
                 self.charset = self._charset_get(part)
                 # tell headers which is the charset
-                self.headers.charset = self.charset
                 tenc = part.get('content-transfer-encoding', None)
                 if subtype == 'plain':
                     # -- text plain
@@ -207,5 +112,6 @@ class JMailMsgParser(Message, JMailBase):
         """parse email content as binary/bytes source"""
         m = email.message_from_bytes(blob, policy=policy.default)
         self.log.dbg('Parsed message blob: ', type(m), sorted(dir(m)),
-            ' - charsets: ', m.get_charset(), ' - ', m.get_charsets(), ' - ', m.get_content_charset())
+                ' - charsets: ', m.get_charset(), ' - ', m.get_charsets(),
+                ' - ', m.get_content_charset())
         return m
