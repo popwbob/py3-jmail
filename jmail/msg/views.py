@@ -30,7 +30,6 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         'load_navbar_path': True,
         'mdir': mdir,
         'msg': msg,
-        'mail_uid': mail_uid,
         'read_html': read_html,
     })
     return jm.render(charset=msg.charset)
