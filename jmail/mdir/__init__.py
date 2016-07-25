@@ -37,16 +37,6 @@ class JMailMDirCache(JMailBase):
         return 'msg:{}:{}'.format(dtype, int(msg_uid))
 
     @classmethod
-    def imap_fetch_get(self, msg_uid, cmd):
-        ck = self.__msg_cache_key('IMAP:FETCH:%s' % cmd, msg_uid)
-        return self.__cache.get(ck, None)
-
-    @classmethod
-    def imap_fetch_set(self, msg_uid, cmd, data):
-        ck = self.__msg_cache_key('IMAP:FETCH:%s' % cmd, msg_uid)
-        self.__cache.set(ck, data, self._data_ttl)
-
-    @classmethod
     def mdir_attribs_set(self, mdir_name, attribs):
         if type(mdir_name) is bytes:
             mdir_name = mdir_name.decode()
@@ -66,6 +56,28 @@ class JMailMDirCache(JMailBase):
     @classmethod
     def subs_list_set(self, sl):
         self.__cache.set('subs:list', sl, self._meta_ttl)
+
+    @classmethod
+    def msg_data_get(self, msg_uid):
+        ck = self.__msg_cache_key('data', msg_uid)
+        return self.__cache.get(ck, None)
+
+    @classmethod
+    def msg_data_set(self, msg_uid, data):
+        ck = self.__msg_cache_key('data', msg_uid)
+        self.__cache.set(ck, data, self._data_ttl)
+        self.log.dbg('CACHE save: msg data - %s' % msg_uid)
+
+    @classmethod
+    def msg_meta_get(self, msg_uid):
+        ck = self.__msg_cache_key('meta', msg_uid)
+        return self.__cache.get(ck, None)
+
+    @classmethod
+    def msg_meta_set(self, msg_uid, meta):
+        ck = self.__msg_cache_key('meta', msg_uid)
+        self.__cache.set(ck, meta, self._meta_ttl)
+        self.log.dbg('CACHE save: msg meta - %s' % msg_uid)
 
 
 class JMailMDir(JMailBase):
@@ -156,30 +168,42 @@ class JMailMDir(JMailBase):
         if type(mail_uid) is str:
             mail_uid = mail_uid.encode()
         self.log.dbg('Mdir message get: %s' % mail_uid.decode())
-        src = self._imap_fetch_source(mail_uid, peek)
-        return JMailMessage(meta=src[0], source=src[1], uid=mail_uid)
+        src = self.__cache.msg_data_get(mail_uid)
+        if src is None:
+            met, src = self._imap_fetch_source(mail_uid, peek)
+        else:
+            self.log.dbg('CACHE hit: msg data - %s' % mail_uid)
+            met = self.__cache.msg_meta_get(mail_uid)
+            if met is None:
+                met = self._imap_fetch_flags(mail_uid)
+            else:
+                self.log.dbg('CACHE hit: msg meta - %s' % mail_uid)
+        return JMailMessage(meta=met, source=src, uid=mail_uid)
 
 
     def _imap_fetch(self, mail_uid, cmd):
         if self.imap.state != 'SELECTED':
             raise JMailError(500, 'mdir not selected, imap state: '+self.imap.state)
-        data = self.__cache.imap_fetch_get(mail_uid, cmd)
-        if data is None:
-            _, data = self.imap.uid('FETCH', mail_uid, cmd)
-            self.__cache.imap_fetch_set(mail_uid, cmd, data)
-            self.log.dbg('Mdir CACHE save: imap fetch %s %s' % (mail_uid, cmd))
-        else:
-            self.log.dbg('Mdir CACHE hit: imap fetch %s %s' % (mail_uid, cmd))
-        self.log.dbg('Mdir fetched data: ', data)
-        return data
+        _, data = self.imap.uid('FETCH', mail_uid, cmd)
+        return data[0]
 
 
     def _imap_fetch_source(self, mail_uid, peek):
+        self.log.dbg('Mdir imap fetch source: %d' % int(mail_uid))
         cmd = 'BODY[]'
         if peek:
             cmd = 'BODY.PEEK[]'
-        return self._imap_fetch(mail_uid, '(FLAGS %s)' % cmd)[0]
+        meta, source = self._imap_fetch(mail_uid, '(FLAGS %s)' % cmd)
+        self.__cache.msg_meta_set(mail_uid, meta)
+        self.__cache.msg_data_set(mail_uid, source)
+        return meta, source
 
+
+    def _imap_fetch_flags(self, mail_uid):
+        self.log.dbg('Mdir imap fetch flags: %d' % int(mail_uid))
+        meta, _ = self._imap_fetch(mail_uid, 'FLAGS')
+        self.__cache.msg_meta_set(mail_uid, meta)
+        return meta
 
     def subs_list(self):
         mbox = self.__cache.subs_list_get()
