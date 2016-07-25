@@ -62,8 +62,8 @@ class TestMsg(JMailTest):
         self.assertEqual(m.size_human(), '3.00B')
 
     def test_message_body_lines(self):
-        m = JMailMessage(source=b'\n\n\n')
-        self.assertListEqual(m.body_lines(), ['', ''])
+        m = JMailMessage(source=b'Content-Type: text/plain; charset=UTF-8\n\n\n')
+        self.assertListEqual(m.body_lines(), [''])
 
     # this should be always the last one
     def test_zzz_cleanup_message(self):
