@@ -26,8 +26,6 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         msg = mdir.msg_get(mail_uid, peek=False)
     except JMailError as e:
         return e.response()
-    # -- mark as read
-    msg.flag_seen()
     jm.tmpl_data({
         'load_navbar_path': True,
         'mdir': mdir,

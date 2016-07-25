@@ -136,7 +136,7 @@ class JMailMDir(JMailBase):
 
 
     def msg_getlist(self, uid_list='__ALL__', peek=True):
-        self.dbg.log('Mdir msg getlist')
+        self.log.dbg('Mdir msg getlist')
         if type(uid_list) is str:
             if uid_list == '__ALL__':
                 #~ typ, msgs_ids = self.imap.uid('SEARCH', 'ALL')
@@ -157,13 +157,7 @@ class JMailMDir(JMailBase):
             mail_uid = mail_uid.encode()
         self.log.dbg('Mdir message get: %s' % mail_uid.decode())
         src = self._imap_fetch_source(mail_uid, peek)
-        return JMailMessage(source=src, uid=mail_uid)
-
-
-    def msg_flags(self, mail_uid):
-        if type(mail_uid) is str:
-            mail_uid = mail_uid.encode()
-        return self._imap_fetch_flags(mail_uid)
+        return JMailMessage(meta=src[0], source=src[1], uid=mail_uid)
 
 
     def _imap_fetch(self, mail_uid, cmd):
@@ -176,6 +170,7 @@ class JMailMDir(JMailBase):
             self.log.dbg('Mdir CACHE save: imap fetch %s %s' % (mail_uid, cmd))
         else:
             self.log.dbg('Mdir CACHE hit: imap fetch %s %s' % (mail_uid, cmd))
+        self.log.dbg('Mdir fetched data: ', data)
         return data
 
 
@@ -183,11 +178,7 @@ class JMailMDir(JMailBase):
         cmd = 'BODY[]'
         if peek:
             cmd = 'BODY.PEEK[]'
-        return self._imap_fetch(mail_uid, cmd)[0][1]
-
-
-    def _imap_fetch_flags(self, mail_uid):
-        return self._imap_fetch(mail_uid, 'FLAGS')[0]
+        return self._imap_fetch(mail_uid, '(FLAGS %s)' % cmd)[0]
 
 
     def subs_list(self):

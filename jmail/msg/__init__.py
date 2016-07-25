@@ -100,20 +100,6 @@ class JMailMessage(JMailBase):
     def body_lines(self):
         return self.body.splitlines()
 
-
-    def flags_store(self, flags, command='+FLAGS'):
-        self.log.dbg('msg flags store: ', flags)
-        typ, data = self.imap.uid('STORE', self.uid, command, '({})'.format(flags))
-        self.log.dbg('store: ', typ, data)
-        if data is not None:
-            self._flags_parse(data[0])
-            self.mdir_cache.msg_flags_set(self.uid, data[0])
-
-
-    def flag_seen(self):
-        if not self.seen:
-            self.flags_store('\\Seen')
-
     # --- parser next generation
 
     def get_source(self):
