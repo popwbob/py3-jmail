@@ -51,29 +51,33 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
 
 
 def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
-    # XXX: Tal vez seteand Content-Disposition como inline ayude a que
-    #      lo muestre el server en lugar de bajarlo?
     try:
-        jm = JMail(req, tmpl_name='msg/attach', macct_id=macct_id, imap_start=True)
+        jm = JMail(req, tmpl_name='msg/attach', macct_id=macct_id,
+                imap_start=True)
     except JMailError as e:
         return e.response()
+
     try:
         mdir = JMailMDir(name_encode=mdir_name_enc)
         msg = mdir.msg_get(mail_uid)
     except JMailError as e:
         return e.response()
-    attach = None
-    for ad in msg.attachs:
-        ad_filename_enc = ad.get('filename_encode')
-        if ad_filename_enc == filename_enc.encode():
-            attach = ad
-            break
-    if attach is None:
-        return jm.error(500, 'No attach')
-    resp = HttpResponse(attach['payload'], content_type='{}; charset={}'.format(attach['content_type'], attach['charset']))
-    resp['Content-Disposition'] = attach['content_disposition']
-    if attach['content_transfer_encoding'] is not None:
-        resp['Content-Transfer-Encoding'] = attach['content_transfer_encoding']
+
+    a = None
+    for p in msg.parts():
+        if p.is_attach():
+            if p.filename_encode() == filename_enc:
+                a = p
+
+    if a is None:
+        return jm.error(404, 'No attach found!')
+
+    resp = HttpResponse(a.payload(), content_type='{}; charset={}'.format(
+            a.content_type(), a.get_charset()))
+
+    resp['Content-Disposition'] = 'attachment; filename="{}"'.format(a.filename())
+
+    jm.log.dbg('Msg attach: ', resp['Content-Disposition'])
     jm.end()
     return resp
 

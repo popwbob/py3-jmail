@@ -222,6 +222,10 @@ class JMailMessage(JMailBase):
         return payload.decode(self.get_charset())
 
 
+    def payload(self):
+        return self._m.get_payload(decode=True)
+
+
     def parts(self):
         pl = list()
         idx = 0
@@ -237,6 +241,18 @@ class JMailMessage(JMailBase):
         return self._m.get_content_type()
 
 
+    def content_transfer_encoding(self):
+        return self._m.get('content-transfer-encoding', None)
+
+
+    def is_attach(self):
+        return self._m.get_content_disposition() == 'attachment'
+
+
+    def is_inline(self):
+        return self._m.get_content_disposition() == 'inline'
+
+
     def filename(self):
         ctype = self.content_type()
         fn = self._m.get_filename()
@@ -247,6 +263,7 @@ class JMailMessage(JMailBase):
                     ext = '.bin'
                 fn = 'part-{}{}'.format(self.uid, ext)
         return fn
+
 
     def filename_encode(self):
         return urlsafe_b64encode(self.filename().encode()).decode()
