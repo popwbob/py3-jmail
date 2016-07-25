@@ -9,8 +9,11 @@ from email.iterators import typed_subpart_iterator
 class JMailMessageHeaders(JMailBase):
     _data = None
 
-    def __init__(self, data=[]):
+    def __init__(self, data=[], charset=None):
         self._data = data
+        if charset is not None:
+            self.charset = charset
+        self.log.dbg('MsgHeaders charset: ', self.charset)
 
     def __len__(self):
         return len(self._data)
@@ -166,12 +169,11 @@ class JMailMessage(JMailBase):
         msg.parse(data)
         msg_html = msg.body_html
         self.attachs = msg.attachs
-        self.charset = msg.charset
         del msg
         # --- parser next generation
         p = JMailMsgParser()
         self._m = p.parse(data) # should return m instead of setting self._m
-        self.headers = JMailMessageHeaders(self._m.items())
+        self.headers = JMailMessageHeaders(self._m.items(), self.get_charset())
         return msg_html
 
 
@@ -181,6 +183,7 @@ class JMailMessage(JMailBase):
     # --- parser next generation
 
     def get_charset(self):
+        """return message charset (or try to guess)"""
         cs = self._m.get_content_charset()
         if cs is None:
             cs = self._m.get_charset()
@@ -190,7 +193,7 @@ class JMailMessage(JMailBase):
         if cs is None:
             self.log.dbg('Msg guessing default charset')
             cs = self.charset # jmail default
-        self.log.dbg('Msg charset: ', cs)
+        self.log.dbg('Msg got charset: ', cs)
         return cs
 
     def source_lines(self):
@@ -203,9 +206,11 @@ class JMailMessage(JMailBase):
             for p in typed_subpart_iterator(self._m, maintype='text', subtype='plain'):
                 payload = p.get_payload(decode=True)
                 break # pick up the first one!
+            self.log.dbg('Msg multipart body lines: ', len(payload))
             return payload.splitlines()
         else:
             payload = self._m.get_payload(decode=True)
+            self.log.dbg('Msg body lines: ', len(payload))
             return payload.decode(self.get_charset()).splitlines()
 
     def parts(self):
