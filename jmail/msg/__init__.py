@@ -4,6 +4,7 @@ from .. import JMailBase
 from .parser import JMailMessageDistParser, JMailMsgParser
 from email.iterators import typed_subpart_iterator
 
+
 class JMailMessage(JMailBase):
     _m = None
     flags = None
@@ -15,12 +16,11 @@ class JMailMessage(JMailBase):
     attachs = None
     uid = None
     seen = None
-    mdir_cache = None
+
 
     def __init__(self, meta=None, source=None, uid=None):
         self.uid = uid
         self.__init_empty()
-        self.__mdir_cache_init()
         if meta is not None:
             self.flags = self._flags_parse(meta)
             self.flags_short = self._flags_short(self.flags)
@@ -48,11 +48,6 @@ class JMailMessage(JMailBase):
         self.headers_short = dict()
         self.flags_short = dict()
         self.size = 0
-
-
-    def __mdir_cache_init(self):
-        from ..mdir import JMailMDirCache
-        self.mdir_cache = JMailMDirCache
 
 
     def _flags_parse(self, fs):
