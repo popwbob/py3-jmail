@@ -2,7 +2,7 @@ import imaplib
 from email.header import decode_header
 from time import strptime, strftime
 from .. import JMailBase
-from .parser import JMailMessageDistParser, JMailMsgParser
+from .parser import JMailMsgParser
 from email.iterators import typed_subpart_iterator
 from base64 import urlsafe_b64encode
 
@@ -105,8 +105,6 @@ class JMailMessage(JMailBase):
     size = None
     headers = None
     headers_short = None
-    body_html = None
-    attachs = None
     uid = None
     seen = None
 
@@ -118,7 +116,9 @@ class JMailMessage(JMailBase):
             self.flags = self._flags_parse(meta)
             self.flags_short = self._flags_short(self.flags)
         if source is not None:
-            self.body_html = self._parse_message(source)
+            self._m = self._parse_message(source)
+            self.headers = JMailMessageHeaders(
+                    self._m.items(), self.get_charset())
             self.headers_short = self.headers.short()
             self.size = len(source)
 
@@ -155,9 +155,7 @@ class JMailMessage(JMailBase):
     def _flags_short(self, flags):
         self.log.dbg('flags short')
         fs = ''
-        # -- attachs
-        if self.attachs and len(self.attachs) > 0:
-            fs += 'A'
+        # TODO: add attachs short flag if there are non text/ parts in msg
         # -- replied
         if b'\\Answered' in flags:
             fs += 'R'
@@ -166,16 +164,7 @@ class JMailMessage(JMailBase):
 
     def _parse_message(self, data):
         self.log.dbg('message parse data: ', type(data))
-        msg = JMailMessageDistParser()
-        msg.parse(data)
-        msg_html = msg.body_html
-        self.attachs = msg.attachs
-        del msg
-        # --- parser next generation
-        p = JMailMsgParser()
-        self._m = p.parse(data) # should return m instead of setting self._m
-        self.headers = JMailMessageHeaders(self._m.items(), self.get_charset())
-        return msg_html
+        return JMailMsgParser().parse(data)
 
 
     def size_human(self):
