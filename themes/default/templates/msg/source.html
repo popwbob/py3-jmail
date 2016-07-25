@@ -7,7 +7,11 @@
         </p>
     </div>
     <hr class="sep">
-    <pre>{{msg.get_source}}</pre>
+    <p>
+    {% for line in msg.source_lines %}
+        {{line}}<br>
+    {% endfor %}
+    </p>
     <hr class="sep">
 </div>
 {% include 'tail.html' %}

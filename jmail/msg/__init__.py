@@ -96,11 +96,11 @@ class JMailMessage(JMailBase):
 
     # --- parser next generation
 
-    def get_source(self):
-        return self._m.as_string()
-
     def get_charset(self):
         return self._m.get_content_charset()
+
+    def source_lines(self):
+        return self._m.as_string().splitlines()
 
     def body_lines(self):
         """return a list of message body lines"""
