@@ -163,7 +163,7 @@ class JMailMessage(JMailBase):
 
 
     def _parse_message(self, data):
-        self.log.dbg('message parse data: ', type(data))
+        self.log.dbg('Msg parse data: ', type(data))
         return JMailMsgParser().parse(data)
 
 
