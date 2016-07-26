@@ -1,4 +1,5 @@
 import imaplib
+import mimetypes
 from email.header import decode_header
 from time import strptime, strftime
 from .. import JMailBase
