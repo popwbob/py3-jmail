@@ -101,6 +101,7 @@ def compose(req, macct_id):
         'load_navbar_path': True,
         'msg': msg,
         'compose_restore': compose_restore,
+        'msg_quote_body': False,
     })
     return jm.render()
 
@@ -173,22 +174,6 @@ def send(req, macct_id):
     return jm.message('mail sent!', tmpl_data=jm.tmpl_data({'load_navbar_path': True}))
 
 
-def __msg_body_quote(body, date_orig, from_orig):
-    if type(body) is str:
-        body = body.encode()
-    if date_orig is None:
-        date_orig = b'(no date)'
-    elif type(date_orig) is str:
-        date_orig = date_orig.encode()
-    if type(from_orig) is str:
-        from_orig = from_orig.encode()
-    rl = list()
-    rl.append(date_orig+b', '+from_orig+b':')
-    for l in body.splitlines():
-        rl.append(b'> '+l)
-    return b'\n'.join(rl)
-
-
 def __msg_subject_update(subcmd, subject_orig):
     if subcmd.startswith('reply'):
         if not subject_orig.lower().startswith('re:'):
@@ -209,8 +194,6 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         msg = mdir.msg_get(msg_uid, peek=False)
     except JMailError as e:
         return e.response()
-    # TODO / FIXME
-    # * Salvo que sea un replyall, limpiar CC y BCC
     # -- set From
     from_orig = msg.headers.get('from')
     msg.headers.set_hdr('from', jm.macct['address'])
@@ -228,9 +211,6 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
     # -- remove CC if not replyall
     if subcmd == 'reply':
         msg.headers.set_hdr('cc', '')
-    # -- quote body
-    date_orig = msg.headers.get('date', None)
-    msg.body = __msg_body_quote(msg.body, date_orig, from_orig)
     # -- update subject
     subject_new = __msg_subject_update(subcmd, msg.headers.get('subject', ''))
     msg.headers.set_hdr('subject', subject_new)
@@ -238,5 +218,8 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         'load_navbar_path': True,
         'msg': msg,
         'mdir': mdir,
+        'msg_quote_body': True,
+        'msg_date_orig': msg.headers.get('date', '(no date)'),
+        'msg_from_orig': from_orig,
     })
     return jm.render()

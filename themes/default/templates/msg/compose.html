@@ -27,7 +27,15 @@
             <label for="mail-subject">Subject</label><br>
             <input id="mail-subject" required="required" type="text" name="mail_subject" value="{{msg.headers.subject}}"><br>
 
-            <textarea id="mail-body" required="required" name="mail_body">{{msg.body}}</textarea>
+        {% if msg_quote_body %}
+            <textarea id="mail-body" required="required"
+                    name="mail_body">{{msg_date_orig}} {{msg_from_orig}}:
+{% for line in msg.body.splitlines %}> {{line}}
+{% endfor %}</textarea>
+        {% else %}
+            <textarea id="mail-body" required="required"
+                    name="mail_body">{{msg.body}}</textarea>
+        {% endif %}
         </div>
     </form>
 </div><!-- mail-compose -->
