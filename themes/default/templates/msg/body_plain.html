@@ -1,5 +1,5 @@
 <p class="mail-body">
-{% for line in msg.body_lines %}
+{% for line in msg.body.splitlines %}
 {{line}}<br>
 {% endfor %}
 </p>

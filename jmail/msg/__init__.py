@@ -190,10 +190,10 @@ class JMailMessage(JMailBase):
         return self._m.as_string().splitlines()
 
 
-    def body_lines(self):
-        """return a list of message body lines"""
+    def body(self):
+        """return message body"""
+        payload = None
         if self._m.is_multipart():
-            payload = '(multipart message)'
             for p in typed_subpart_iterator(self._m, maintype='text', subtype='plain'):
                 payload = p.get_payload(decode=True)
                 break # pick up the first one!
@@ -202,8 +202,8 @@ class JMailMessage(JMailBase):
             payload = self._m.get_payload(decode=True)
             self.log.dbg('Msg body lines: ', type(payload), len(payload))
         if not payload:
-            payload = b'(empty)'
-        return payload.decode(self.get_charset()).splitlines()
+            payload = b''
+        return payload.decode(self.get_charset())
 
 
     def body_html(self):

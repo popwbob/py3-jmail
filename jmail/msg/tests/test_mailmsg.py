@@ -94,13 +94,13 @@ class TestMailMsg(JMailTest):
         self.assertEqual(sl[9], 'Que direcci=F3n?')
         self.assertEqual(sl[10], '------=_Part--')
 
-    def test_mailmsg_mpart_lines(self):
+    def test_mailmsg_mpart(self):
         m = JMailMessage(source=eml_mpart)
         subj = m.headers.get('Subject')
         self.assertTrue(subj.startswith('En el R'))
         self.assertTrue(subj.endswith('o'))
         self.assertEqual(ord(subj[7]), 65533)
-        self.assertListEqual(m.body_lines(), [r'Que dirección?'])
+        self.assertEqual(m.body(), 'Que dirección?')
 
     def test_mailmsg_mpart_html(self):
         m = JMailMessage(source=eml_mpart_html)
@@ -109,7 +109,7 @@ class TestMailMsg(JMailTest):
 
     def test_mailmsg_mpart_attach(self):
         m = JMailMessage(source=eml_mpart_attach)
-        self.assertListEqual(m.body_lines(), ['plain text body'])
+        self.assertEqual(m.body(), 'plain text body')
         p = m.parts()
         self.assertEqual(len(p), 3)
         self.assertEqual(p[1].payload(), b'hola mundo!\n')

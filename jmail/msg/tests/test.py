@@ -132,9 +132,9 @@ class TestMsg(JMailTest):
         m = JMailMessage(source=b'\n\n\n')
         self.assertEqual(m.size_human(), '3.00B')
 
-    def test_message_body_lines(self):
+    def test_message_body(self):
         m = JMailMessage(source=b'Content-Type: text/plain; charset=UTF-8\n\n\n')
-        self.assertListEqual(m.body_lines(), [''])
+        self.assertEqual(m.body(), '\n')
 
     # -- cleanup
 
