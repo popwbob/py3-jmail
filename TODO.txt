@@ -14,3 +14,7 @@
   encriptándola usando su clave jmail.
   Entonces la primera vez que se conecta al imap pido la password, la encripto
   y la guardo y la use hasta que expire y la vuelvo a pedir.
+
+* Cuando es replyall, el To del original lo tengo que agregar también como
+  CC del nuevo mensaje. Sólo agrego los CC original ahora y se pierde el To
+  original.
