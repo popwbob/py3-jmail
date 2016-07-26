@@ -92,7 +92,7 @@ def compose(req, macct_id):
     msg_saved = jm.cache_get('compose:save')
     compose_restore = False
     if msg_saved is not None:
-        msg = JMailMessage(source=msg_saved)
+        msg = JMailMessage(source=msg_saved.encode())
         compose_restore = True
     else:
         msg = JMailMessage(source=b'')
