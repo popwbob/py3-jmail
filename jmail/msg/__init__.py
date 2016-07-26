@@ -186,8 +186,8 @@ class JMailMessage(JMailBase):
         return cs
 
 
-    def source_lines(self):
-        return self._m.as_string().splitlines()
+    def source(self):
+        return self._m.as_string()
 
 
     def body(self):

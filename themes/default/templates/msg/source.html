@@ -8,7 +8,7 @@
     </div>
     <hr class="sep">
     <p>
-    {% for line in msg.source_lines %}
+    {% for line in msg.source.splitlines %}
         {{line}}<br>
     {% endfor %}
     </p>

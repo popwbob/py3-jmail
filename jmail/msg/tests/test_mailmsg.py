@@ -87,7 +87,7 @@ class TestMailMsg(JMailTest):
 
     def test_mailmsg_source(self):
         m = JMailMessage(source=eml_mpart)
-        sl = m.source_lines()
+        sl = m.source().splitlines()
         self.assertEqual(len(sl), 11)
         self.assertEqual(sl[0], 'X-Test: jmail')
         self.assertEqual(sl[1], 'Subject: En el =?unknown-8bit?q?R=EDo?=')
