@@ -18,6 +18,7 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         jm = JMail(req, tmpl_name='msg/read', macct_id=macct_id, imap_start=True)
     except JMailError as e:
         return e.response()
+    jm.log.dbg('Msg read view')
     if read_html is not None:
         read_html = True
     jm.log.dbg('read HTML: ', read_html)
@@ -32,7 +33,8 @@ def read(req, macct_id, mdir_name_enc, mail_uid, read_html=None):
         'msg': msg,
         'read_html': read_html,
     })
-    return jm.render(charset=msg.get_charset())
+    jm.log.dbg('Msg read view render')
+    return jm.render()
 
 
 def source(req, macct_id, mdir_name_enc, mail_uid):
@@ -47,7 +49,7 @@ def source(req, macct_id, mdir_name_enc, mail_uid):
         })
     except JMailError as e:
         return e.response()
-    return jm.render(charset=msg.get_charset())
+    return jm.render()
 
 
 def attach(req, macct_id, mdir_name_enc, mail_uid, filename_enc):
@@ -100,7 +102,7 @@ def compose(req, macct_id):
         'msg': msg,
         'compose_restore': compose_restore,
     })
-    return jm.render(charset=msg.get_charset())
+    return jm.render()
 
 
 def __compose_discard(jm, macct_id):
@@ -237,4 +239,4 @@ def reply(req, macct_id, mdir_name_enc, msg_uid, subcmd='reply'):
         'msg': msg,
         'mdir': mdir,
     })
-    return jm.render(charset=msg.get_charset())
+    return jm.render()
