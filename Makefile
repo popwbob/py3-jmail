@@ -3,7 +3,7 @@ default:
 
 clean:
 	@find . -type d -name __pycache__ | xargs rm -vrf
-	@rm -rf htmlcov htdocs
+	@rm -rf htmlcov htdocs build dist jmail.egg-info .coverage
 
 compile-all: clean lib-pyc lib-pyo
 
@@ -38,4 +38,7 @@ apidoc:
 		jmail/apps.py jmail/*/apps.py \
 		jmail/tests jmail/*/migrations jmail/*/tests
 
-.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage htdocs apidoc
+virtualenv:
+	@python3 -m virtualenv -p python3 ../jmail.venv
+
+.PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage htdocs apidoc virtualenv
