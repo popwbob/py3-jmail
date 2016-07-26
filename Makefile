@@ -40,5 +40,6 @@ apidoc:
 
 virtualenv:
 	@python3 -m virtualenv -p python3 ../jmail.venv
+	@../jmail.venv/bin/pip install -r requirements-devel.txt
 
 .PHONY: default clean compile-all lib-pyc lib-pyo django-runserver smtpd-debug-server test test-coverage htdocs apidoc virtualenv
