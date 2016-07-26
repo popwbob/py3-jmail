@@ -15,10 +15,10 @@ from django.contrib.auth import logout as django_logout
 from django.conf import settings
 from django.core.cache import cache as django_cache
 
+from jmail.version import VERSION
 from jmail.log import JMailLog
 from jmail.error import JMailMessagePage, JMailError, JMailErrorUserUnauth
 
-VERSION = '0.3-devel'
 IMAP_DEBUG = 0
 B2H_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
