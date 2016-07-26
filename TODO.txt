@@ -1,8 +1,6 @@
-* La password de la cuenta imap NO debería vivir en la base de datos.
-  Podría guardarla en el cache durante un tiempo configurable por el usuario,
-  encriptándola usando su clave jmail.
-  Entonces la primera vez que se conecta al imap pido la password, la encripto
-  y la guardo y la use hasta que expire y la vuelvo a pedir.
+* Mark unread messages as seen when they are cached!!
+
+* Mantener las "partes" originales (ie: los attachs) cuando hago forward/reply.
 
 * Setear In-Reply-To y References when replying (hacer lo que corresponda para
   forward también).
@@ -11,4 +9,8 @@
   enviar el/los mensajes en Queue. Una vez enviado satisfactoriamente guardarlo
   en Sent.
 
-* Mantener las "partes" originales (ie: los attachs) cuando hago forward/reply.
+* La password de la cuenta imap NO debería vivir en la base de datos.
+  Podría guardarla en el cache durante un tiempo configurable por el usuario,
+  encriptándola usando su clave jmail.
+  Entonces la primera vez que se conecta al imap pido la password, la encripto
+  y la guardo y la use hasta que expire y la vuelvo a pedir.
